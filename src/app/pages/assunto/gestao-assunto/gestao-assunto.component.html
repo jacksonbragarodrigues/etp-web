@@ -1,0 +1,87 @@
+<div class="container-main">
+  <!-- Filtros -->
+  <div class="header-default">
+    <form [formGroup]="gestaoAssuntoFiltroForm">
+      <div
+        class="row m-0 d-flex w-100 align-middle py-2 listagem-guias-pesquisa"
+        style="background-color: #004164; align-items: center; margin-left: 1px"
+      >
+        <div class="col-sm-12 callout t-18 text-center">
+          <span class="font-title">Gestão de Assuntos</span>
+        </div>
+      </div>
+      <div class="form-group">
+        <div class="row row-form m-12">
+          <app-pesquisar-shared-formulario
+            [tableLazyLoadingPai]="tableLazyLoading.bind(this)"
+            [limparCamposPai]="limparCampos.bind(this)"
+            ><div class="col-sm-12 col-md-6 col-lg-4 col-xl-4">
+              <label for="descricaoPesquisa">Descrição</label>
+              <input
+                formControlName="descricaoPesquisa"
+                type="text"
+                id="descricaoPesquisa"
+                class="form-control"
+              /></div
+          ></app-pesquisar-shared-formulario>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <!-- Header tabela -->
+  <div class="header-default respopnsivo-style">
+    <div class="row m-0 d-flex w-100 align-middle py-2 header-table">
+      <div
+        class="col-sm-12 col-md-12 col-lg-12 col-xl-12 callout text-center titulo-table-mobile"
+      >
+        <div class="row align-items-center">
+          <!-- Texto centralizado -->
+          <div class="col text-center">
+            <span class="font-title">Assuntos</span>
+          </div>
+
+          <!-- Botão alinhado à direita -->
+          <div class="col-auto text-end">
+            <button
+              noDoubleClick
+              style="width: 35%; min-width: 100px"
+              title="Novo"
+              type="button"
+              class="btn btn-success success-btn-color"
+              (click)="cadastrarAssunto()"
+            >
+              <em
+                class="fa fa-lg fa-plus float-center pt-1 pr-1 icons-btn"
+                style="font-size: 15px"
+              ></em>
+              <span style="font-size: 15px">Novo</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabela -->
+    <app-table-shared-formulario
+      [tableLazyLoadingPai]="tableLazyLoading.bind(this)"
+      [onSortPai]="onSort.bind(this)"
+      [gestaoBase]="gestaoBase"
+      [page]="page"
+      [editarPai]="editarAssunto.bind(this)"
+      [excluirPai]="excluirAssunto.bind(this)"
+      [acaoExtraPai]="visualizarFormularioPadrao.bind(this)"
+      [toolTipAcaoExtra]="'Visualizar Formulário Padrão'"
+      [iconeAcaoExtra]="'fa-solid fa-eye'"
+    ></app-table-shared-formulario>
+  </div>
+</div>
+
+<app-modal-cadastrar-assunto
+  #cadastrar_assunto
+  (cadastrarAssunto)="gravarAssunto($event)"
+></app-modal-cadastrar-assunto>
+
+<app-modal-visualizar-formulario-padrao
+  #visualizar_formulario_padrao
+></app-modal-visualizar-formulario-padrao>

@@ -1,0 +1,150 @@
+<div class="container-main">
+  <!-- Filtros -->
+  <div class="header-default">
+    <form [formGroup]="gestaoFormularioFiltroForm">
+      <div
+        class="row m-0 d-flex w-100 align-middle py-2 listagem-guias-pesquisa"
+        style="background-color: #004164; align-items: center; margin-left: 1px"
+      >
+        <div class="col-sm-12 callout t-18 text-center">
+          <span class="font-title">Gestão de Modelos</span>
+        </div>
+      </div>
+      <div class="form-group">
+        <div class="row row-form m-12">
+          <div class="col-sm-12 col-md-6 col-lg-3 col-xl-3">
+            <label for="assunto">Assunto</label>
+            <p-multiSelect
+              [style]="{ width: '100%' }"
+              id="assunto"
+              formControlName="assuntoFormulario"
+              [options]="assuntoList"
+              optionLabel="descricao"
+              placeholder="Selecione um assunto"
+              filterBy="descricao"
+              [filter]="true"
+            />
+          </div>
+
+          <div class="col-sm-12 col-md-6 col-lg-3 col-xl-3">
+            <label for="situacao">Situação</label>
+            <p-multiSelect
+              [style]="{ width: '100%' }"
+              id="situacao"
+              formControlName="situacaoFormulario"
+              [options]="situacaoList"
+              [dataKey]="'id'"
+              optionLabel="descricao"
+              placeholder="Selecione uma situação"
+              filterBy="descricao"
+              [filter]="true"
+            />
+          </div>
+
+          <div class="col-sm-12 col-md-6 col-lg-2 col-xl-2 botoes"></div>
+
+          <div class="col-sm-12 col-md-6 col-lg-2 col-xl-2 botoes">
+            <button
+              (click)="tableLazyLoading()"
+              type="button"
+              class="btn btn-secondary btn-info btn-size w-100"
+              style="color: white"
+            >
+              <em
+                _ngcontent-cfm-c345=""
+                class="fas fa-search float-center icons-btn icons-btn"
+              ></em
+              >Pesquisar
+            </button>
+          </div>
+          <div class="col-sm-12 col-md-6 col-lg-2 col-xl-2 botoes">
+            <button
+              (click)="limparCampos()"
+              type="button"
+              class="btn btn-secondary btn-size w-100"
+              style="margin-bottom: 0"
+            >
+              <em
+                _ngcontent-cfm-c345=""
+                class="fas fa-eraser float-center icons-btn icons-btn"
+              ></em
+              >Limpar
+            </button>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <!-- Header tabela -->
+  <div class="header-default respopnsivo-style">
+    <div class="row m-0 d-flex w-100 align-middle py-2 header-table">
+      <div
+        class="col-sm-12 col-md-12 col-lg-12 col-xl-12 callout text-center titulo-table-mobile"
+      >
+        <div class="row align-items-center">
+          <!-- Texto centralizado -->
+          <div class="col text-center">
+            <span class="font-title">Modelos</span>
+          </div>
+
+          <!-- Botão alinhado à direita -->
+          <div class="col-auto text-end">
+            <button
+              noDoubleClick
+              style="width: 35%; min-width: 100px"
+              title="Novo"
+              type="button"
+              class="btn btn-success success-btn-color"
+              (click)="cadastrarFormulario()"
+            >
+              <em
+                class="fa fa-lg fa-plus float-center pt-1 pr-1 icons-btn"
+                style="font-size: 15px"
+              ></em>
+              <span style="font-size: 15px">Novo</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabela -->
+    <app-table-shared-form
+      [tableLazyLoadingPai]="tableLazyLoading.bind(this)"
+      [onSortPai]="onSort.bind(this)"
+      [gestaoBase]="gestaoBase"
+      [page]="page"
+      [selecionarFormulario]="selecionaItem.bind(this)"
+      [construirFormulario]="construirformulario.bind(this)"
+      [sobreporMenuAcaoForm]="false"
+    >
+    </app-table-shared-form>
+  </div>
+</div>
+
+<app-versionar-formulario
+  [executaVersionarFormularioGestao]="executaVersionar.bind(this)"
+  #versionar_formulario
+></app-versionar-formulario>
+
+<modal-cadastrar-formulario
+  #cadastrar_formulario
+  (cadastrarFormulario)="gravarFormulario($event)"
+></modal-cadastrar-formulario>
+
+<modal-construir-formulario
+  #construir_formulario
+  (gravarJsonFormulario)="gravarDadosFormulario($event)"
+  (gravarDadosInformados)="garvarDadosInformados($event)"
+  (fecharModalConstruirFormulario)="tableLazyLoading()"
+  (desbloquearFormulario)="bloquearFormulario($event)"
+  (executarAposMinutos)="executarAposMinutos($event)"
+  (editarFormulario)="editarFormulario($event)"
+></modal-construir-formulario>
+
+<modal-versoes-formulario
+  #versoes_formulario
+  (construirFormulario)="construirformulario($event)"
+>
+</modal-versoes-formulario>

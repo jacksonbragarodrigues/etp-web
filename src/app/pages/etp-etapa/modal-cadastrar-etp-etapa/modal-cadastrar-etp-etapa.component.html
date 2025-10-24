@@ -1,0 +1,75 @@
+<ng-template #modalCadastrarEtapaComponent class="modal fade">
+  <div class="modal-header">
+    <span>{{ titulo }}</span>
+  </div>
+
+  <div class="modal-body">
+    <form [formGroup]="gestaoEtapaModalForm">
+      <div class="row row-form m-12">
+        <div class="row m-12">
+          <div class="col-sm-12 col-md-6 col-lg-12 col-xl-12 mt-2">
+            <label for="descricao">Descrição</label>
+            <textarea
+              formControlName="descricao"
+              placeholder="Descrição da Etapa"
+              class="form-control"
+              id="descricaoEtapa"
+              name="descricaoEtapa"
+              rows="5"
+              maxlength="255"
+            ></textarea>
+          </div>
+          <app-error-mensage
+            [descricao]="'Descrição'"
+            [form]="gestaoEtapaModalForm"
+            [controlName]="'descricao'"
+          ></app-error-mensage>
+        </div>
+        <div class="col-sm-12 col-md-6 col-lg-12 col-xl-12 mt-2">
+          <label for="chave">Chave</label>
+          <textarea
+            formControlName="chave"
+            placeholder="Chave da Etapa"
+            class="form-control"
+            id="chaveEtapa"
+            name="chaveEtapa"
+            rows="1"
+            maxlength="255"
+          ></textarea>
+          <app-error-mensage
+            [descricao]="'Chave'"
+            [form]="gestaoEtapaModalForm"
+            [controlName]="'chave'"
+          ></app-error-mensage>
+        </div>
+      </div>
+      <div class="row row-form" style="margin-top: 30px">
+        <div class="col">
+          <button
+            noDoubleClick
+            [disabled]="!gestaoEtapaModalForm.valid"
+            (click)="gravar()"
+            type="button"
+            class="w-100 success-btn-color btn btn-success"
+            type="submit"
+          >
+            <em class="fa fa-lg fa-check float-center pt-1"></em> Gravar
+          </button>
+        </div>
+
+        <div class="col">
+          <button
+            noDoubleClick
+            (click)="close()"
+            type="button"
+            class="w-100 btn btn-danger"
+            data-bs-dismiss="modal"
+          >
+            <em class="fa fa-lg fa-minus-circle float-center pt-1"></em>
+            Cancelar
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+</ng-template>

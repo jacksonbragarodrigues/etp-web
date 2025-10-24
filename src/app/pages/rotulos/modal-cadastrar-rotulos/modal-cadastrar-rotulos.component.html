@@ -1,0 +1,75 @@
+<ng-template #modalCadastrarRotulosComponent class="modal fade">
+  <div class="modal-header">
+    <span>{{ titulo }}</span>
+  </div>
+
+  <div class="modal-body">
+    <form [formGroup]="gestaoRotulosModalForm">
+      <div class="row row-form m-12">
+        <div class="row m-12">
+          <div class="col-sm-12 col-md-6 col-lg-12 col-xl-12 mt-2">
+            <label for="de">De</label>
+            <input
+              type="text"
+              formControlName="de"
+              placeholder="De do Rótulo"
+              class="form-control"
+              id="de"
+              name="de"
+              maxlength="255"
+            />
+            <app-error-mensage
+              [descricao]="'De'"
+              [form]="gestaoRotulosModalForm"
+              [controlName]="'de'"
+            ></app-error-mensage>
+          </div>
+          <div class="col-sm-12 col-md-6 col-lg-12 col-xl-12 mt-2">
+            <label for="para">Para</label>
+            <input
+              type="text"
+              formControlName="para"
+              placeholder="Para do Rótulo"
+              class="form-control"
+              id="para"
+              name="para"
+              maxlength="255"
+            />
+            <app-error-mensage
+              [descricao]="'Para'"
+              [form]="gestaoRotulosModalForm"
+              [controlName]="'para'"
+            ></app-error-mensage>
+          </div>
+        </div>
+      </div>
+      <div class="row row-form" style="margin-top: 30px">
+        <div class="col">
+          <button
+            noDoubleClick
+            [disabled]="!gestaoRotulosModalForm.valid"
+            (click)="gravar()"
+            type="button"
+            class="w-100 success-btn-color btn btn-success"
+            type="submit"
+          >
+            <em class="fa fa-lg fa-check float-center pt-1"></em> Gravar
+          </button>
+        </div>
+
+        <div class="col">
+          <button
+            noDoubleClick
+            (click)="close()"
+            type="button"
+            class="w-100 btn btn-danger"
+            data-bs-dismiss="modal"
+          >
+            <em class="fa fa-lg fa-minus-circle float-center pt-1"></em>
+            Cancelar
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+</ng-template>

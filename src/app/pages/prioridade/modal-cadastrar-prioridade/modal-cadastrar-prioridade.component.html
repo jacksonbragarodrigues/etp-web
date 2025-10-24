@@ -1,0 +1,92 @@
+<ng-template #modalCadastrarPrioridadeComponent class="modal fade">
+  <div class="modal-header">
+    <span>{{ titulo }}</span>
+  </div>
+
+  <div class="modal-body">
+    <form [formGroup]="gestaoPrioridadeModalForm">
+      <div class="row row-form m-12">
+        <div class="row m-12">
+          <div class="col-sm-12 col-md-6 col-lg-12 col-xl-12 mt-2">
+            <label for="descricao">Descrição</label>
+            <textarea
+              formControlName="descricao"
+              placeholder="Descrição da Situação"
+              class="form-control"
+              id="descricaoPrioridade"
+              name="descricaoPrioridade"
+              rows="5"
+              maxlength="255"
+            ></textarea>
+            <app-error-mensage
+              [descricao]="'Descrição'"
+              [form]="gestaoPrioridadeModalForm"
+              [controlName]="'descricao'"
+            ></app-error-mensage>
+          </div>
+          <div class="col-sm-12 col-md-6 col-lg-12 col-xl-12 mt-2">
+            <label for="chave">Chave</label>
+            <textarea
+              formControlName="chave"
+              placeholder="Chave da Prioridade"
+              class="form-control"
+              id="chavePrioridade"
+              name="chavePrioridade"
+              rows="1"
+              maxlength="255"
+            ></textarea>
+            <app-error-mensage
+              [descricao]="'Chave'"
+              [form]="gestaoPrioridadeModalForm"
+              [controlName]="'chave'"
+            ></app-error-mensage>
+          </div>
+          <div class="col-sm-12 col-md-6 col-lg-12 col-xl-12 mt-2">
+            <label for="padrao" class="text">Padrão</label>
+            <select formControlName="padrao" class="form-select">
+              <option
+                *ngFor="let item of padraoList"
+                selected
+                [value]="item.id"
+              >
+                {{ item.descricao }}
+              </option>
+            </select>
+            <app-error-mensage
+              [descricao]="'Padrão'"
+              [form]="gestaoPrioridadeModalForm"
+              [controlName]="'padrao'"
+            ></app-error-mensage>
+          </div>
+        </div>
+      </div>
+      <div class="row row-form" style="margin-top: 30px">
+        <div class="col">
+          <button
+            noDoubleClick
+            [disabled]="!gestaoPrioridadeModalForm.valid"
+            (click)="gravar()"
+            type="button"
+            class="w-100 success-btn-color btn btn-success"
+            type="submit"
+          >
+            <em class="fa fa-lg fa-check float-center pt-1"></em> Gravar
+          </button>
+        </div>
+
+        <div class="col">
+          <button
+            noDoubleClick
+            (click)="close()"
+            type="button"
+            class="w-100 btn btn-danger"
+            data-bs-dismiss="modal"
+          >
+            <em class="fa fa-lg fa-minus-circle float-center pt-1"></em>
+            Cancelar
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+</ng-template>

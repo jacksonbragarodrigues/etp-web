@@ -1,0 +1,411 @@
+<div class="container-main">
+  <!-- Filtros -->
+  <div class="header-default">
+    <form [formGroup]="gestaoETPFiltroForm">
+      <div
+        class="row m-0 d-flex w-100 align-middle py-2 listagem-guias-pesquisa"
+        style="background-color: #004164; align-items: center; margin-left: 1px"
+      >
+        <div class="col-sm-12 callout t-18 text-center">
+          <span class="font-title">Análise de ETP</span>
+        </div>
+      </div>
+      <div class="form-group">
+        <div class="row row-form m-12">
+          <div class="col-sm-12 col-md-3 col-lg-3 col-xl-3">
+            <label for="unidade">Unidade Requisitante</label>
+            <p-multiSelect
+              [style]="{ width: '100%' }"
+              id="unidade"
+              formControlName="unidadeId"
+              [options]="unidadesList"
+              [dataKey]="'id'"
+              optionLabel="descricao"
+              placeholder="Selecione uma unidade"
+              filterBy="sigla,descricao"
+              [filter]="true"
+              ><ng-template let-unidade pTemplate="item">
+                <div class="flex align-items-center gap-2">
+                  <div>{{ unidade.sigla }} - {{ unidade.descricao }}</div>
+                </div>
+              </ng-template>
+            </p-multiSelect>
+          </div>
+
+          <div class="col-sm-12 col-md-3 col-lg-3 col-xl-3">
+            <label for="numeroEtp">Número do ETP</label>
+            <input
+              (keydown.enter)="gestaoBase.onEnter($event)"
+              formControlName="numeroEtp"
+              type="text"
+              id="numeroEtp"
+              placeholder="9999/2025"
+              class="form-control"
+              style="height: 43px"
+              (blur)="completaNumeroEtpAnalise($event, 'numeroEtp')"
+            />
+          </div>
+
+          <div class="col-sm-12 col-md-3 col-lg-3 col-xl-3">
+            <label for="situacao">Situação</label>
+            <p-multiSelect
+              [style]="{ width: '100%' }"
+              id="situacao"
+              formControlName="situacaoEtp"
+              [options]="situacaoList"
+              [dataKey]="'id'"
+              optionLabel="descricao"
+              placeholder="Selecione uma situação"
+              filterBy="descricao"
+              [filter]="true"
+              display="chip"
+            />
+          </div>
+
+          <div class="col-sm-12 col-md-2 col-lg-2 col-xl-2 botoes">
+            <button
+              (click)="tableLazyLoading()"
+              type="button"
+              class="btn btn-secondary btn-info btn-size w-100"
+              style="color: white"
+            >
+              <em
+                _ngcontent-cfm-c345=""
+                class="fas fa-search float-center icons-btn icons-btn"
+              ></em
+              >Pesquisar
+            </button>
+          </div>
+        </div>
+        <div class="row row-form m-12">
+          <div class="col-sm-12 col-md-3 col-lg-3 col-xl-3">
+            <label for="dataRegistroInicial">Data de Registro Inicial</label>
+            <input
+              type="date"
+              id="dataRegistroInicial"
+              class="form-control"
+              formControlName="dataRegistroInicial"
+              style="height: 43px"
+            />
+          </div>
+
+          <div class="col-sm-12 col-md-3 col-lg-3 col-xl-3">
+            <label for="dataRegistroFinal">Data de Registro Final</label>
+            <input
+              type="date"
+              id="dataRegistroFinal"
+              class="form-control"
+              formControlName="dataRegistroFinal"
+              style="height: 43px"
+            />
+          </div>
+
+          <div class="col-sm-12 col-md-3 col-lg-3 col-xl-3">
+            <label for="etpEtapa">Etapa</label>
+            <p-multiSelect
+              [style]="{ width: '100%' }"
+              id="etpEtapa"
+              formControlName="etpEtapa"
+              [options]="etapaList"
+              [dataKey]="'id'"
+              optionLabel="descricao"
+              placeholder="Selecione uma etapa"
+              filterBy="descricao"
+              [filter]="true"
+              display="chip"
+            >
+            </p-multiSelect>
+          </div>
+
+          <div class="col-sm-12 col-md-2 col-lg-2 col-xl-2 botoes">
+            <button
+              (click)="limparCamposEtpAnalise()"
+              type="button"
+              class="btn btn-secondary btn-size w-100"
+              style="margin-bottom: 0"
+            >
+              <em
+                _ngcontent-cfm-c345=""
+                class="fas fa-eraser float-center icons-btn icons-btn"
+              ></em
+              >Limpar
+            </button>
+          </div>
+        </div>
+        <div class="row row-form m-12">
+          <div class="col-sm-12 col-md-6 d-flex gap-4">
+            <div class="form-check">
+              <input
+                class="form-check-input"
+                type="radio"
+                id="minhas"
+                name="soMinhasAnalises"
+                [value]="true"
+                formControlName="soMinhasAnalises"
+              />
+              <label class="form-check-label" for="minhas">
+                Somente Minhas Análises
+              </label>
+            </div>
+
+            <div class="form-check">
+              <input
+                class="form-check-input"
+                type="radio"
+                id="todas"
+                name="soMinhasAnalises"
+                [value]="false"
+                formControlName="soMinhasAnalises"
+              />
+              <label class="form-check-label" for="todas">
+                Todas as Análises
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <!-- Header tabela -->
+  <div class="header-default responsivo-style">
+    <div class="row m-0 d-flex w-100 align-middle py-2 header-table">
+      <div
+        class="col-sm-12 col-md-12 col-lg-12 col-xl-12 callout text-center titulo-table-mobile"
+      >
+        <div class="row align-items-center">
+          <!-- Texto centralizado -->
+          <div class="col text-center">
+            <span class="font-title">ETP's em Análise</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabela -->
+    <app-table
+      #table
+      height="550px"
+      paginationClass="d-flex justify-content-end"
+      tableClass="table table-hover table-striped table-bordered"
+      [responsive]="true"
+      [pagination]="true"
+      [paginationTop]="false"
+      [page]="pageEtpAnalise"
+      [scrollable]="false"
+      [paginationSelection]="true"
+      paginationPrevious="<"
+      paginationNext=">"
+      (lazyLoad)="tableLazyLoading($event)"
+    >
+      <div empty>Nenhum registro foi encontrado</div>
+      <thead header>
+        <th class="text-left">ID</th>
+        <th class="text-left">Tipo de Contratação</th>
+        <th class="text-left">Descrição</th>
+        <th class="text-center">Processo SEI</th>
+        <th class="text-center">Número do ETP</th>
+        <th class="text-left">Unidade Requisitante</th>
+        <th class="text-left">Situação</th>
+        <th class="text-left">Etapa</th>
+        <th class="text-center">Versão</th>
+        <th class="text-left">Prioridade</th>
+        <th class="text-left">Data Limite</th>
+        <th class="text-left">Analistas</th>
+        <!-- <th class="text-left">Ficha de Análise</th> -->
+      </thead>
+      <tbody body>
+        <ng-container
+          *ngFor="let itemEtp of pageEtpAnalise?.content; let i = index"
+        >
+          <tr (click)="verificarFichaAnalise(itemEtp)">
+            <td
+              [ngStyle]="{
+                color:
+                  itemEtp.statusFichaDeAnalise === 'Não criada'
+                    ? 'red'
+                    : 'inherit'
+              }"
+              class="text-left"
+            >
+              {{ itemEtp.id }}
+            </td>
+            <td
+              [ngStyle]="{
+                color:
+                  itemEtp.statusFichaDeAnalise === 'Não criada'
+                    ? 'red'
+                    : 'inherit'
+              }"
+              class="text-left motivo"
+            >
+              {{ itemEtp.tipoLicitacao.descricao }}
+            </td>
+            <td
+              [ngStyle]="{
+                color:
+                  itemEtp.statusFichaDeAnalise === 'Não criada'
+                    ? 'red'
+                    : 'inherit'
+              }"
+              class="text-left motivo"
+            >
+              {{ itemEtp.descricao }}
+            </td>
+
+            <td
+              [ngStyle]="{
+                color:
+                  itemEtp.statusFichaDeAnalise === 'Não criada'
+                    ? 'red'
+                    : 'inherit'
+              }"
+              class="text-center motivo"
+            >
+              {{
+                itemEtp.numeroProcessoSei !== null
+                  ? itemEtp.numeroProcessoSei + "/" + itemEtp.anoProcessoSei
+                  : ""
+              }}
+            </td>
+
+            <td
+              [ngStyle]="{
+                color:
+                  itemEtp.statusFichaDeAnalise === 'Não criada'
+                    ? 'red'
+                    : 'inherit'
+              }"
+              class="text-center motivo"
+            >
+              {{
+                itemEtp.etpNumeracao !== null
+                  ? itemEtp.etpNumeracao + "/" + itemEtp.ano
+                  : ""
+              }}
+            </td>
+            <td
+              [ngStyle]="{
+                color:
+                  itemEtp.statusFichaDeAnalise === 'Não criada'
+                    ? 'red'
+                    : 'inherit'
+              }"
+              class="text-left"
+            >
+              {{ itemEtp.unidadeSigla }}
+            </td>
+            <td
+              [ngStyle]="{
+                color:
+                  itemEtp.statusFichaDeAnalise === 'Não criada'
+                    ? 'red'
+                    : 'inherit'
+              }"
+              class="text-left"
+            >
+              {{ itemEtp.situacao.descricao }}
+            </td>
+            <td
+              [ngStyle]="{
+                color:
+                  itemEtp.statusFichaDeAnalise === 'Não criada'
+                    ? 'red'
+                    : 'inherit'
+              }"
+              class="text-left"
+            >
+              {{ itemEtp.etpEtapa.descricao }}
+            </td>
+
+            <td
+              [ngStyle]="{
+                color:
+                  itemEtp.statusFichaDeAnalise === 'Não criada'
+                    ? 'red'
+                    : 'inherit'
+              }"
+              class="text-center motivo"
+            >
+              {{ itemEtp.versao }}
+            </td>
+
+            <td
+              [ngStyle]="{
+                color:
+                  itemEtp.statusFichaDeAnalise === 'Não criada'
+                    ? 'red'
+                    : 'inherit'
+              }"
+              class="text-left"
+              title="{{ itemEtp.prioridade }}"
+            >
+              <!-- TODO: PEGAR DE ETP_PRIORIDADE-->
+              {{
+                itemEtp.prioridade === "M"
+                  ? "Média"
+                  : itemEtp.prioridade === "B"
+                  ? "Baixa"
+                  : itemEtp.prioridade === "A"
+                  ? "Alta"
+                  : ""
+              }}
+            </td>
+            <td
+              [ngStyle]="{
+                color:
+                  itemEtp.statusFichaDeAnalise === 'Não criada'
+                    ? 'red'
+                    : 'inherit'
+              }"
+              class="text-left"
+            >
+              {{ itemEtp.dataLimiteAnalise }}
+            </td>
+            <td
+              [ngStyle]="{
+                color:
+                  itemEtp.statusFichaDeAnalise === 'Não criada'
+                    ? 'red'
+                    : 'inherit'
+              }"
+              class="text-left"
+              title="{{ itemEtp.listaAnalistas }}"
+            >
+              {{ itemEtp.listaAnalistas }}
+            </td>
+            <!-- <td class="text-left"
+              [ngStyle]="{ 'color': itemEtp.statusFichaDeAnalise === 'Não criada' ? 'red' : 'inherit' }">
+              {{ itemEtp.statusFichaDeAnalise }}
+          </td> -->
+          </tr>
+        </ng-container>
+      </tbody>
+    </app-table>
+  </div>
+</div>
+<cadastrar-etp
+  #cadastrar_etp
+  (cadastrarEtp)="gravarEtpEtpAnalise($event)"
+></cadastrar-etp>
+<app-versionar
+  [executaVersionarGestao]="executaVersionarEtpAnalise.bind(this)"
+  #versionar_etp
+></app-versionar>
+<app-formulario-etp-analise
+  #formulario_etp_analise
+  (gravarDadosInformadosAnalise)="
+    gravarDadosFormularioEtpNextEtpAnalise($event)
+  "
+  (fecharModalFormularioEtpAnalise)="tableLazyLoading()"
+  (atualizarFormularioAnalise)="atualizarFormularioEtpEtpAnalise($event)"
+  (desbloquearEtpAnalise)="bloquearEtpAnalise($event)"
+></app-formulario-etp-analise>
+<versoes-etp #versoes_etp (elaborarEtp)="elaborarEtpEtpAnalise($event)">
+</versoes-etp>
+<ficha-analise
+  #fichaAnalise
+  (gravarFichaAnalise)="gravarFichaAnalise($event)"
+  (removeAnalistaFichaAnalise)="removerAnalistaFichaAnalise($event)"
+>
+</ficha-analise>

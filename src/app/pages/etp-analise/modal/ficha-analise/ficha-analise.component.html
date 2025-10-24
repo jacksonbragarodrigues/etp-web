@@ -1,0 +1,302 @@
+<ng-template
+  #fichaAnalise
+  class="modal modal-xl fade"
+  data-bs-backdrop="static">
+
+  <div class="modal-header">
+    <span>{{ titulo }}</span>
+  </div>
+
+  <div class="modal-body">
+    <form [formGroup]="fichaAnaliseModalForm">
+      <div class="row row-form m-12">
+        <div class="row m-12">
+          <div class="col-sm-12 col-md-3 col-lg-6 col-xl-3">
+            <label for="tipoContratacao" class="text">Tipo de Contratação:</label>
+          </div>
+          <div class="col-sm-12 col-md-4 col-lg-6 col-xl-9">
+            <input type="text"
+                   id="tipoContratacao"
+                   formControlName="tipoContratacao"
+                   class="form-control"/>
+          </div>
+        </div>
+        <div class="row m-12">
+          <div class="col-sm-12 col-md-3 col-lg-3 col-xl-3">
+            <label for="numero" class="text">Número do ETP:</label>
+          </div>
+          <div class="col-sm-12 col-md-4 col-lg-6 col-xl-9">
+            <input type="text"
+                   id="numero"
+                   formControlName="numero"
+                   class="form-control"/>
+          </div>
+        </div>
+        <div class="row m-12" >
+          <div class="col-sm-12 col-md-3 col-lg-6 col-xl-3">
+            <label for="descricao" class="text">Descrição:</label>
+          </div>
+          <div class="col-sm-12 col-md-4 col-lg-6 col-xl-9">
+            <input type="text"
+                   id="descricao"
+                   formControlName="descricao"
+                   class="form-control"/>
+          </div>
+        </div>
+        <div class="row m-12">
+          <div class="col-sm-12 col-md-3 col-lg-6 col-xl-3">
+            <label for="unidadeRequisitante" class="text">Unidade Requisitante:</label>
+          </div>
+          <div class="col-sm-12 col-md-4 col-lg-6 col-xl-9">
+            <input type="text"
+                   id="unidadeRequisitante"
+                   formControlName="unidadeRequisitante"
+                   class="form-control"/>
+          </div>
+        </div>
+        <div class="row m-12" >
+          <div class="col-sm-12 col-md-3 col-lg-6 col-xl-3">
+            <label for="unidadeAnalise" class="text">Unidade de Análise:</label>
+          </div>
+          <div class="col-sm-12 col-md-4 col-lg-6 col-xl-9">
+            <p-autoComplete field="descricaoSigla"
+                            id="unidadeAnalise"
+                            styleClass="w-100 h-80"
+                            inputStyleClass="w-100 h-80"
+                            [(ngModel)]="unidadeAnalise"
+                            [ngModelOptions]="{standalone: true}"
+                            [suggestions]="unidadeAnaliseListFilter"
+                            [minLength]="3"
+                            (completeMethod)="buscarUnidadesAnalise($event)"
+                            [forceSelection]="true"
+                            (onSelect)="onUnidadeAnaliseSelecionada($event)"
+                            [baseZIndex]="9999999">
+            </p-autoComplete>
+          </div>
+        </div>
+
+        <div class="row m-12" >
+          <div class="col-sm-12 col-md-3 col-lg-6 col-xl-3">
+            <label for="unidadeAnalise" class="text">Prioridade:</label>
+          </div>
+          <div class="col-sm-12 col-md-4 col-lg-6 col-xl-9">
+            <select
+              formControlName="prioridade"
+              id="prioridade"
+              class="form-select"
+              (change)="onPrioridadeChange($event)">
+              <option [value]="null" disabled selected  label=""></option>
+              <option
+                *ngFor="let item of prioridadeList"
+                [value]="item.chave"
+              >
+                {{ item.descricao }}
+              </option>
+            </select>
+            <app-error-mensage
+              [descricao]="'Prioridade'"
+              [form]="fichaAnaliseModalForm"
+              [controlName]="'prioridade'"
+            ></app-error-mensage>
+          </div>
+        </div>
+
+        <div class="row m-12">
+
+          <div class="col-sm-12 col-md-3 col-lg-3 col-xl-3">
+            <label for="dataEntrada" class="form-label fw-bolder">Entrada</label>
+            <input
+              type="date"
+              id="dataEntrada"
+              class="form-control"
+              formControlName="dataEntrada"
+              style="width: 100% !important; height: 50%"
+            />
+          </div>
+
+
+          <div class="col-sm-12 col-md-3 col-lg-3 col-xl-3">
+            <label for="dataLimiteAnalista" class="form-label fw-bolder">Limite do Analista ({{ qtdDiasLimiteAnalista }} dias)</label>
+            <input
+              type="date"
+              id="dataLimiteAnalista"
+              class="form-control"
+              formControlName="dataLimiteAnalista"
+              style="width: 100% !important; height: 50%"
+            />
+          </div>
+
+          <div class="col-sm-12 col-md-3 col-lg-3 col-xl-3">
+            <label for="dataLimiteRevisor" class="form-label fw-bolder">Limite do Revisor ({{ qtdDiasLimiteRevisor }} dias)</label>
+            <input
+              type="date"
+              id="dataLimiteRevisor"
+              class="form-control"
+              formControlName="dataLimiteRevisor"
+              style="width: 100% !important; height: 50%"
+            />
+          </div>
+
+          <div class="col-sm-12 col-md-3 col-lg-3 col-xl-3">
+            <label for="dataLimiteSaida" class="form-label fw-bolder">Limite de Saída ({{ qtdDiasLimiteAnalista +  qtdDiasLimiteRevisor}} dias)</label>
+            <input
+              type="date"
+              id="dataLimiteSaida"
+              class="form-control"
+              formControlName="dataLimiteSaida"
+              style="width: 100% !important; height: 50%"
+            />
+          </div>
+
+        </div>
+
+        <div class="row m-12">
+
+          <div class="col-sm-12 col-md-3 col-lg-3 col-xl-3">
+            <label for="dataEntregaRevisor" class="form-label fw-bolder">Início Revisão</label>
+            <input
+              type="date"
+              id="dataEntregaRevisor"
+              class="form-control"
+              formControlName="dataEntregaRevisor"
+              style="width: 100% !important; height: 50%"
+            />
+          </div>
+
+          <div class="col-sm-12 col-md-3 col-lg-3 col-xl-3">
+            <label for="dataSaidaEfeitva" class="form-label fw-bolder">Saída</label>
+            <input
+              type="date"
+              id="dataSaidaEfeitva"
+              class="form-control"
+              formControlName="dataSaidaEfeitva"
+              style="width: 100% !important; height: 50%"
+            />
+
+          </div>
+
+
+
+        </div>
+      </div>
+    </form>
+    <div class="row" style="padding-left: 4% !important;padding-right: 2%;">
+      <div class=" col-sm-12">
+
+        <div class="header-ficha respopnsivo-style">
+          <div class="row m-0 d-flex w-100 align-middle py-2 header-table">
+            <div class="col-sm-12 col-md-12 col-lg-12 col-xl-12 callout text-center titulo-table-mobile">
+              <div class="row align-items-center">
+                <!-- Texto centralizado -->
+                <div class="col text-center">
+                  <span class="font-title">Analistas</span>
+                </div>
+                <!-- Botão alinhado à direita -->
+                <div class="col-auto text-end">
+                  <button
+                    noDoubleClick
+                    style="width: 10%;min-width: 40px;"
+                    title="Adicionar analista"
+                    type="button"
+                    class="btn btn-success success-btn-color"
+                    (click)="adicionarAnalistas()"
+                  >
+                    <em
+                      class="fa fa-lg fa-plus float-center pt-1 pr-1 icons-btn"
+                      style="font-size: 15px"
+                    ></em>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <app-table
+            #table
+            height="50px"
+            paginationClass="d-flex justify-content-end mt-1"
+            tableClass="table table-hover table-striped table-bordered"
+            [responsive]="true"
+            [pagination]="true"
+            [paginationTop]="false"
+            [page]="page"
+            [scrollable]="false"
+            [paginationSelection]="true"
+            paginationPrevious="<"
+            paginationNext=">"
+            (lazyLoad)="tableLazyLoading($event)"
+          >
+
+            <div empty>Nenhum analista atribuido</div>
+            <thead header>
+            <th class="text-left">Permissão</th>
+            <th class="text-left">Login</th>
+            <th class="text-left">Nome</th>
+            <th class="text-left">Data de Início</th>
+            <th class="text-left">Data Final</th>
+            <th class="text-center">Ações</th>
+            </thead>
+            <tbody body>
+            <ng-container *ngFor="let analista of page?.content; let i = index">
+              <tr>
+
+                <td hidden >{{ analista.idFichaAnalise }}</td>
+                <td>{{ analista.permissao }}</td>
+
+                <td class="text-left">{{ analista.login }}</td>
+                <td class="text-left">{{ analista.nome }}</td>
+                <td class="text-left">{{ analista.dataInicial | date:'dd/MM/yyyy' }}</td>
+                <td class="text-left">{{ analista.dataFinal | date:'dd/MM/yyyy'}}</td>
+                <td style="font-weight: unset" class="text-center pe-3">
+                  <button
+                    (click)="excluirAnalista(analista)"
+                    noDoubleClick
+                    style="border: none"
+                    class="btn btn-ligth p-0 me-1"
+                    ngbTooltip="Excluir">
+                    <em class="fa-solid fa-trash"></em>
+                  </button>
+                </td>
+              </tr>
+            </ng-container>
+            </tbody>
+          </app-table>
+        </div>
+      </div>
+    </div>
+
+    <div class="row row-form" style="margin-top: 0px; padding-right: 2%;">
+      <div class="botoes">
+        <div></div>
+        <div>
+          <button
+            style="margin: 5px"
+            noDoubleClick
+            (click)="gravarFicha()"
+            type="button"
+            class="btn btn-success btn-size"
+            type="submit"
+          >
+            <em class="fa-solid fa-floppy-disk"></em> Salvar
+          </button>
+
+          <button
+            style="margin: 5px"
+            noDoubleClick
+            (click)="close()"
+            type="button"
+            class="btn btn-danger btn-size"
+            data-bs-dismiss="modal"
+          >
+            <em class="fa fa-lg fa-minus-circle float-center pt-1"></em>
+            Cancelar
+          </button>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-template>
+<selecionar-analista
+  #selecionarAnalista
+  (enviarAnalistaSlecionado)="incluirAnalista($event)">
+</selecionar-analista>

@@ -1,0 +1,45 @@
+.centraliza-checkbox {
+  position: relative;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.modal {
+  width: 100% !important;
+  --bs-modal-width: 100% !important;
+}
+
+.modal-content {
+  width: 800px !important;
+}
+
+.remodal {
+  max-width: 100% !important;
+}
+
+.botoes {
+  background-color: #fff;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 5px;
+  margin-top: 20px;
+  button {
+    margin-left: 2px;
+    margin-right: 2px;
+  }
+}
+
+::ng-deep.theme-contrast .botoes {
+  background-color: #000000 !important;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 5px;
+  margin-top: 20px;
+  button {
+    margin-left: 2px;
+    margin-right: 2px;
+  }
+}
+

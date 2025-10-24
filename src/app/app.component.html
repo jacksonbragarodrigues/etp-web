@@ -1,0 +1,19 @@
+<lib-administrativo-template
+  [titleComplete]="titulo"
+  [menu]="menu"
+  tipoMenu="horizontal"
+  [subtitle]="subtitulo"
+  [titleConcise]="subtitulo"
+  [showMenuApps]="false"
+  [showSearch]="false"
+  [habilitaLoginUnico]="false"
+  menuAppsName="ADM_WEB"
+  siglaAplicacao="FORM_WEB"
+  [showMenuFromCA]="true"
+  nomeMenuFromCA="ETP"
+  [isMenuDynamic]="true"
+  (onLogin)="handlePermissionAndMenu()"
+  (onLogout)="onLogout()"
+>
+  <router-outlet></router-outlet>
+</lib-administrativo-template>

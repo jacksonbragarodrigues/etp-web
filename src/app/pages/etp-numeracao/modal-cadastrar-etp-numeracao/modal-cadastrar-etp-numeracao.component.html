@@ -1,0 +1,102 @@
+<ng-template #modalCadastraEtpNumeracaoComponent class="modal fade">
+  <div class="modal-header">
+    <span>{{ titulo }}</span>
+  </div>
+  <div class="modal-body">
+    <form [formGroup]="gestaoEtpNumercaoModalForm">
+      <div class="row row-form m-12">
+        <div class="row m-12">
+          <div class="col-sm-12 col-md-2 col-lg-3 col-xl-3">
+            <label for="ano">Ano</label>
+            <input
+              (blur)="recuperarNumeroEtp()"
+              (click)="setCurrentYear()"
+              formControlName="ano"
+              type="number"
+              min="0"
+              maxlength="4"
+              id="ano"
+              class="form-control"
+            />
+            <app-error-mensage
+              [descricao]="'Ano'"
+              [form]="gestaoEtpNumercaoModalForm"
+              [controlName]="'ano'"
+            >
+            </app-error-mensage>
+          </div>
+          <div class="col-sm-12 col-md-3 col-lg-4 col-xl-4">
+            <label for="etpNumeracao">Número</label>
+            <input
+              formControlName="etpNumeracao"
+              type="number"
+              min="0"
+              maxlength="9"
+              id="etpNumeracao"
+              class="form-control text-center"
+            />
+            <app-error-mensage
+              [descricao]="'Número'"
+              [form]="gestaoEtpNumercaoModalForm"
+              [controlName]="'etpNumeracao'"
+            >
+            </app-error-mensage>
+          </div>
+
+          <div class="col-sm-12 col-md-3 col-lg-4 col-xl-4">
+            <label for="status">Status</label>
+            <select class="form-select" id="status" formControlName="status">
+              <option
+                *ngFor="let item of statusList"
+                selected
+                [value]="item.id"
+              >
+                {{ item.nome }}
+              </option>
+            </select>
+          </div>
+
+          <div class="col-sm-12 col-md-6 col-lg-12 col-xl-12 mt-2">
+            <label for="etp">ETP</label>
+            <select
+              class="form-select form-select-lg"
+              id="etp"
+              formControlName="etp"
+            >
+              <option *ngFor="let item of etpList" selected [value]="item.id">
+                {{ item.nome }}
+              </option>
+            </select>
+          </div>
+        </div>
+        <div class="row row-form" style="margin-top: 30px">
+          <div class="col">
+            <button
+              noDoubleClick
+              [disabled]="!gestaoEtpNumercaoModalForm.valid"
+              (click)="gravar()"
+              type="button"
+              class="w-100 success-btn-color btn btn-success"
+              type="submit"
+            >
+              <em class="fa fa-lg fa-check float-center pt-1"></em> Gravar
+            </button>
+          </div>
+
+          <div class="col">
+            <button
+              noDoubleClick
+              (click)="close()"
+              type="button"
+              class="w-100 btn btn-danger"
+              data-bs-dismiss="modal"
+            >
+              <em class="fa fa-lg fa-minus-circle float-center pt-1"></em>
+              Cancelar
+            </button>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+</ng-template>

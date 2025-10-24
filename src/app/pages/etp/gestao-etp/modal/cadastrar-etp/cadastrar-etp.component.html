@@ -1,0 +1,208 @@
+<ng-template
+  #cadastrarEtpComponent
+  class="modal modal-xl fade"
+  data-bs-backdrop="static"
+>
+  <div class="modal-header">
+    <span>{{ titulo }}</span>
+  </div>
+
+  <div class="modal-body">
+    <form [formGroup]="gestaoEtpModalForm">
+      <div class="row row-form m-12">
+        <div class="row m-12" style="margin-top: 10px">
+          <div class="col-sm-12 col-md-4 col-lg-6 col-xl-6">
+            <label for="processoSei">Processo SEI</label>
+            <input
+              (keydown.enter)="gestaoBase.onEnter($event)"
+              type="text"
+              id="processoSei"
+              formControlName="processoSei"
+              class="form-control"
+              (keydown.enter)="pesquisaProcesso()"
+            />
+            <app-error-mensage
+              [descricao]="'Processo SEI'"
+              [form]="gestaoEtpModalForm"
+              [controlName]="'processoSei'"
+            ></app-error-mensage>
+          </div>
+        </div>
+
+        <div class="row m-12">
+          <div class="col-sm-12 col-md-6 col-lg-12 col-xl-12 mt-2">
+            <label for="descricaoEtp">Descrição</label>
+            <textarea
+              formControlName="descricao"
+              placeholder="Descrição ETP"
+              class="form-control"
+              id="descricaoEtp"
+              name="descricaoEtp"
+              rows="5"
+              maxlength="255"
+            ></textarea>
+            <app-error-mensage
+              [descricao]="'Descrição'"
+              [form]="gestaoEtpModalForm"
+              [controlName]="'descricao'"
+            ></app-error-mensage>
+          </div>
+        </div>
+
+        <div class="row m-12" style="margin-top: 10px">
+          <div class="col-sm-12 col-md-4 col-lg-6 col-xl-6">
+            <label for="tipoLicitacao" class="text">Tipo de Contratação</label>
+            <select
+              formControlName="tipoLicitacaoId"
+              id="tipoLicitacao"
+              class="form-select"
+            >
+              <option
+                *ngFor="let item of tipoLicitacaoList"
+                selected
+                [value]="item.id"
+              >
+                {{ item.descricao }}
+              </option>
+            </select>
+            <app-error-mensage
+              [descricao]="'Tipo de Contratação'"
+              [form]="gestaoEtpModalForm"
+              [controlName]="'tipoLicitacaoId'"
+            ></app-error-mensage>
+          </div>
+
+          <div class="col-sm-12 col-md-4 col-lg-6 col-xl-6">
+            <label for="formularioId" class="text">Formulário</label>
+            <select
+              formControlName="formularioId"
+              id="formularioId"
+              class="form-select"
+            >
+              <option
+                *ngFor="let item of formularioList"
+                selected
+                [value]="item.id"
+              >
+                {{
+                  item.id + " - " + item.descricao + " - Versão: " + item.versao
+                }}
+              </option>
+            </select>
+            <app-error-mensage
+              [descricao]="'Formulário'"
+              [form]="gestaoEtpModalForm"
+              [controlName]="'formularioId'"
+            ></app-error-mensage>
+          </div>
+
+          <div class="col-sm-12 col-md-4 col-lg-6 col-xl-6">
+            <label for="situacaoId">Situação</label>
+            <select
+              formControlName="situacaoId"
+              id="situacaoId"
+              class="form-select"
+            >
+              <option
+                *ngFor="let item of situacaoList"
+                selected
+                [value]="item.id"
+              >
+                {{ item.descricao }}
+              </option>
+            </select>
+            <app-error-mensage
+              [descricao]="'Situação'"
+              [form]="gestaoEtpModalForm"
+              [controlName]="'situacaoId'"
+            ></app-error-mensage>
+          </div>
+
+          <div class="col-sm-12 col-md-4 col-lg-6 col-xl-6">
+            <label for="etapaId" class="text">Etapa</label>
+            <select formControlName="etapaId" id="etapaId" class="form-select">
+              <option *ngFor="let item of etapaList" selected [value]="item.id">
+                {{ item.id + " - " + item.descricao }}
+              </option>
+            </select>
+            <app-error-mensage
+              [descricao]="'Etapa'"
+              [form]="gestaoEtpModalForm"
+              [controlName]="'etapaId'"
+            ></app-error-mensage>
+          </div>
+        </div>
+
+        <div class="row m-12" style="margin-top: 10px">
+          <div class="col-sm-12 col-md-4 col-lg-12 col-xl-12">
+            <label for="unidade" class="text">Unidade</label>
+            <select
+              *ngIf="unidadeList.length === 1"
+              formControlName="unidadeUsarioLogado"
+              class="form-select"
+            >
+              <option
+                *ngFor="let item of unidadeList"
+                selected
+                [value]="item.id"
+              >
+                {{ item.descricaoSigla }}
+              </option>
+            </select>
+            <p-autoComplete
+              *ngIf="unidadeList.length > 1"
+              field="descricaoSigla"
+              id="unidade"
+              formControlName="unidadeEtp"
+              styleClass="w-100"
+              inputStyleClass="w-100"
+              [(ngModel)]="unidadeEtp"
+              [suggestions]="unidadeListFiltrada"
+              [minLength]="3"
+              (completeMethod)="buscarUnidades($event)"
+              [forceSelection]="true"
+              (onSelect)="onItemSelecionado()"
+              (onFocus)="onCampoFocado()"
+              [baseZIndex]="9999999"
+            >
+            </p-autoComplete>
+            <app-error-mensage
+              [descricao]="'Unidade'"
+              [form]="gestaoEtpModalForm"
+              [controlName]="'unidadeId'"
+            ></app-error-mensage>
+          </div>
+        </div>
+      </div>
+      <div class="row row-form" style="margin-top: 30px">
+        <div class="botoes">
+          <div></div>
+          <div>
+            <button
+              style="margin: 5px"
+              noDoubleClick
+              [disabled]="!gestaoEtpModalForm.valid || !estaAberto"
+              (click)="gravar()"
+              type="button"
+              class="btn btn-success btn-size"
+              type="submit"
+            >
+              <em class="fa fa-lg fa-check float-center pt-1"></em> Gravar
+            </button>
+            <button
+              style="margin: 5px"
+              noDoubleClick
+              (click)="close()"
+              type="button"
+              class="btn btn-danger btn-size"
+              data-bs-dismiss="modal"
+            >
+              <em class="fa fa-lg fa-minus-circle float-center pt-1"></em>
+              Cancelar
+            </button>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+</ng-template>

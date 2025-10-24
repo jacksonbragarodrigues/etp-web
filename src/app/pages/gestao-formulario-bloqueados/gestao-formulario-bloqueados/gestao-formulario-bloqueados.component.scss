@@ -1,0 +1,69 @@
+@media screen and (max-width: 575px) {
+  .container-main {
+    margin: 10px !important;
+    margin-top: 0px !important;
+  }
+  .col-sm-12.col-md-12.col-lg-2.col-xl-2.btn-group.text-end {
+    display: flex !important;
+  }
+  span.font-title {
+    margin-left: 50% !important;
+  }
+}
+.m-12 {
+  margin: 12px;
+}
+
+.centraliza-checkbox {
+  position: relative;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.altura-card-auto {
+  height: 93%;
+}
+
+.theme-dark .btn-group,
+.theme-dark .btn-group-vertical {
+  display: block !important;
+}
+
+.btn-group,
+.btn-group-vertical {
+  display: block !important;
+}
+
+.titulo-tabela-centralizado {
+  margin-left: 36%;
+}
+
+.width-btn-acoes {
+  width: 106%;
+}
+
+.form-check-label {
+  margin-left: 5px;
+}
+
+.botoes {
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+}
+
+.label-check {
+  margin-left: 5px;
+}
+
+.menu-acao {
+  cursor: pointer !important;
+  pointer-events: all !important;
+}
+
+td {
+  max-width: 50ch; /* Set a max width */
+  white-space: nowrap; /* Prevent wrapping */
+  overflow: hidden; /* Hide overflow text */
+  text-overflow: ellipsis; /* Add ellipsis (...) */
+}

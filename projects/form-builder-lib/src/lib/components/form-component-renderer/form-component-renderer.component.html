@@ -1,0 +1,1140 @@
+<div *ngIf="isVisible || !previewMode"
+     style="margin-bottom: 13px;"
+     [class]="getComponentClasses()"
+     [style]="getComponentStyle()"
+     (click)="onComponentClick($event)"
+     (mouseenter)="onComponentMouseEnter()"
+     (mouseleave)="onComponentMouseLeave()"
+     [attr.data-component-id]="component.id"
+     [attr.data-component-type]="component.type"
+     [style.opacity]="!isVisible && !previewMode ? '0.5' : '1'"
+     [style.border]="!isVisible && !previewMode ? '2px dashed #ccc' : 'none'"
+     [title]="!isVisible && !previewMode ? 'Hidden by conditional logic' : ''">
+
+  <!-- Input Types (text, email, password, number, date, url, tel, file) -->
+  <div *ngIf="isInputType()" [class]="getContainerClasses()">
+    <div *ngIf="component.label && !(component.properties.hideLabel && previewMode)"
+         class="d-flex justify-content-between align-items-center">
+      <label [for]="component.id" [class]="getLabelClasses()">
+        {{ component.label }}
+        <span class="text-danger" *ngIf="component.required"></span>
+        <i class="bi bi-code-slash text-info ms-1"
+           *ngIf="!previewMode && hasConditionalLogic()"
+           title="Este componente tem lógica condicional configurada"
+           data-bs-toggle="tooltip"
+           data-bs-placement="top"></i>
+        <i class="fa fa-question-circle text-muted ms-1"
+           *ngIf="component.properties.tooltip"
+           [title]="component.properties.tooltip"
+           data-bs-toggle="tooltip"
+           data-bs-placement="top"></i>
+      </label>
+
+      <!-- Sigilo checkbox when allowsConfidentiality is true -->
+      <div *ngIf="component.properties.allowsConfidentiality" class="form-check form-check-inline mb-0">
+        <input class="form-check-input"
+               type="checkbox"
+               [id]="component.id + '_sigilo'"
+               [disabled]="component.properties.disabled && previewMode">
+        <label class="form-check-label" [for]="component.id + '_sigilo'">
+          Sigilo
+        </label>
+      </div>
+    </div>
+
+    <!-- Input with or without prefix -->
+    <div *ngIf="component.properties.prefix && (component.type === 'input' || component.type === 'number'); else simpleInput"
+         class="input-group">
+      <span class="input-group-text">{{ component.properties.prefix }}</span>
+      <input
+        [class]="getFormControlClasses()"
+        [type]="getInputType()"
+        [id]="component.id"
+        [placeholder]="getMaskedPlaceholder()"
+        [value]="value"
+        (input)="onInputChange($event)"
+        [attr.required]="component.required && previewMode ? true : null"
+        [disabled]="component.properties.disabled && previewMode"
+        [readonly]="component.properties.readonly && previewMode">
+    </div>
+
+    <ng-template #simpleInput>
+      <input
+        [class]="getFormControlClasses()"
+        [type]="getInputType()"
+        [id]="component.id"
+        [placeholder]="getMaskedPlaceholder()"
+        [value]="value"
+        (input)="onInputChange($event)"
+        [attr.required]="component.required && previewMode ? true : null"
+        [disabled]="component.properties.disabled && previewMode"
+        [readonly]="component.properties.readonly && previewMode">
+    </ng-template>
+
+    <!-- Validation feedback -->
+    <div class="invalid-feedback" *ngIf="previewMode">
+      Please provide a valid {{ component.label ? component.label.toLowerCase() : 'value' }}.
+    </div>
+
+    <!-- Help text -->
+    <div class="form-text" *ngIf="component.properties.attributes?.['help-text']">
+      {{ component.properties.attributes?.['help-text'] }}
+    </div>
+
+    <!-- Validation error message -->
+    <div class="text-danger small mt-1" *ngIf="shouldShowValidationError()">
+      <i class="bi bi-exclamation-circle me-1"></i>
+      {{ getValidationErrorMessage() }}
+    </div>
+  </div>
+
+  <!-- Textarea -->
+  <div *ngIf="isTextareaType()" [class]="getContainerClasses()">
+    <div *ngIf="component.label && !(component.properties.hideLabel && previewMode)"
+         class="d-flex justify-content-between align-items-center">
+      <label [for]="component.id" [class]="getLabelClasses()">
+        {{ component.label }}
+        <span class="text-danger" *ngIf="component.required"></span>
+        <i class="bi bi-code-slash text-info ms-1"
+           *ngIf="!previewMode && hasConditionalLogic()"
+           title="Este componente tem lógica condicional configurada"
+           data-bs-toggle="tooltip"
+           data-bs-placement="top"></i>
+        <i class="fa fa-question-circle text-muted ms-1"
+           *ngIf="component.properties.tooltip"
+           [title]="component.properties.tooltip"
+           data-bs-toggle="tooltip"
+           data-bs-placement="top"></i>
+      </label>
+
+      <!-- Sigilo checkbox when allowsConfidentiality is true -->
+      <div *ngIf="component.properties.allowsConfidentiality" class="form-check form-check-inline mb-0">
+        <input class="form-check-input"
+               type="checkbox"
+               [id]="component.id + '_sigilo'"
+               [disabled]="component.properties.disabled && previewMode">
+        <label class="form-check-label" [for]="component.id + '_sigilo'">
+          Sigilo
+        </label>
+      </div>
+    </div>
+
+    <!-- Textarea with or without prefix -->
+    <div *ngIf="component.properties.prefix; else simpleTextarea"
+         class="input-group">
+      <span class="input-group-text">{{ component.properties.prefix }}</span>
+      <textarea
+        [class]="getFormControlClasses()"
+        [id]="component.id"
+        [placeholder]="getMaskedPlaceholder()"
+        [value]="value"
+        (input)="onInputChange($event)"
+        [rows]="component.properties.rows || 4"
+        [cols]="component.properties.cols || undefined"
+        [attr.required]="component.required && previewMode ? true : null"
+        [disabled]="component.properties.disabled && previewMode"
+        [readonly]="component.properties.readonly && previewMode">
+      </textarea>
+    </div>
+
+    <ng-template #simpleTextarea>
+      <textarea
+        [class]="getFormControlClasses()"
+        [id]="component.id"
+        [placeholder]="getMaskedPlaceholder()"
+        [value]="value"
+        (input)="onInputChange($event)"
+        [rows]="component.properties.rows || 4"
+        [cols]="component.properties.cols || undefined"
+        [attr.required]="component.required && previewMode ? true : null"
+        [disabled]="component.properties.disabled && previewMode"
+        [readonly]="component.properties.readonly && previewMode">
+      </textarea>
+    </ng-template>
+
+    <!-- Character count -->
+    <div class="form-text" *ngIf="component.properties.maxLength && previewMode">
+      {{ value?.length || 0 }} / {{ component.properties.maxLength }} characters
+    </div>
+
+    <!-- Help text -->
+    <div class="form-text" *ngIf="component.properties.attributes?.['help-text']">
+      {{ component.properties.attributes?.['help-text'] }}
+    </div>
+
+    <!-- Validation error message -->
+    <div class="text-danger small mt-1" *ngIf="shouldShowValidationError()">
+      <i class="bi bi-exclamation-circle me-1"></i>
+      {{ getValidationErrorMessage() }}
+    </div>
+  </div>
+
+  <!-- Rich Text Editor -->
+  <div *ngIf="isRichTextType()" [class]="getContainerClasses()">
+    <div *ngIf="component.label && !(component.properties.hideLabel && previewMode)"
+         class="d-flex justify-content-between align-items-center">
+      <label [for]="component.id" [class]="getLabelClasses()">
+        {{ component.label }}
+        <span class="text-danger" *ngIf="component.required"></span>
+        <i class="bi bi-code-slash text-info ms-1"
+           *ngIf="!previewMode && hasConditionalLogic()"
+           title="Este componente tem lógica condicional configurada"
+           data-bs-toggle="tooltip"
+           data-bs-placement="top"></i>
+        <i class="fa fa-question-circle text-muted ms-1"
+           *ngIf="component.properties.tooltip"
+           [title]="component.properties.tooltip"
+           data-bs-toggle="tooltip"
+           data-bs-placement="top"></i>
+      </label>
+
+      <!-- Sigilo checkbox when allowsConfidentiality is true -->
+      <div *ngIf="component.properties.allowsConfidentiality" class="form-check form-check-inline mb-0">
+        <input class="form-check-input"
+               type="checkbox"
+               [id]="component.id + '_sigilo'"
+               [disabled]="component.properties.disabled && previewMode">
+        <label class="form-check-label" [for]="component.id + '_sigilo'">
+          Sigilo
+        </label>
+      </div>
+    </div>
+
+    <!-- Custom CKEditor Rich Text Editor -->
+    <div class="rich-text-editor-wrapper"
+         [style.--ck-editor-height]="(component.properties.ckEditorConfig?.height || 200) + 'px'">
+      <app-custom-ckeditor
+        [config]="getCKEditorConfig()"
+        [(ngModel)]="value"
+        (change)="onCKEditorValueChange($event)"
+        [disabled]="!!component.properties.disabled"
+        [readonly]="!!component.properties.readonly"
+        [placeholder]="component.placeholder || 'Digite seu conteúdo aqui...'"
+        [editorId]="getCKEditorUniqueId()"
+        (ready)="onCKEditorReady($event)">
+      </app-custom-ckeditor>
+    </div>
+
+    <!-- Help text -->
+    <div class="form-text" *ngIf="component.properties.attributes?.['help-text']">
+      {{ component.properties.attributes?.['help-text'] }}
+    </div>
+
+    <!-- Validation error message -->
+    <div class="text-danger small mt-1" *ngIf="shouldShowValidationError()">
+      <i class="bi bi-exclamation-circle me-1"></i>
+      {{ getValidationErrorMessage() }}
+    </div>
+  </div>
+
+  <!-- Text Help Component -->
+  <div *ngIf="isTextHelpType()" [class]="getContainerClasses()">
+    <!-- Builder mode: Show all text help components with current styling -->
+    <div *ngIf="!previewMode" class="text-help-container p-3 border-start border-3 rounded"
+         [class.border-warning]="component.properties.onlyInternal"
+         [class.border-primary]="!component.properties.onlyInternal"
+         [class.bg-warning-subtle]="component.properties.onlyInternal"
+         [class.bg-primary-subtle]="!component.properties.onlyInternal">
+
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <span [class]="getTextHelpLabelClasses()"
+              [title]="component.properties.help ? getTextHelpTooltip() : ''"
+              [attr.data-bs-toggle]="component.properties.help ? 'tooltip' : null"
+              [attr.data-bs-placement]="component.properties.help ? 'top' : null"
+              [attr.data-bs-html]="component.properties.help ? 'true' : null"
+              style="cursor: help;">
+          <i class="bi bi-question-circle me-2"></i>
+          {{ component.label || 'Text Help' }}
+        </span>
+
+        <!-- Indicador do tipo -->
+        <small class="badge"
+               [class.bg-warning]="component.properties.onlyInternal"
+               [class.bg-primary]="!component.properties.onlyInternal">
+          {{ component.properties.onlyInternal ? 'Nota Interna' : 'Texto de Ajuda' }}
+        </small>
+      </div>
+
+      <!-- Placeholder para o builder mode -->
+      <!-- <div class="text-help-placeholder text-muted">
+        <small>
+          <i class="bi bi-file-text me-1"></i>
+          {{ component.properties.help ? 'Passe o mouse sobre o título para ver a ajuda' : 'Texto de ajuda será exibido aqui no preview' }}
+        </small>
+      </div> -->
+    </div>
+
+    <!-- Preview mode: Only show public (non-internal) text help as clickable links -->
+    <div *ngIf="previewMode && !component.properties.onlyInternal && component.properties.help"
+         class="text-help-link-container">
+      <a href="javascript:void(0)"
+         class="text-help-link text-primary text-decoration-none fw-medium"
+         (click)="onTextHelpClick()"
+         style="cursor: pointer;">
+        <i class="bi bi-question-circle me-2"></i>
+        {{ component.label || 'Text Help' }}
+      </a>
+    </div>
+  </div>
+
+  <!-- Select Dropdown -->
+  <div *ngIf="isSelectType()" [class]="getContainerClasses()">
+    <label *ngIf="component.label && !(component.properties.hideLabel && previewMode)" [for]="component.id" [class]="getLabelClasses()">
+      {{ component.label }}
+      <span class="text-danger" *ngIf="component.required"></span>
+      <i class="bi bi-code-slash text-info ms-1"
+         *ngIf="!previewMode && hasConditionalLogic()"
+         title="Este componente tem lógica condicional configurada"
+         data-bs-toggle="tooltip"
+         data-bs-placement="top"></i>
+      <i class="fa fa-question-circle text-muted ms-1"
+         *ngIf="component.properties.tooltip"
+         [title]="component.properties.tooltip"
+         data-bs-toggle="tooltip"
+         data-bs-placement="top"></i>
+    </label>
+
+    <!-- Multiple Selection with Chips -->
+    <div *ngIf="component.properties.multiple && !component.properties.layoutHorizontal; else standardSelect">
+      <!-- Chips Container -->
+      <div class="chips-container form-control" [class.disabled]="component.properties.disabled && previewMode">
+        <!-- Selected chips -->
+        <div class="d-flex flex-wrap gap-2" *ngIf="getSelectedChips().length > 0">
+          <span *ngFor="let chip of getSelectedChips(); trackBy: trackByChipValue"
+                class="chip badge bg-primary d-flex align-items-center">
+            <span class="chip-label">{{ chip.label }}</span>
+            <button type="button"
+                    class="btn-close btn-close-white ms-2"
+                    [disabled]="component.properties.disabled && previewMode"
+                    (click)="removeChip(chip.value)"
+                    aria-label="Remove">
+            </button>
+          </span>
+        </div>
+
+        <!-- Placeholder when no selection -->
+        <div *ngIf="getSelectedChips().length === 0" class="text-muted">
+          {{ component.placeholder || 'Selecione...' }}
+        </div>
+      </div>
+
+      <!-- Dropdown for adding items -->
+      <select
+        [class]="getFormControlClasses()"
+        [id]="component.id + '_dropdown'"
+        (change)="onMultiSelectChange($event)"
+        [disabled]="component.properties.disabled && previewMode">
+
+        <option value="">+ Adicionar item...</option>
+        <option
+          *ngFor="let option of getAvailableOptions(); trackBy: trackByOptionValue"
+          [value]="option.value">
+          {{ option.label }}
+        </option>
+      </select>
+    </div>
+
+    <!-- Standard Select (Single or Horizontal layout) -->
+    <ng-template #standardSelect>
+      <!-- Horizontal layout for select -->
+      <div *ngIf="component.properties.layoutHorizontal; else verticalSelect"
+           class="d-flex flex-wrap gap-3">
+        <div style="margin-left: 20px" class="form-check" *ngFor="let option of getOptions(); trackBy: trackByOptionValue">
+          <input class="form-check-input" type="radio"
+                 [name]="getRadioName()"
+                 [id]="component.id + '_select_' + option.value"
+                 [value]="option.value"
+                 [checked]="value === option.value"
+                 (change)="onValueChange(option.value)"
+                 [disabled]="component.properties.disabled && previewMode">
+          <label class="form-check-label" [for]="component.id + '_select_' + option.value">
+            {{ option.label }}
+          </label>
+        </div>
+      </div>
+
+      <ng-template #verticalSelect>
+        <select
+          [class]="getFormControlClasses()"
+          [id]="component.id"
+          [value]="value"
+          (change)="onSelectChange($event)"
+          [attr.required]="component.required && previewMode ? true : null"
+          [disabled]="component.properties.disabled && previewMode"
+          [multiple]="component.properties.multiple && previewMode">
+
+          <option value="" *ngIf="!component.properties.multiple">
+            {{ component.placeholder || 'Selecione...' }}
+          </option>
+
+          <option
+            *ngFor="let option of getOptions(); trackBy: trackByOptionValue"
+            [value]="option.value"
+            [selected]="option.selected">
+            {{ option.label }}
+          </option>
+        </select>
+      </ng-template>
+    </ng-template>
+
+    <!-- Help text -->
+    <div class="form-text" *ngIf="component.properties.attributes?.['help-text']">
+      {{ component.properties.attributes?.['help-text'] }}
+    </div>
+
+    <!-- Validation error message -->
+    <div class="text-danger small mt-1" *ngIf="shouldShowValidationError()">
+      <i class="bi bi-exclamation-circle me-1"></i>
+      {{ getValidationErrorMessage() }}
+    </div>
+  </div>
+
+  <!-- Checkbox -->
+  <div *ngIf="isCheckboxType()" [class]="getContainerClasses()">
+    <!-- Horizontal layout for checkboxes -->
+    <div *ngIf="component.properties.layoutHorizontal; else verticalCheckbox" class="d-flex flex-wrap gap-3">
+      <div style="margin-left: 20px" class="form-check" *ngFor="let option of getOptions(); trackBy: trackByOptionValue">
+        <input class="form-check-input" type="checkbox"
+               [id]="component.id + '_cb_' + option.value"
+               [value]="option.value"
+               [checked]="option.selected"
+               (change)="onCheckboxOptionChange($event, option)"
+               [disabled]="component.properties.disabled && previewMode">
+        <label class="form-check-label" [for]="component.id + '_cb_' + option.value">
+          {{ option.label }}
+        </label>
+      </div>
+    </div>
+
+    <ng-template #verticalCheckbox>
+      <!-- Single checkbox or vertical group -->
+      <div *ngIf="!hasOptions()" style="margin-left: 20px" class="form-check">
+        <input
+          [class]="getFormControlClasses()"
+          type="checkbox"
+          [id]="component.id"
+          [checked]="value"
+          (change)="onCheckboxChange($event)"
+          [attr.required]="component.required && previewMode ? true : null"
+          [disabled]="component.properties.disabled && previewMode">
+
+        <label *ngIf="component.label && !(component.properties.hideLabel && previewMode)" [for]="component.id" [class]="getLabelClasses()">
+          {{ component.label }}
+          <span class="text-danger" *ngIf="component.required"></span>
+          <i class="bi bi-code-slash text-info ms-1"
+             *ngIf="!previewMode && hasConditionalLogic()"
+             title="Este componente tem lógica condicional configurada"
+             data-bs-toggle="tooltip"
+             data-bs-placement="top"></i>
+          <i class="fa fa-question-circle text-muted ms-1"
+             *ngIf="component.properties.tooltip"
+             [title]="component.properties.tooltip"
+             data-bs-toggle="tooltip"
+             data-bs-placement="top"></i>
+        </label>
+      </div>
+
+      <!-- Checkbox group vertical -->
+      <div *ngIf="hasOptions()">
+        <label *ngIf="component.label && !(component.properties.hideLabel && previewMode)" class="form-label">
+          {{ component.label }}
+          <span class="text-danger" *ngIf="component.required"></span>
+          <i class="fa fa-question-circle text-muted ms-1"
+             *ngIf="component.properties.tooltip"
+             [title]="component.properties.tooltip"
+             data-bs-toggle="tooltip"
+             data-bs-placement="top"></i>
+        </label>
+        <div style="margin-left: 20px" class="form-check" *ngFor="let option of getOptions(); trackBy: trackByOptionValue">
+          <input class="form-check-input" type="checkbox"
+                 [id]="component.id + '_cb_' + option.value"
+                 [value]="option.value"
+                 [checked]="option.selected"
+                 (change)="onCheckboxOptionChange($event, option)"
+                 [disabled]="component.properties.disabled && previewMode">
+          <label class="form-check-label" [for]="component.id + '_cb_' + option.value">
+            {{ option.label }}
+          </label>
+        </div>
+      </div>
+    </ng-template>
+
+    <!-- Help text -->
+    <div class="form-text" *ngIf="component.properties.attributes?.['help-text']">
+      {{ component.properties.attributes?.['help-text'] }}
+    </div>
+
+    <!-- Validation error message -->
+    <div class="text-danger small mt-1" *ngIf="shouldShowValidationError()">
+      <i class="bi bi-exclamation-circle me-1"></i>
+      {{ getValidationErrorMessage() }}
+    </div>
+  </div>
+
+  <!-- Radio Group -->
+  <fieldset *ngIf="isRadioType()" [class]="getContainerClasses()">
+    <label *ngIf="component.label && !(component.properties.hideLabel && previewMode)" [class]="getLabelClasses()">
+      {{ component.label }}
+      <span class="text-danger" *ngIf="component.required"></span>
+      <i class="bi bi-code-slash text-info ms-1"
+         *ngIf="!previewMode && hasConditionalLogic()"
+         title="Este componente tem lógica condicional configurada"
+         data-bs-toggle="tooltip"
+         data-bs-placement="top"></i>
+      <i class="fa fa-question-circle text-muted ms-1"
+         *ngIf="component.properties.tooltip"
+         [title]="component.properties.tooltip"
+         data-bs-toggle="tooltip"
+         data-bs-placement="top"></i>
+    </label>
+
+    <!-- Horizontal layout -->
+    <div *ngIf="component.properties.layoutHorizontal; else verticalRadio"
+         class="d-flex flex-wrap gap-3">
+      <div style="margin-left: 20px" class="form-check" *ngFor="let option of getOptions(); trackBy: trackByOptionValue">
+        <input
+          class="form-check-input"
+          type="radio"
+          [name]="getRadioName()"
+          [id]="component.id + '_' + option.value"
+          [value]="option.value"
+          [checked]="value === option.value"
+          (change)="onValueChange(option.value)"
+          [attr.required]="component.required && previewMode ? true : null"
+          [disabled]="component.properties.disabled && previewMode">
+
+        <label
+          class="form-check-label"
+          [for]="component.id + '_' + option.value">
+          {{ option.label }}
+        </label>
+      </div>
+    </div>
+
+    <ng-template #verticalRadio>
+      <div style="margin-left: 20px" class="form-check" *ngFor="let option of getOptions(); trackBy: trackByOptionValue">
+        <input
+          class="form-check-input"
+          type="radio"
+          [name]="getRadioName()"
+          [id]="component.id + '_' + option.value"
+          [value]="option.value"
+          [checked]="value === option.value"
+          (change)="onValueChange(option.value)"
+          [attr.required]="component.required && previewMode ? true : null"
+          [disabled]="component.properties.disabled && previewMode">
+
+        <label
+          class="form-check-label"
+          [for]="component.id + '_' + option.value">
+          {{ option.label }}
+        </label>
+      </div>
+    </ng-template>
+
+    <!-- Help text -->
+    <div class="form-text" *ngIf="component.properties.attributes?.['help-text']">
+      {{ component.properties.attributes?.['help-text'] }}
+    </div>
+
+    <!-- Validation error message -->
+    <div class="text-danger small mt-1" *ngIf="shouldShowValidationError()">
+      <i class="bi bi-exclamation-circle me-1"></i>
+      {{ getValidationErrorMessage() }}
+    </div>
+  </fieldset>
+
+  <!-- Select Box -->
+  <div *ngIf="isSelectBoxType()" [class]="getContainerClasses()">
+    <label *ngIf="component.label && !(component.properties.hideLabel && previewMode)" [class]="getLabelClasses()">
+      {{ component.label }}
+      <span class="text-danger" *ngIf="component.required"></span>
+      <i class="bi bi-code-slash text-info ms-1"
+         *ngIf="!previewMode && hasConditionalLogic()"
+         title="Este componente tem lógica condicional configurada"
+         data-bs-toggle="tooltip"
+         data-bs-placement="top"></i>
+      <i class="fa fa-question-circle text-muted ms-1"
+         *ngIf="component.properties.tooltip"
+         [title]="component.properties.tooltip"
+         data-bs-toggle="tooltip"
+         data-bs-placement="top"></i>
+    </label>
+
+    <!-- Placeholder text when no options -->
+    <div *ngIf="!hasOptions()" class="form-text text-muted">
+      {{ component.placeholder || 'Nenhuma opção disponível' }}
+    </div>
+
+    <!-- Options -->
+    <div *ngIf="hasOptions()">
+      <!-- Horizontal layout -->
+      <div *ngIf="component.properties.layoutHorizontal; else verticalSelectBox"
+           class="d-flex flex-wrap gap-3">
+        <div class="form-check" *ngFor="let option of getOptions(); trackBy: trackByOptionValue">
+          <input
+            class="form-check-input"
+            type="checkbox"
+            [id]="component.id + '_sb_' + option.value"
+            [value]="option.value"
+            [checked]="isSelectBoxOptionSelected(option)"
+            (change)="onSelectBoxOptionChange($event, option)"
+            [attr.required]="component.required && previewMode && !component.properties.multiple ? true : null"
+            [disabled]="component.properties.disabled && previewMode">
+
+          <label
+            class="form-check-label"
+            [for]="component.id + '_sb_' + option.value">
+            {{ option.label }}
+          </label>
+        </div>
+      </div>
+
+      <!-- Vertical layout -->
+      <ng-template #verticalSelectBox>
+        <div style="margin-left: 20px" class="form-check" *ngFor="let option of getOptions(); trackBy: trackByOptionValue">
+          <input
+            class="form-check-input"
+            type="checkbox"
+            [id]="component.id + '_sb_' + option.value"
+            [value]="option.value"
+            [checked]="isSelectBoxOptionSelected(option)"
+            (change)="onSelectBoxOptionChange($event, option)"
+            [attr.required]="component.required && previewMode && !component.properties.multiple ? true : null"
+            [disabled]="component.properties.disabled && previewMode">
+
+          <label
+            class="form-check-label"
+            [for]="component.id + '_sb_' + option.value">
+            {{ option.label }}
+          </label>
+        </div>
+      </ng-template>
+    </div>
+
+    <!-- Selection info -->
+    <div class="form-text" *ngIf="hasOptions() && component.properties.multiple && previewMode">
+      Múltipla seleção {{ component.properties.multiple ? 'habilitada' : 'desabilitada' }}
+      <span *ngIf="isValueArray() && value.length > 0"> - {{ value.length }} item(s) selecionado(s)</span>
+    </div>
+
+    <!-- Help text -->
+    <div class="form-text" *ngIf="component.properties.attributes?.['help-text']">
+      {{ component.properties.attributes?.['help-text'] }}
+    </div>
+
+    <!-- Validation error message -->
+    <div class="text-danger small mt-1" *ngIf="shouldShowValidationError()">
+      <i class="bi bi-exclamation-circle me-1"></i>
+      {{ getValidationErrorMessage() }}
+    </div>
+  </div>
+
+  <!-- Select API -->
+  <div *ngIf="isSelectApiType()" [class]="getContainerClasses()">
+    <label *ngIf="component.label && !(component.properties.hideLabel && previewMode)" [for]="component.id" [class]="getLabelClasses()">
+      {{ component.label }}
+      <span class="text-danger" *ngIf="component.required"></span>
+      <i class="bi bi-code-slash text-info ms-1"
+         *ngIf="!previewMode && hasConditionalLogic()"
+         title="Este componente tem lógica condicional configurada"
+         data-bs-toggle="tooltip"
+         data-bs-placement="top"></i>
+      <i class="fa fa-question-circle text-muted ms-1"
+         *ngIf="component.properties.tooltip"
+         [title]="component.properties.tooltip"
+         data-bs-toggle="tooltip"
+         data-bs-placement="top"></i>
+    </label>
+
+    <!-- Loading state -->
+    <div *ngIf="isApiLoading()" class="d-flex align-items-center text-muted">
+      <div class="spinner-border spinner-border-sm me-2" role="status">
+        <span class="visually-hidden">Carregando...</span>
+      </div>
+      <span>Carregando opções da API...</span>
+    </div>
+
+    <!-- Error state -->
+    <div *ngIf="hasApiError()" class="alert alert-warning d-flex align-items-center">
+      <i class="bi bi-exclamation-triangle me-2"></i>
+      <div class="flex-grow-1">
+        <strong>Erro ao carregar opções:</strong><br>
+        {{ getApiError() }}
+      </div>
+      <button type="button"
+              class="btn btn-outline-warning btn-sm"
+              (click)="reloadApiOptions()"
+              [disabled]="isApiLoading()"
+              title="Tentar novamente">
+        <i class="bi bi-arrow-clockwise"></i>
+      </button>
+    </div>
+
+    <!-- API Configuration missing -->
+    <div *ngIf="!component.properties.apiConfig?.url && !isApiLoading()" class="alert alert-info">
+      <i class="bi bi-info-circle me-2"></i>
+      Configure o endpoint da API nas propriedades do componente
+    </div>
+
+    <!-- Multiple Selection with Chips (same as regular Select) -->
+    <div *ngIf="component.properties.multiple && !component.properties.layoutHorizontal && hasApiOptions(); else standardApiSelect">
+      <!-- Chips Container -->
+      <div class="chips-container form-control" [class.disabled]="component.properties.disabled && previewMode">
+        <!-- Selected chips -->
+        <div class="d-flex flex-wrap gap-2" *ngIf="getSelectedChips().length > 0">
+          <span *ngFor="let chip of getSelectedChips(); trackBy: trackByChipValue"
+                class="chip badge bg-primary d-flex align-items-center">
+            <span class="chip-label">{{ chip.label }}</span>
+            <button type="button"
+                    class="btn-close btn-close-white ms-2"
+                    [disabled]="component.properties.disabled && previewMode"
+                    (click)="removeChip(chip.value)"
+                    aria-label="Remove">
+            </button>
+          </span>
+        </div>
+
+        <!-- Placeholder when no selection -->
+        <div *ngIf="getSelectedChips().length === 0" class="text-muted">
+          {{ component.placeholder || 'Selecione...' }}
+        </div>
+      </div>
+
+      <!-- Dropdown for adding items -->
+      <select
+        [class]="getFormControlClasses()"
+        [id]="component.id + '_dropdown'"
+        (change)="onMultiSelectChange($event)"
+        [disabled]="component.properties.disabled && previewMode || isApiLoading()">
+
+        
+        <option value="">+ Adicionar item...</option>
+        <option
+          *ngFor="let option of getAvailableOptions(); trackBy: trackByOptionValue"
+          [value]="option.value">
+          {{ option.label }}
+        </option>
+      </select>
+    </div>
+
+    <!-- Standard API Select (Single or Horizontal layout) -->
+    <ng-template #standardApiSelect>
+      <!-- Horizontal layout for select -->
+      <div *ngIf="component.properties.layoutHorizontal && hasApiOptions(); else verticalApiSelect"
+           class="d-flex flex-wrap gap-3">
+
+        <!-- Multiple selection with checkboxes -->
+        <ng-container *ngIf="component.properties.multiple; else singleHorizontalApi">
+          <div style="margin-left: 20px" class="form-check" *ngFor="let option of getApiOptions(); trackBy: trackByOptionValue">
+            <input
+              class="form-check-input"
+              type="checkbox"
+              [id]="component.id + '_api_cb_' + option.value"
+              [value]="option.value"
+              [checked]="isSelectBoxOptionSelected(option)"
+              (change)="onSelectBoxOptionChange($event, option)"
+              [disabled]="component.properties.disabled && previewMode || isApiLoading()">
+            <label class="form-check-label" [for]="component.id + '_api_cb_' + option.value">
+              {{ option.label }}
+            </label>
+          </div>
+        </ng-container>
+
+        <!-- Single selection with radio buttons -->
+        <ng-template #singleHorizontalApi>
+          <div style="margin-left: 20px" class="form-check" *ngFor="let option of getApiOptions(); trackBy: trackByOptionValue">
+            <input class="form-check-input" type="radio"
+                   [name]="getRadioName()"
+                   [id]="component.id + '_api_' + option.value"
+                   [value]="option.value"
+                   [checked]="isSelectBoxOptionSelected(option)"
+                   (change)="onValueChange(option.value)"
+                   [disabled]="component.properties.disabled && previewMode || isApiLoading()">
+            <label class="form-check-label" [for]="component.id + '_api_' + option.value">
+              {{ option.label }}
+            </label>
+          </div>
+        </ng-template>
+      </div>
+
+      <ng-template #verticalApiSelect>
+        <select
+          [class]="getFormControlClasses()"
+          [id]="component.id"
+          [value]="getDisplayValue()"
+          (change)="onSelectChange($event)"
+          [attr.required]="component.required && previewMode ? true : null"
+          [disabled]="component.properties.disabled && previewMode || isApiLoading()"
+          [multiple]="component.properties.multiple && previewMode">
+
+          <option value="" *ngIf="!component.properties.multiple">
+            {{ isApiLoading() ? 'Carregando...' : (component.placeholder || 'Selecione...') }}
+          </option>
+
+          <option
+            *ngFor="let option of getApiOptions(); trackBy: trackByOptionValue"
+            [value]="option.value"
+            [selected]="option.selected">
+            {{ option.label }}
+          </option>
+        </select>
+      </ng-template>
+    </ng-template>
+
+    <!-- Selection info for multiple selection -->
+    <!-- <div class="form-text" *ngIf="hasApiOptions() && component.properties.multiple && previewMode">
+      Múltipla seleção habilitada
+      <span *ngIf="isValueArray() && value.length > 0"> - {{ value.length }} item(s) selecionado(s)</span>
+    </div> -->
+
+    <!-- API Info -->
+    <!-- <div class="form-text" *ngIf="hasApiOptions() && previewMode">
+      {{ getApiOptions().length }} opção(s) carregada(s) da API
+      <button type="button"
+              class="btn btn-link btn-sm p-0 ms-2"
+              (click)="reloadApiOptions()"
+              [disabled]="isApiLoading()"
+              title="Recarregar dados">
+        <i class="bi bi-arrow-clockwise"></i>
+      </button>
+    </div> -->
+
+    <!-- Help text -->
+    <div class="form-text" *ngIf="component.properties.attributes?.['help-text']">
+      {{ component.properties.attributes?.['help-text'] }}
+    </div>
+
+    <!-- Validation error message -->
+    <div class="text-danger small mt-1" *ngIf="shouldShowValidationError()">
+      <i class="bi bi-exclamation-circle me-1"></i>
+      {{ getValidationErrorMessage() }}
+    </div>
+  </div>
+
+
+  <!-- Panel Container -->
+  <div *ngIf="isPanelType()"
+       [class]="getContainerClasses()"
+       [attr.data-component-id]="component.id"
+       [attr.data-component-type]="component.type">
+    <div class="card-header" *ngIf="component.label">
+      <div class="d-flex align-items-center"
+           [style.cursor]="component.properties.collapsible ? 'pointer' : 'default'"
+           (click)="component.properties.collapsible ? togglePanelCollapse() : null">
+        <!-- Collapse Icon -->
+        <span *ngIf="component.properties.collapsible"
+              class="collapse-icon me-2"
+              style="font-size: 1.2rem;">
+          <i *ngIf="!isPanelCollapsed()"
+             class="fas fa-square-minus text-muted"
+             title="Collapse Panel"></i>
+          <i *ngIf="isPanelCollapsed()"
+             class="fas fa-square-plus text-muted"
+             title="Expand Panel"></i>
+        </span>
+        <h6 class="mb-0">
+          {{ component.label }}
+          <i *ngIf="previewMode && component.valid !== false"
+             class="bi bi-check-circle text-success ms-2"
+             title="Todos os campos obrigatórios estão preenchidos"></i>
+          <i *ngIf="previewMode && component.valid === false"
+             class="bi bi-x-circle text-danger ms-2"
+             title="Existem campos obrigatórios não preenchidos"></i>
+        </h6>
+      </div>
+    </div>
+    <div class="card-body" [style.display]="isPanelCollapsed() ? 'none' : 'block'">
+      <!-- Nested components would go here -->
+      <div class="panel-content"
+           [class.drag-over]="dragOverContainer && !previewMode"
+           (dragover)="onContainerDragOver($event)"
+           (dragleave)="onContainerDragLeave($event)"
+           (drop)="onContainerDrop($event)">
+        <app-form-component-renderer
+          *ngFor="let childComponent of component.children || []; trackBy: trackByComponentId"
+          [component]="childComponent"
+          [previewMode]="previewMode"
+          [selected]="isChildSelected(childComponent.id)"
+          [showToolbar]="isChildSelected(childComponent.id)"
+          (openProperties)="onChildOpenProperties(childComponent)"
+          (deleteComponent)="onChildDeleteComponent(childComponent.id)">
+        </app-form-component-renderer>
+
+        <!-- Empty panel indicator -->
+        <div class="empty-panel text-center text-muted py-3"
+             *ngIf="(!component.children || component.children.length === 0) && !previewMode">
+          <i class="bi bi-plus-circle-dotted"></i>
+          <p class="mb-0 small">Drop components here</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Columns Layout -->
+  <div *ngIf="isColumnsType()" [class]="getColumnsContainerClasses()">
+    <!-- Columns Label (same pattern as other components) -->
+    <label *ngIf="component.label && !(component.properties.hideLabel && previewMode)" class="form-label columns-main-label">
+      {{ component.label }}
+      <span class="text-danger" *ngIf="component.required"></span>
+      <i class="fa fa-question-circle text-muted ms-1"
+         *ngIf="component.properties.tooltip"
+         [title]="component.properties.tooltip"
+         data-bs-toggle="tooltip"
+         data-bs-placement="top"></i>
+    </label>
+
+    <div class="row g-3"
+         [class.drag-over]="dragOverContainer && !previewMode"
+         (dragover)="onContainerDragOver($event)"
+         (dragleave)="onContainerDragLeave($event)"
+         (drop)="onContainerDrop($event)">
+
+      <div *ngFor="let column of getColumns(); trackBy: trackByColumnIndex; let columnIndex = index"
+           [class]="getColumnClasses(column)"
+           [attr.data-column-index]="columnIndex">
+
+        <div class="column-content h-100"
+             [class.empty-column]="getColumnComponents(columnIndex).length === 0 && !previewMode"
+             [class.drag-over-column]="dragOverColumn === columnIndex && !previewMode"
+             (dragover)="onColumnDragOver($event, columnIndex)"
+             (dragleave)="onColumnDragLeave($event, columnIndex)"
+             (drop)="onColumnDrop($event, columnIndex)">
+
+          <!-- Column components with hover behavior -->
+          <app-form-component-renderer
+            *ngFor="let columnComponent of getColumnComponents(columnIndex); trackBy: trackByComponentId"
+            [component]="columnComponent"
+            [previewMode]="previewMode"
+            [selected]="isChildSelected(columnComponent.id)"
+            [showToolbar]="isChildSelected(columnComponent.id) || isChildHovered(columnComponent.id)"
+            [hovered]="isChildHovered(columnComponent.id)"
+            (openProperties)="onChildOpenProperties(columnComponent)"
+            (deleteComponent)="onChildDeleteComponent(columnComponent.id)"
+            (mouseenter)="onChildMouseEnter(columnComponent.id)"
+            (mouseleave)="onChildMouseLeave(columnComponent.id)">
+          </app-form-component-renderer>
+
+          <!-- Empty column indicator -->
+          <div class="empty-column-indicator text-center text-muted py-4"
+               *ngIf="getColumnComponents(columnIndex).length === 0 && !previewMode">
+            <i class="bi bi-plus-circle-dotted fs-4"></i>
+            <p class="mb-0 small">Column {{ columnIndex + 1 }}</p>
+            <p class="mb-0 small">Drop components here</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Removed columns configuration - moved to toolbar -->
+  </div>
+
+  <!-- DataGrid -->
+  <div *ngIf="isDataGridType()" [class]="getDataGridContainerClasses()">
+    <div class="datagrid-label" *ngIf="component.label && !(component.properties.hideLabel && previewMode)">
+      <h6 class="mb-3">{{ component.label }}</h6>
+    </div>
+
+    <!-- Design Mode: Column Builder -->
+    <div *ngIf="!previewMode" class="datagrid-builder">
+      <!-- Columns Table -->
+      <div class="datagrid-columns-container">
+        <table class="table table-bordered table-sm">
+          <!-- Column Components -->
+          <tbody>
+            <tr class="columns-row">
+              <td *ngFor="let childComponent of component.children || []; trackBy: trackByComponentId"
+                  class="column-cell">
+                <!-- Render each child component properly -->
+                <app-form-component-renderer
+                  [component]="childComponent"
+                  [previewMode]="false"
+                  [selected]="isChildSelected(childComponent.id)"
+                  [showToolbar]="isChildSelected(childComponent.id)"
+                  [hovered]="false"
+                  (openProperties)="onChildOpenProperties(childComponent)"
+                  (deleteComponent)="onChildDeleteComponent(childComponent.id)">
+                </app-form-component-renderer>
+              </td>
+              <!-- Add Column Drop Zone -->
+              <td class="add-column-zone-cell"
+                  [class.drag-over]="dragOverContainer && !previewMode"
+                  (dragover)="onContainerDragOver($event)"
+                  (dragleave)="onContainerDragLeave($event)"
+                  (drop)="onContainerDrop($event)">
+                <div class="add-column-placeholder">
+                  <i class="bi bi-plus-circle-dotted"></i>
+                  <!-- <span>Arraste os componentes do painel esquerdo</span> -->
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <!-- Empty State -->
+        <!-- <div class="datagrid-empty-state" *ngIf="(!component.children || component.children.length === 0)">
+          <div class="empty-state-content text-center py-4">
+            <i class="bi bi-table fs-1 text-muted"></i>
+            <h6 class="mt-3 text-muted">Data Grid</h6>
+            <p class="text-muted mb-3">Drag components here to create table columns</p>
+            <div class="empty-drop-zone"
+                 [class.drag-over]="dragOverContainer"
+                 (dragover)="onContainerDragOver($event)"
+                 (dragleave)="onContainerDragLeave($event)"
+                 (drop)="onContainerDrop($event)">
+              <i class="bi bi-plus-circle-dotted"></i>
+              <span>Drop your first component</span>
+            </div>
+          </div>
+        </div> -->
+
+      </div>
+
+      <!-- DataGrid Configuration -->
+      <!-- <div class="datagrid-config mt-3">
+        <div class="d-flex justify-content-between align-items-center">
+          <small class="text-muted">
+            Columns: {{ component.children?.length || 0 }}
+          </small>
+          <div class="datagrid-controls">
+            <small class="text-muted me-2">{{ component.properties.addAnother || 'Add Another' }}</small>
+          </div>
+        </div>
+      </div> -->
+    </div>
+
+    <!-- Preview Mode: Data Table -->
+    <div *ngIf="previewMode" class="datagrid-preview">
+      <!-- Data Table -->
+      <div class="datagrid-table-container">
+        <table class="table table-striped table-sm" *ngIf="component.children && component.children.length > 0">
+          <thead class="table-dark">
+            <tr style="display: none">
+              <th *ngFor="let childComponent of component.children; trackBy: trackByComponentId; let i = index">
+                {{ childComponent.label || ('Column ' + (i + 1)) }}
+                <span class="text-danger" *ngIf="childComponent.required"></span>
+              </th>
+              <th width="100" *ngIf="!component.properties.disableAddingRemovingRows">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let row of getDataGridRows(); trackBy: trackByRowId; let rowIndex = index">
+              <td *ngFor="let childComponent of component.children; trackBy: trackByComponentId">
+                <app-form-component-renderer
+                  [component]="getRowComponent(childComponent, row, rowIndex)"
+                  [previewMode]="true"
+                  [selected]="false"
+                  [showToolbar]="false"
+                  (valueChange)="onRowComponentChange($event, row, childComponent.key)">
+                </app-form-component-renderer>
+              </td>
+              <td *ngIf="!component.properties.disableAddingRemovingRows" class="text-center">
+                <button type="button"
+                        class="btn btn-outline-danger btn-sm"
+                        (click)="removeDataGridRow(rowIndex)"
+                        title="Remove Row">
+                  <i class="bi bi-trash"></i>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <!-- Add Row Button -->
+        <div class="mt-3" *ngIf="!component.properties.disableAddingRemovingRows">
+          <button type="button"
+                  class="btn btn-outline-primary btn-sm"
+                  (click)="addDataGridRow()"
+                  [disabled]="isDataGridAtMaxRows()">
+            <i class="bi bi-plus"></i> {{ component.properties.addAnother || 'Add Another' }}
+          </button>
+
+          <!-- Debug Button (only in development) -->
+          <button type="button"
+                  class="btn btn-outline-secondary btn-sm ms-2"
+                  (click)="debugDataGridExport()"
+                  title="Debug DataGrid (console)">
+            <i class="bi bi-bug"></i> Debug
+          </button>
+
+          <!-- Validation Test Button -->
+          <button type="button"
+                  class="btn btn-outline-warning btn-sm ms-2"
+                  (click)="debugDataGridValidation()"
+                  title="Test DataGrid Validation (console)">
+            <i class="bi bi-check-circle"></i> Test Validation
+          </button>
+        </div>
+
+        <!-- Empty State for Preview -->
+        <div *ngIf="(!component.children || component.children.length === 0)" class="text-center py-4 text-muted">
+          <i class="bi bi-table fs-1"></i>
+          <p class="mt-2 mb-0">No columns defined</p>
+          <small>Switch to design mode to add columns</small>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Component Actions Toolbar -->
+  <div class="component-toolbar" *ngIf="(showToolbar || isHovered) && !previewMode">
+    <div class="toolbar-left">
+      <!-- <span class="component-type-badge">{{ component.type }}</span> -->
+    </div>
+    <div class="toolbar-right">
+      <!-- Columns specific actions -->
+      <button *ngIf="isColumnsType()"
+        class="btn btn-outline-success btn-xs"
+        (click)="addColumn()"
+        [disabled]="getColumns().length >= 6"
+        title="Add Column">
+        <i class="bi bi-plus"></i>
+      </button>
+      <button *ngIf="isColumnsType()"
+        class="btn btn-outline-warning btn-xs"
+        (click)="removeColumn()"
+        [disabled]="getColumns().length <= 1"
+        title="Remove Column">
+        <i class="bi bi-dash"></i>
+      </button>
+
+      <button
+        class="btn btn-outline-primary btn-xs"
+        (click)="onOpenProperties($event)"
+        title="Properties">
+        <i class="bi bi-gear"></i>
+      </button>
+      <button
+        class="btn btn-outline-danger btn-xs"
+        (click)="onDeleteComponent($event)"
+        title="Delete">
+        <i class="bi bi-trash"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- Design Mode Overlay -->
+  <div class="design-overlay" *ngIf="!previewMode">
+    <div class="component-info">
+      <span class="component-type">{{ component.type }}</span>
+      <span class="component-id">{{ component.id }}</span>
+    </div>
+
+    <!-- Validation indicators -->
+    <div class="validation-indicators" *ngIf="component.required || component.validation?.length || component.properties.conditional">
+      <!-- <span class="badge bg-warning" *ngIf="component.required" title="Required field">
+        <i class="bi bi-exclamation-triangle"></i>
+      </span> -->
+      <span class="badge bg-info" *ngIf="component.validation?.length" title="Has validation rules">
+        <i class="bi bi-shield-check"></i>
+      </span>
+      <span class="badge bg-secondary" *ngIf="component.properties.conditional"
+            [title]="'Conditional: ' + (component.properties.conditional.show === 'true' ? 'Show' : 'Hide') + ' when ' + component.properties.conditional.when + ' = ' + component.properties.conditional.eq">
+        <i class="bi bi-code-slash"></i>
+      </span>
+      <span class="badge bg-danger" *ngIf="!isVisible && !previewMode" title="Hidden by conditional logic">
+        <i class="bi bi-eye-slash"></i>
+      </span>
+    </div>
+  </div>
+</div>

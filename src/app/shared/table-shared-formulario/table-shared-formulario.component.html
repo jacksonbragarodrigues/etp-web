@@ -1,0 +1,88 @@
+<app-table
+  #table
+  height="550px"
+  paginationClass="d-flex justify-content-end"
+  tableClass="table table-hover table-striped table-bordered"
+  [responsive]="false"
+  [pagination]="true"
+  [paginationTop]="false"
+  [page]="page"
+  [scrollable]="false"
+  [paginationSelection]="true"
+  paginationPrevious="<"
+  paginationNext=">"
+  (lazyLoad)="tableLazyLoading($event)"
+>
+  <div empty>Nenhum registro foi encontrado</div>
+  <thead header>
+    <th sortable="id" (sort)="onSort($event)" class="text-left ps-4 pe-4">
+      ID
+    </th>
+    <th
+      sortable="descricao"
+      (sort)="onSort($event)"
+      class="text-left ps-4 pe-5"
+    >
+      Descrição
+    </th>
+    <th sortable="chave" (sort)="onSort($event)" class="text-left ps-4 pe-5">
+      Chave
+    </th>
+    <th class="text-left ps-4 pe-5">Data de modificação</th>
+    <th class="text-left ps-4 pe-5">Usuário de modificação</th>
+    <th class="text-left">Ações</th>
+  </thead>
+  <tbody body>
+    <ng-container
+      *ngFor="let itemCompartilhado of page?.content; let i = index"
+    >
+      <tr>
+        <td class="text-left">
+          {{ itemCompartilhado.id }}
+        </td>
+        <td class="text-left ps-4 pe-5">
+          {{ itemCompartilhado.descricao }}
+        </td>
+        <td class="text-left ps-4 pe-5">
+          {{ itemCompartilhado.chave }}
+        </td>
+        <td class="text-left ps-4 pe-5">
+          {{ gestaoBase.getDataModificacao(itemCompartilhado) }}
+        </td>
+        <td class="text-left ps-4 pe-5">
+          {{ gestaoBase.getUsuarioModificacao(itemCompartilhado) }}
+        </td>
+        <td style="font-weight: unset" class="text-left pe-3">
+          <button
+            (click)="editar(itemCompartilhado)"
+            style="border: none"
+            class="btn btn-ligth p-0 me-1 cursor-pointer"
+            ngbTooltip="Alterar"
+            noDoubleClick
+          >
+            <em class="fa-solid fa-file-pen"></em>
+          </button>
+          <button
+            (click)="excluir(itemCompartilhado)"
+            noDoubleClick
+            style="border: none"
+            class="btn btn-ligth p-0 me-1"
+            ngbTooltip="Excluir"
+          >
+            <em class="fa-solid fa-trash"></em>
+          </button>
+          <button
+            *ngIf="acaoExtraPai !== undefined"
+            (click)="acaoExtra(itemCompartilhado)"
+            noDoubleClick
+            style="border: none"
+            class="btn btn-ligth p-0 me-1"
+            ngbTooltip="{{ toolTipAcaoExtra }}"
+          >
+            <em class="{{ iconeAcaoExtra }}"></em>
+          </button>
+        </td>
+      </tr>
+    </ng-container>
+  </tbody>
+</app-table>

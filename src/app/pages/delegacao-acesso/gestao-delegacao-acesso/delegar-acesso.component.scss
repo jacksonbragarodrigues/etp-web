@@ -1,0 +1,68 @@
+.modal-largura-customizada .modal-dialog {
+  max-width: 80% !important; /* Define a largura da modal, por exemplo, 80% */
+}
+
+.modal {
+  width: 100% !important;
+  --bs-modal-width: 100% !important;
+}
+
+.modal-content {
+  width: 800px !important;
+}
+
+.remodal {
+  max-width: 100% !important;
+}
+
+.botoes {
+  background-color: #fff;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 5px;
+  margin-top: 20px;
+  button {
+    margin-left: 2px;
+    margin-right: 2px;
+  }
+}
+
+::ng-deep.theme-contrast .botoes {
+  background-color: #000000 !important;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 5px;
+  margin-top: 20px;
+  button {
+    margin-left: 2px;
+    margin-right: 2px;
+  }
+}
+
+::ng-deep.theme-contrast .p-tabview-nav-container {
+  background-color: #000000 !important;
+}
+
+::ng-deep .theme-contrast .p-tabview {
+  box-sizing: border-box;
+  color: var(--primary-color-text) !important;
+  background-color: #000000 !important;
+  .p-tabview-nav-content {
+    background-color: #000000!important;
+  }
+  .p-tabview-nav {
+    background-color: #000000 !important;
+  }
+  .p-tabview-panels {
+    background-color: #000000!important;
+  }
+}
+
+::ng-deep .theme-contrast .p-datatable {
+  background-color: #000000 !important;
+  .p-datatable-header {
+    background-color: #000000 !important;
+  }
+}

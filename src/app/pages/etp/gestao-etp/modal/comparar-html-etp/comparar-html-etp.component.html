@@ -1,0 +1,130 @@
+<div class="container-main">
+  <!-- Filtros -->
+  <div class="header-default">
+    @if (versaoSizeDiferenteDeUm) {
+    <div
+      class="row m-0 d-flex w-100 align-middle py-2 listagem-guias-pesquisa"
+      style="background-color: #004164; align-items: center; margin-left: 1px"
+    >
+      <div class="col-sm-12 callout t-18 text-center">
+        <span class="font-title">Comparação de versões</span>
+      </div>
+    </div>
+    <div class="form-group">
+      <div class="row row-form m-12">
+        <div class="col-sm-4 col-md-4 col-lg-4 col-xl-4">
+          <label for="listaVersoesInicial">Versão:</label>
+          <p-dropdown
+            [style]="{ width: '100%' }"
+            id="listaVersoesInicial"
+            [(ngModel)]="versaoInicial"
+            [options]="listaVersoesInicialEtp"
+            optionLabel="displayName"
+            placeholder="Selecione uma versão"
+            [filter]="true"
+            [filterFields]="['descricao']"
+            (onChange)="createHtmlEtp(''); habilitarListaFinalEtp()"
+          >
+            <ng-template let-etpInicial pTemplate="item">
+              <div class="flex align-items-center gap-2">
+                <div>
+                  <strong>{{ etpInicial.id }}</strong>
+                  -
+                  {{ etpInicial.descricao }} - <strong>Versão:</strong>
+                  {{ etpInicial.versao }}
+                </div>
+              </div>
+            </ng-template>
+          </p-dropdown>
+        </div>
+        @if (listaVersoesFinalEtp.length > 0) {
+        <div class="col-sm-4 col-md-4 col-lg-4 col-xl-4">
+          <label for="listaVersoesFinal">Compara com a versão:</label>
+          <p-dropdown
+            [disabled]="disabledSecondeList"
+            [style]="{ width: '100%' }"
+            id="listaVersoesFinal"
+            [(ngModel)]="versaoFinal"
+            [options]="listaVersoesFinalEtp"
+            optionLabel="displayName"
+            placeholder="Selecione uma versão para ser comparada"
+            [filter]="true"
+            [filterFields]="['descricao']"
+            (onChange)="createHtmlEtp('')"
+          >
+            <ng-template let-etpFinal pTemplate="item">
+              <div class="flex align-items-center gap-2">
+                <div>
+                  <strong>{{ etpFinal.id }}</strong> -
+                  {{ etpFinal.descricao }} - <strong>Versão:</strong>
+                  {{ etpFinal.versao }}
+                </div>
+              </div>
+            </ng-template>
+          </p-dropdown>
+        </div>
+        } @else {
+        <div
+          class="col-sm-4 col-md-4 col-lg-4 col-xl-4 d-flex justify-content-center align-items-center mt-4"
+        >
+          <div class="alert alert-warning" role="alert">
+            A versão selecionada já é a última.
+          </div>
+        </div>
+        }
+        <div class="col-sm-2 col-md-2 col-lg-2 col-xl-2 botoes">
+          <button
+            [disabled]="habilitarBotaoCompararEtp()"
+            (click)="compararHtmlEtp()"
+            type="button"
+            class="btn btn-secondary btn-info btn-size w-100"
+            style="color: white"
+          >
+            <em
+              _ngcontent-cfm-c345=""
+              class="fas fa-search float-center icons-btn icons-btn"
+            ></em
+            >Comparar
+          </button>
+        </div>
+      </div>
+    </div>
+    } @else {
+    <div
+      class="row m-0 d-flex w-100 align-middle py-2 listagem-guias-pesquisa"
+      style="background-color: #004164; align-items: center; margin-left: 1px"
+    >
+      <div class="col-sm-12 callout t-18 text-center">
+        <span class="font-title"
+          >Só existe uma versão para este formulário!</span
+        >
+      </div>
+    </div>
+    }
+  </div>
+</div>
+
+<div [hidden]="!temComparacao" class="container-main">
+  <!-- Filtros -->
+  <div class="header-default">
+    <div
+      class="row m-0 d-flex w-100 align-middle py-2 listagem-guias-pesquisa"
+      style="background-color: #004164; align-items: center; margin-left: 1px"
+    >
+      <div class="col-sm-12 callout t-18 text-center">
+        <span class="font-title"
+          >Diferenças: {{ versaoInicial?.descricao }} - Versão
+          {{ versaoInicial?.versao }} e {{ versaoFinal?.descricao }} - Versão
+          {{ versaoFinal?.versao }}</span
+        >
+      </div>
+    </div>
+    <div class="form-group">
+      <div
+        id="compararHtml"
+        class="overflow-auto border p-2"
+        style="max-height: 600px"
+      ></div>
+    </div>
+  </div>
+</div>

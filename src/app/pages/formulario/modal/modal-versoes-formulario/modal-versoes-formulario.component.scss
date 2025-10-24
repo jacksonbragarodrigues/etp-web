@@ -1,0 +1,76 @@
+@media screen and (max-width: 575px) {
+  .container-main {
+    margin: 10px !important;
+    margin-top: 0px !important;
+  }
+  .col-sm-12.col-md-12.col-lg-2.col-xl-2.btn-group.text-end {
+    display: flex !important;
+  }
+  span.font-title {
+    margin-left: 50% !important;
+  }
+}
+
+.theme-dark .btn-group,
+.theme-dark .btn-group-vertical {
+  display: block !important;
+}
+
+.btn-group,
+.btn-group-vertical {
+  display: block !important;
+}
+
+.titulo-tabela-centralizado {
+  margin-left: 36%;
+}
+
+.width-btn-acoes {
+  width: 106%;
+}
+
+.botao-fechar {
+  background: transparent;
+  border: none;
+  padding: 0;
+  width: auto;
+  height: auto;
+  outline: none;
+  border: none;
+  cursor: pointer;
+}
+
+.botao-fechar:focus {
+  outline: none; /* Remove o contorno padrão */
+  box-shadow: none; /* Remove sombras aplicadas pelo navegador */
+}
+
+.texto-botao {
+  font-size: 25px;
+  color: white;
+  margin-right: 5px;
+}
+
+.botoes {
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+}
+
+.menu-acao {
+  cursor: pointer !important;
+  pointer-events: all !important;
+}
+
+.modal {
+  width: 100% !important;
+  --bs-modal-width: 100% !important;
+}
+
+.modal-content {
+  width: 800px !important;
+}
+
+.remodal {
+  max-width: 100% !important;
+}

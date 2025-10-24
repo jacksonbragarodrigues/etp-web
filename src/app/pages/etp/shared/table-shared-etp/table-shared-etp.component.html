@@ -1,0 +1,84 @@
+<app-table
+  #table
+  height="550px"
+  paginationClass="d-flex justify-content-end"
+  tableClass="table table-hover table-striped table-bordered"
+  [responsive]="true"
+  [pagination]="true"
+  [paginationTop]="false"
+  [page]="page"
+  [scrollable]="false"
+  [paginationSelection]="true"
+  paginationPrevious="<"
+  paginationNext=">"
+  (lazyLoad)="tableLazyLoading($event)"
+>
+  <div empty>Nenhum registro foi encontrado</div>
+  <thead header>
+  <th class="text-left">ID</th>
+  <th *ngIf="!desabilitarCampos" class="text-left">Tipo de Contratação</th>
+  <th class="text-left">Descrição</th>
+  <th *ngIf="!desabilitarCampos" class="text-center">Processo SEI</th>
+  <th *ngIf="!desabilitarCampos" class="text-center">Número ETP</th>
+  <th *ngIf="!desabilitarCampos" class="text-left">Unidade</th>
+  <th class="text-center">Situação</th>
+  <th class="text-left">Etapa</th>
+  <th class="text-left">Versão</th>
+  <th class="text-left">Motivo Versionamento</th>
+  <th class="text-left">Modificado</th>
+  </thead>
+  <tbody body>
+  <ng-container *ngFor="let itemEtp of page?.content; let i = index">
+    <tr (click)="elaborarEtp(itemEtp)">
+      <td class="text-left">
+        {{ itemEtp.id }}
+      </td>
+      <td *ngIf="!desabilitarCampos" class="text-left motivo">
+        {{ itemEtp.tipoLicitacao.descricao }}
+      </td>
+      <td class="text-left" title="{{ itemEtp.descricao }}">
+        {{ itemEtp.descricao }}
+      </td>
+      <td *ngIf="!desabilitarCampos" class="text-center">
+        {{
+          itemEtp.numeroProcessoSei !== null
+            ? itemEtp.numeroProcessoSei + "/" + itemEtp.anoProcessoSei
+            : ""
+        }}
+      </td>
+      <td *ngIf="!desabilitarCampos" class="text-center">
+        {{
+          itemEtp.etpNumeracao !== null
+            ? itemEtp.etpNumeracao + "/" + itemEtp.ano
+            : ""
+        }}
+      </td>
+      <td *ngIf="!desabilitarCampos" class="text-left">
+        {{ itemEtp.unidadeSigla }}
+      </td>
+      <td class="text-left">
+        {{ itemEtp.situacao.descricao }}
+      </td>
+      <td class="text-left">
+        {{ itemEtp.etpEtapa.descricao }}
+      </td>
+      <td class="text-center">
+        {{ itemEtp.versao }}
+      </td>
+      <td
+        class="text-left motivo"
+        title="{{ itemEtp.dsMotivoVersionamento }} {{
+            itemEtp.dtVersionamento
+          }} {{ itemEtp.cdUsuarioVersionamento }}"
+      >
+        {{ itemEtp.dsMotivoVersionamento }} {{ itemEtp.dtVersionamento }}
+        {{ itemEtp.cdUsuarioVersionamento }}
+      </td>
+      <td class="text-left">
+        {{ gestaoBase.getDataModificacao(itemEtp) }}
+        {{ gestaoBase.getUsuarioModificacao(itemEtp) }}
+      </td>
+    </tr>
+  </ng-container>
+  </tbody>
+</app-table>

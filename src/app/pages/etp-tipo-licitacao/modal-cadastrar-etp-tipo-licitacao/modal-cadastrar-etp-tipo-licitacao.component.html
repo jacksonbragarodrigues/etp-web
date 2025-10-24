@@ -1,0 +1,319 @@
+<ng-template #modalCadastrarEtpTipoLicitacaoComponent class="modal fade">
+  <div class="modal-header">
+    <span>{{ titulo }}</span>
+    <div class="col-lg-1">
+      <button
+        style="
+          background-color: transparent;
+          border: none;
+          color: white;
+          padding-left: 85%;
+        "
+        (click)="close()"
+      >
+        X
+      </button>
+    </div>
+  </div>
+
+  <div class="mb-3 ml-3" *ngIf="descricaoTipoContratacao !== ''">
+    <span class="fw-bold padding-left:5px">Tipo de Contratação:</span>
+    <span class="text-dark ms-2">{{ descricaoTipoContratacao }}</span>
+  </div>
+
+  <div class="modal-body">
+    <div class="menu-lateral">
+      <menu-lateral
+        [tabsModel]="tabsModel"
+        posicaoMenu="left"
+        [menuSlim]="true"
+        [autoSelect]="true"
+      ></menu-lateral>
+      <div *ngIf="menuIndex == 0">
+        <form [formGroup]="gestaoEtpTipoLicitacaoModalForm">
+          <div class="row row-form m-12">
+            <div class="row m-12">
+              <div class="col-sm-12 col-md-6 col-lg-12 col-xl-12 mt-2">
+                <label for="descricao">Descrição</label>
+                <textarea
+                  formControlName="descricao"
+                  placeholder="Descrição do tipo de contratação"
+                  class="form-control"
+                  id="descricaoEtpTipoLicitacao"
+                  name="descricaoEtpTipoLicitacao"
+                  rows="5"
+                  maxlength="255"
+                ></textarea>
+              </div>
+              <app-error-mensage
+                [descricao]="'Descrição'"
+                [form]="gestaoEtpTipoLicitacaoModalForm"
+                [controlName]="'descricao'"
+              ></app-error-mensage>
+            </div>
+            <div class="row m-12">
+              <div class="col-sm-12 col-md-6 col-lg-12 col-xl-12 mt-2">
+                <label for="chave">Chave</label>
+                <input
+                  type="text"
+                  formControlName="chave"
+                  placeholder="Chave do tipo de contratação"
+                  class="form-control"
+                  id="chaveEtpTipoLicitacao"
+                  name="chaveEtpTipoLicitacao"
+                  appForceUppercase
+                />
+              </div>
+              <app-error-mensage
+                [descricao]="'Chave'"
+                [form]="gestaoEtpTipoLicitacaoModalForm"
+                [controlName]="'chave'"
+              ></app-error-mensage>
+            </div>
+          </div>
+
+          <div class="row row-form" style="margin-top: 30px">
+            <div class="col">
+              <button
+                noDoubleClick
+                [disabled]="!gestaoEtpTipoLicitacaoModalForm.valid"
+                (click)="gravar()"
+                type="button"
+                class="w-100 success-btn-color btn btn-success"
+                type="submit"
+              >
+                <em class="fa fa-lg fa-check float-center pt-1"></em> Gravar
+              </button>
+            </div>
+
+            <div class="col">
+              <button
+                noDoubleClick
+                (click)="close()"
+                type="button"
+                class="w-100 btn btn-danger"
+                data-bs-dismiss="modal"
+              >
+                <em class="fa fa-lg fa-minus-circle float-center pt-1"></em>
+                Cancelar
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="row" *ngIf="menuIndex == 1">
+        <div class="col-sm-12">
+          <div class="header-ficha respopnsivo-style">
+            <div class="row m-0 d-flex w-100 align-middle py-2 header-table">
+              <div
+                class="col-sm-12 col-md-12 col-lg-12 col-xl-12 callout text-center titulo-table-mobile"
+              >
+                <div class="row align-items-center">
+                  <!-- Texto centralizado -->
+                  <div class="col text-center">
+                    <span class="font-title">Unidades de análise</span>
+                  </div>
+                  <!-- Botão alinhado à direita -->
+                  <div class="col-auto text-end">
+                    <button
+                      noDoubleClick
+                      style="width: 10%; min-width: 40px"
+                      title="Adicionar unidade de análise"
+                      type="button"
+                      class="btn btn-success success-btn-color"
+                      (click)="adicionarEtpUnidadeAnalise()"
+                    >
+                      <em
+                        class="fa fa-lg fa-plus float-center pt-1 pr-1 icons-btn"
+                        style="font-size: 15px"
+                      ></em>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <app-table
+              #table
+              height="50px"
+              paginationClass="d-flex justify-content-end"
+              tableClass="table table-hover table-striped table-bordered"
+              [responsive]="false"
+              [pagination]="true"
+              [paginationTop]="false"
+              [page]="page"
+              [scrollable]="false"
+              [paginationSelection]="true"
+              paginationPrevious="<"
+              paginationNext=">"
+              (lazyLoad)="tableLazyLoading($event)"
+            >
+              <div empty>Nenhuma unidade de análise atribuida</div>
+              <thead header>
+                <th class="text-left">Unidade</th>
+                <th class="text-left">Descrição</th>
+                <th class="text-left">Etapa</th>
+                <th class="text-left">Data de modificação</th>
+                <th class="text-left">Usuário de modificação</th>
+                <th class="text-center">Ações</th>
+              </thead>
+              <tbody body>
+                <ng-container
+                  *ngFor="let unidadeAnalise of page?.content; let i = index"
+                >
+                  <tr>
+                    <td class="text-center">
+                      {{ unidadeAnalise.siglaUnidade }}
+                    </td>
+                    <td class="text-center">{{ unidadeAnalise.dsUnidade }}</td>
+                    <td class="text-center">{{ unidadeAnalise.dsEtapa }}</td>
+                    <td class="text-left ps-4 pe-5">
+                      {{ gestaoBase.getDataModificacao(unidadeAnalise) }}
+                    </td>
+                    <td class="text-left ps-4 pe-5">
+                      {{ gestaoBase.getUsuarioModificacao(unidadeAnalise) }}
+                    </td>
+                    <td style="font-weight: unset" class="text-center pe-3">
+                      <button
+                        (click)="editarEtpUnidadeAnalise(unidadeAnalise)"
+                        style="border: none"
+                        class="btn btn-ligth p-0 me-1 cursor-pointer"
+                        ngbTooltip="Alterar"
+                        noDoubleClick
+                      >
+                        <em class="fa-solid fa-file-pen"></em>
+                      </button>
+                      <button
+                        (click)="excluirEtpUnidadeAnalise(unidadeAnalise)"
+                        noDoubleClick
+                        style="border: none"
+                        class="btn btn-ligth p-0 me-1"
+                        ngbTooltip="Excluir"
+                      >
+                        <em class="fa-solid fa-trash"></em>
+                      </button>
+                    </td>
+                  </tr>
+                </ng-container>
+              </tbody>
+            </app-table>
+          </div>
+        </div>
+      </div>
+      <div class="row" *ngIf="menuIndex == 2">
+        <div class="col-sm-12">
+          <div class="header-ficha respopnsivo-style">
+            <div class="row m-0 d-flex w-100 align-middle py-2 header-table">
+              <div
+                class="col-sm-12 col-md-12 col-lg-12 col-xl-12 callout text-center titulo-table-mobile"
+              >
+                <div class="row align-items-center">
+                  <!-- Texto centralizado -->
+                  <div class="col text-center">
+                    <span class="font-title">Prazos</span>
+                  </div>
+                  <!-- Botão alinhado à direita -->
+                  <div class="col-auto text-end">
+                    <button
+                      noDoubleClick
+                      style="width: 10%; min-width: 40px"
+                      title="Adicionar prazo"
+                      type="button"
+                      class="btn btn-success success-btn-color"
+                      (click)="adicionarEtpPrazo()"
+                    >
+                      <em
+                        class="fa fa-lg fa-plus float-center pt-1 pr-1 icons-btn"
+                        style="font-size: 15px"
+                      ></em>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <app-table
+              #table
+              height="50px"
+              paginationClass="d-flex justify-content-end"
+              tableClass="table table-hover table-striped table-bordered"
+              [responsive]="false"
+              [pagination]="true"
+              [paginationTop]="false"
+              [page]="page"
+              [scrollable]="false"
+              [paginationSelection]="true"
+              paginationPrevious="<"
+              paginationNext=">"
+              (lazyLoad)="tableLazyLoadingPrazo($event)"
+            >
+              <div empty>Nenhum prazo atribuido</div>
+              <thead header>
+                <th class="text-left">Prioridade</th>
+                <th class="text-left">Etapa</th>
+                <th class="text-left">Motivação</th>
+                <th class="text-left">Dias Limite Revisor</th>
+                <th class="text-left">Dias Limite Analista</th>
+                <th class="text-left">Status</th>
+                <th class="text-left">Data de modificação</th>
+                <th class="text-left">Usuário de modificação</th>
+                <th class="text-center">Ações</th>
+              </thead>
+              <tbody body>
+                <ng-container
+                  *ngFor="let prazo of pagePrazo?.content; let i = index"
+                >
+                  <tr>
+                    <td class="text-center">{{ prazo.dsPrioridade }}</td>
+                    <td class="text-center">{{ prazo.dsEtapa }}</td>
+                    <td class="text-center">{{ prazo.motivacaoPrazo }}</td>
+                    <td class="text-center">
+                      {{ prazo.qtdDiasLimiteRevisor }}
+                    </td>
+                    <td class="text-center">
+                      {{ prazo.qtdDiasLimiteAnalista }}
+                    </td>
+                    <td class="text-center">
+                      {{ prazo.indStRegistro === "A" ? "Ativo" : "Inativo" }}
+                    </td>
+                    <td class="text-left ps-4 pe-5">
+                      {{ gestaoBase.getDataModificacao(prazo) }}
+                    </td>
+                    <td class="text-left ps-4 pe-5">
+                      {{ gestaoBase.getUsuarioModificacao(prazo) }}
+                    </td>
+                    <td style="font-weight: unset" class="text-center pe-3">
+                      <button
+                        (click)="editarEtpPrazo(prazo)"
+                        style="border: none"
+                        class="btn btn-ligth p-0 me-1 cursor-pointer"
+                        ngbTooltip="Alterar"
+                        noDoubleClick
+                      >
+                        <em class="fa-solid fa-file-pen"></em>
+                      </button>
+                      <button
+                        (click)="excluirEtpPrazo(prazo)"
+                        noDoubleClick
+                        style="border: none"
+                        class="btn btn-ligth p-0 me-1"
+                        ngbTooltip="Excluir"
+                      >
+                        <em class="fa-solid fa-trash"></em>
+                      </button>
+                    </td>
+                  </tr>
+                </ng-container>
+              </tbody>
+            </app-table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-template>
+
+<etp-unidade-analise
+  #etpUnidadeAnalise
+  (enviarUnidadeAnalise)="incluirUnidadeAnalise($event)"
+>
+</etp-unidade-analise>
+<etp-prazo #etpPrazo (enviarPrazo)="incluirPrazo($event)"> </etp-prazo>

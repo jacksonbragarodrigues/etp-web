@@ -1,0 +1,8 @@
+include:
+  - project: 'devops/templates/template-gitlab-ci'
+    ref: master
+    file: '/Npm.gitlab-ci.yml'
+
+variables:
+  TAG_JOBS_NODE:
+    value: "node20-build"

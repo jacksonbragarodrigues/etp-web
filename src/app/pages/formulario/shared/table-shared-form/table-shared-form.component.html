@@ -1,0 +1,61 @@
+<app-table
+  #table
+  height="550px"
+  paginationClass="d-flex justify-content-end"
+  tableClass="table table-hover table-striped table-bordered"
+  [responsive]="false"
+  [pagination]="true"
+  [paginationTop]="false"
+  [page]="page"
+  [scrollable]="false"
+  [paginationSelection]="true"
+  paginationPrevious="<"
+  paginationNext=">"
+  (lazyLoad)="tableLazyLoading($event)"
+>
+  <div empty>Nenhum registro foi encontrado</div>
+  <thead header>
+    <th class="text-left">ID</th>
+    <th class="text-left">Assunto</th>
+    <th class="text-left">Situação</th>
+    <th class="text-left">Descrição</th>
+    <th class="text-left">Versão</th>
+    <th class="text-left">Motivo Versionamento</th>
+    <th class="text-left">Modificado</th>
+  </thead>
+  <tbody body>
+    <ng-container *ngFor="let itemFormulario of page?.content; let i = index">
+      <tr (click)="construirForm(itemFormulario)">
+        <td class="text-left">
+          {{ itemFormulario.id }}
+        </td>
+        <td class="text-left">
+          {{ itemFormulario.assunto.descricao }}
+        </td>
+        <td class="text-left">
+          {{ itemFormulario.situacao.descricao }}
+        </td>
+        <td class="text-left">
+          {{ itemFormulario.descricao }}
+        </td>
+        <td class="text-left">
+          {{ itemFormulario.versao }}
+        </td>
+        <td
+          class="text-left"
+          title="{{ itemFormulario.motivoVersionamento }} {{
+            itemFormulario.dataVersionamento
+          }} {{ itemFormulario.cdUsuarioVersionamento }}"
+        >
+          {{ itemFormulario.motivoVersionamento }}
+          {{ itemFormulario.dataVersionamento }}
+          {{ itemFormulario.cdUsuarioVersionamento }}
+        </td>
+        <td class="text-left">
+          {{ gestaoBase.getDataModificacao(itemFormulario) }}
+          {{ gestaoBase.getUsuarioModificacao(itemFormulario) }}
+        </td>
+      </tr>
+    </ng-container>
+  </tbody>
+</app-table>

@@ -1,0 +1,122 @@
+<ng-template
+  #etpUnidadeAnalise
+  class="modal modal-xl fade"
+  data-bs-backdrop="static"
+  xmlns="http://www.w3.org/1999/html"
+>
+  <div class="modal-header">
+    <span>{{ titulo }}</span>
+  </div>
+
+  <div class="modal-body">
+    <form [formGroup]="unidadeAnaliseForm">
+      <div class="row row-form m-12">
+        <div class="col-sm-12 col-md-4 col-lg-12 col-xl-12">
+          <label for="etapaId" class="text">Etapa</label>
+          <select formControlName="etapaId" id="etapaId" class="form-select">
+            <option *ngFor="let item of etapasList" selected [value]="item.id">
+              {{ item.id + " - " + item.descricao }}
+            </option>
+          </select>
+          <app-error-mensage
+            [descricao]="'Etapa'"
+            [form]="unidadeAnaliseForm"
+            [controlName]="'etapaId'"
+          ></app-error-mensage>
+        </div>
+      </div>
+      <div class="row row-form m-12">
+        <div class="col-sm-12 col-md-4 col-lg-12 col-xl-12">
+          <label for="unidade" class="text">Unidade</label>
+          <select
+            *ngIf="unidadesList.length === 1"
+            formControlName="unidadeUsarioLogado"
+            class="form-select"
+          >
+            <option
+              *ngFor="let item of unidadesList"
+              selected
+              [value]="item.id"
+            >
+              {{ item.descricaoSigla }}
+            </option>
+          </select>
+          <p-autoComplete
+            *ngIf="unidadesList.length > 1"
+            field="descricaoSigla"
+            id="unidade"
+            formControlName="unidadeId"
+            styleClass="w-100"
+            inputStyleClass="w-100"
+            [suggestions]="unidadeListFiltrada"
+            [minLength]="3"
+            (completeMethod)="buscarUnidades($event)"
+            [forceSelection]="true"
+            [baseZIndex]="9999999"
+          >
+          </p-autoComplete>
+          <app-error-mensage
+            [descricao]="'Unidade'"
+            [form]="unidadeAnaliseForm"
+            [controlName]="'unidadeId'"
+          ></app-error-mensage>
+        </div>
+        <div class="col-sm-12 col-md-6 col-lg-12 col-xl-12 mt-2">
+          <label for="padrao" class="text">Padrão</label>
+          <select formControlName="padrao" class="form-select">
+            <option *ngFor="let item of padraoList" selected [value]="item.id">
+              {{ item.descricao }}
+            </option>
+          </select>
+          <app-error-mensage
+            [descricao]="'Padrão'"
+            [form]="unidadeAnaliseForm"
+            [controlName]="'padrao'"
+          ></app-error-mensage>
+        </div>
+        <div class="col-sm-12 col-md-6 col-lg-12 col-xl-12 mt-2">
+            <label for="descricao">Descrição</label>
+            <textarea
+              formControlName="descricao"
+              placeholder="Descrição"
+              class="form-control"
+              id="descricao"
+              name="descricao"
+              rows="5"
+              maxlength="255"
+            ></textarea>
+          </div>
+      </div>
+    </form>
+    <div class="row row-form" style="margin-top: 30px; padding-right: 2%">
+      <div class="botoes">
+        <div></div>
+        <div>
+          <button
+            style="margin: 5px"
+            noDoubleClick
+            [disabled]="unidadeAnaliseForm.invalid"
+            (click)="enviarUnidadeAnaliseSelecionada()"
+            type="button"
+            class="btn btn-success btn-size"
+            type="submit"
+          >
+            <em class="fa-solid fa-floppy-disk"></em> Salvar
+          </button>
+
+          <button
+            style="margin: 5px"
+            noDoubleClick
+            (click)="close()"
+            type="button"
+            class="btn btn-danger btn-size"
+            data-bs-dismiss="modal"
+          >
+            <em class="fa fa-lg fa-minus-circle float-center pt-1"></em>
+            Cancelar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-template>

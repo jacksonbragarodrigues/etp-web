@@ -1,0 +1,109 @@
+<ng-template
+  #selecionarAnalista
+  class="modal modal-xl fade"
+  data-bs-backdrop="static"
+  xmlns="http://www.w3.org/1999/html">
+
+  <div class="modal-header">
+    <span>{{ titulo }}</span>
+  </div>
+
+  <div class="modal-body">
+    <form [formGroup]="selecionarAnalistaForm">
+      <div class="row row-form m-12">
+        <div class="col-sm-12">
+          <label class="form-label fw-bolder">Usuário</label>
+        </div>
+        <div class="col-sm-12">
+          <p-autoComplete field="nomeServidor"
+                          id="nomeServidor"
+                          inputStyleClass="w-100"
+                          styleClass="w-100"
+                          [(ngModel)]="analistaSelecionado"
+                          [ngModelOptions]="{standalone: true}"
+                          [suggestions]="analistListFilter"
+                          [minLength]="3"
+                          (completeMethod)="buscarAnalistaPorNome($event)"
+                          (onSelect)="onAnalistaSlecionado($event)"
+                          [forceSelection]="true"
+                          (onClear)="clearAnalistaSlecionado()"
+                          (onUnselect)="clearAnalistaSlecionado()">
+
+          </p-autoComplete>
+        </div>
+      </div>
+      <div class="row row-form m-12" style="margin-top: 10px!important">
+        <div class="col-sm-12 col-md-4 col-lg-6 col-xl-4">
+          <select formControlName="tipoPermissao"
+                  id="tipoPermissao"
+                  class="form-select">
+            <option [value]="null" selected disabled label="Tipo Permissão"></option>
+            <option *ngFor="let item of tipoPermissaoList"
+                    [value]="item.chave">
+              {{ item.descricao }}
+            </option>
+
+          </select>
+          <app-error-mensage
+            [descricao]="'Tipo permissão'"
+            [form]="selecionarAnalistaForm"
+            [controlName]="'tipoPermissao'"
+          ></app-error-mensage>
+        </div>
+
+        <div class="col-sm-12 col-md-4 col-lg-6 col-xl-4">
+          <input
+            type="date"
+            id="dataInicial"
+            class="form-control"
+            formControlName="dataInicial"
+            style="width: 100% !important; height: 100%"
+          />
+        </div>
+
+        <div class="col-sm-12 col-md-4 col-lg-6 col-xl-4">
+          <input
+            type="date"
+            id="dataFinal"
+            class="form-control"
+            formControlName="dataFinal"
+            style="width: 100% !important; height: 100%"
+          />
+        </div>
+
+      </div>
+    </form>
+    <div class="row row-form" style="margin-top: 30px; padding-right: 2%;">
+      <div class="botoes">
+        <div></div>
+        <div>
+          <button
+            style="margin: 5px"
+            noDoubleClick
+            [disabled]="selecionarAnalistaForm.invalid"
+            (click)="enviarAnalistaSelecionado()"
+            type="button"
+            class="btn btn-success btn-size"
+            type="submit"
+          >
+            <em class="fa-solid fa-floppy-disk"></em> Selecionar
+          </button>
+
+          <button
+            style="margin: 5px"
+            noDoubleClick
+            (click)="close()"
+            type="button"
+            class="btn btn-danger btn-size"
+            data-bs-dismiss="modal"
+          >
+            <em class="fa fa-lg fa-minus-circle float-center pt-1"></em>
+            Cancelar
+          </button>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+</ng-template>

@@ -1,0 +1,62 @@
+<ng-template
+  #versionarFormularioComponent
+  class="modal modal-xl fade"
+  data-bs-backdrop="static"
+>
+  <div class="modal-header">
+    <span>Versionar Formulário</span>
+  </div>
+
+  <div class="modal-body">
+    <form [formGroup]="gestaoVersaoFormularioModalForm">
+      <div class="row row-form m-12">
+        <div class="row m-12">
+          <div class="col-sm-12 col-md-6 col-lg-12 col-xl-12 mt-2">
+            <label for="descricaoversao">Motivo</label>
+            <textarea
+              formControlName="descricao"
+              placeholder="Motivo do versionamento"
+              class="form-control"
+              id="descricaoversao"
+              name="descricaoversao"
+              rows="5"
+              maxlength="255"
+            ></textarea>
+            <app-error-mensage
+              [descricao]="'Motivo'"
+              [form]="gestaoVersaoFormularioModalForm"
+              [controlName]="'descricao'"
+            ></app-error-mensage>
+          </div>
+        </div>
+      </div>
+      <div class="row row-form" style="margin-top: 30px">
+        <div class="col">
+          <button
+            noDoubleClick
+            (click)="executaVersionarFormulario()"
+            [disabled]="!gestaoVersaoFormularioModalForm.valid"
+            type="button"
+            class="w-100 success-btn-color btn btn-success"
+            type="submit"
+          >
+            <em class="fa fa-lg fa-check float-center pt-1"></em> Versionar
+          </button>
+        </div>
+
+        <div class="col">
+          <button
+            noDoubleClick
+            (click)="closeFormulario()"
+            type="button"
+            class="w-100 btn btn-danger"
+            data-bs-dismiss="modal"
+          >
+            <em class="fa fa-lg fa-minus-circle float-center pt-1"></em>
+            Cancelar
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+</ng-template>

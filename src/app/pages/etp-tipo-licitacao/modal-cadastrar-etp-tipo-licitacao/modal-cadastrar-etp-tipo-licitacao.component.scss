@@ -1,0 +1,24 @@
+.centraliza-checkbox {
+  position: relative;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+
+.menu-lateral {
+  display: flex;
+  flex-direction: row;
+  gap: 40px; /* Espaço automático entre menu e conteúdo */
+}
+
+
+.menu-lateral > div {
+  flex: 1;               /* O conteúdo ocupa o restante */
+}
+
+
+
+
+
+
+

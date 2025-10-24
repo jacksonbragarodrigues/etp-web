@@ -1,0 +1,51 @@
+<ng-template #modalVisualizarFormularioPadraoComponent class="modal modal-xl fade">
+  <div class="modal-header">
+    <span
+      >Visualização do Formulário Padrão</span
+    >
+  </div>
+  <div class="modal-body">
+    <div class="row mt-4">
+      <div class="col-1">
+        <div class="maximinizar">
+          <a
+            (click)="openFullScreenFormularioView('conteudoMenu')"
+            data-toggle="tooltip"
+            data-placement="top"
+            title="Tela Cheia"
+          >
+            <i class="fas fa-expand"></i
+          ></a>
+        </div>
+        <menu-lateral
+          [tabsModel]="tabsModel"
+          posicaoMenu="left"
+          [menuSlim]="true"
+        >
+        </menu-lateral>
+      </div>
+      <div id="conteudoMenu" class="col-11 py-4 ps-5 pe-4 border shadow">
+        <div [hidden]="menuIndex != 0">
+          <formio id="renderizador"></formio>
+        </div>
+
+      </div>
+    </div>
+  </div>
+  <div class="modal-footer botoes" *ngIf="parametrosView.renderizarFooter">
+    <div class="row botoes" style="width: 50%">
+      <div class="col">
+        <button
+          noDoubleClick
+          (click)="close()"
+          type="button"
+          class="w-100 btn btn-danger"
+          data-bs-dismiss="modal"
+        >
+          <em class="fa fa-lg fa-minus-circle float-center pt-1"></em>
+          Fechar
+        </button>
+      </div>
+    </div>
+  </div>
+</ng-template>

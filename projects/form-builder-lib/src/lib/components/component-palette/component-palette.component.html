@@ -1,0 +1,240 @@
+<div class="component-palette p-3">
+  
+  <!-- Search and Filter Section -->
+  <div class="palette-header mb-3">
+    <!-- Search Box -->
+    <div class="search-box mb-3">
+      <div class="input-group input-group-sm">
+        <span class="input-group-text">
+          <i class="bi bi-search"></i>
+        </span>
+        <input
+          type="text"
+          class="form-control"
+          placeholder="Pesquisar..."
+          [(ngModel)]="searchTerm"
+          (input)="onSearchChange()">
+      </div>
+    </div>
+  </div>
+
+  <!-- Components Accordion -->
+  <div class="components-accordion">
+    <div class="accordion" id="componentsAccordion">
+
+      <!-- Basic Components -->
+      <div class="accordion-item">
+        <h2 class="accordion-header" id="headingBasic">
+          <button class="accordion-button"
+                  [class.collapsed]="!isAccordionOpen('basic')"
+                  type="button"
+                  (click)="toggleAccordion('basic')"
+                  [attr.aria-expanded]="isAccordionOpen('basic')">
+            <i class="bi bi-input-cursor me-2"></i>
+            Básicos
+            <span class="badge bg-primary ms-2">{{ getComponentsByCategory('basic').length }}</span>
+          </button>
+        </h2>
+        <div id="collapseBasic"
+             class="accordion-collapse collapse"
+             [class.show]="isAccordionOpen('basic')"
+             aria-labelledby="headingBasic">
+          <div class="accordion-body p-2">
+            <div class="components-grid">
+              <div
+                *ngFor="let template of getFilteredComponentsByCategory('basic'); trackBy: trackByType"
+                class="component-item"
+                draggable="true"
+                (dragstart)="onDragStart($event, template)"
+                (dragend)="onDragEnd()"
+                [title]="template.description">
+      
+                <!-- Component Icon -->
+                <div class="component-icon">
+                  <i [class]="getIconClass(template)"></i>
+                </div>
+
+                <!-- Component Info -->
+                <div class="component-info">
+                  <div class="component-name">{{ template.label }}</div>
+                  <div class="component-description">{{ template.description }}</div>
+                </div>
+
+                <!-- Drag Indicator -->
+                <div class="drag-indicator">
+                  <i class="bi bi-grip-vertical"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+      <!-- Layout Components -->
+      <div class="accordion-item">
+        <h2 class="accordion-header" id="headingLayout">
+          <button class="accordion-button"
+                  [class.collapsed]="!isAccordionOpen('layout')"
+                  type="button"
+                  (click)="toggleAccordion('layout')"
+                  [attr.aria-expanded]="isAccordionOpen('layout')">
+            <i class="bi bi-layout-three-columns me-2"></i>
+            Layout
+            <span class="badge bg-info ms-2">{{ getComponentsByCategory('layout').length }}</span>
+          </button>
+        </h2>
+        <div id="collapseLayout"
+             class="accordion-collapse collapse"
+             [class.show]="isAccordionOpen('layout')"
+             aria-labelledby="headingLayout">
+          <div class="accordion-body p-2">
+            <div class="components-grid">
+              <div
+                *ngFor="let template of getFilteredComponentsByCategory('layout'); trackBy: trackByType"
+                class="component-item"
+                draggable="true"
+                (dragstart)="onDragStart($event, template)"
+                (dragend)="onDragEnd()"
+                [title]="template.description">
+
+                <div class="component-icon">
+                  <i [class]="getIconClass(template)"></i>
+                </div>
+                <div class="component-info">
+                  <div class="component-name">{{ template.label }}</div>
+                  <div class="component-description">{{ template.description }}</div>
+                </div>
+                <div class="drag-indicator">
+                  <i class="bi bi-grip-vertical"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Data Components -->
+      <div class="accordion-item">
+        <h2 class="accordion-header" id="headingData">
+          <button class="accordion-button"
+                  [class.collapsed]="!isAccordionOpen('data')"
+                  type="button"
+                  (click)="toggleAccordion('data')"
+                  [attr.aria-expanded]="isAccordionOpen('data')">
+            <i class="bi bi-table me-2"></i>
+            Data
+            <span class="badge bg-success ms-2">{{ getComponentsByCategory('data').length }}</span>
+          </button>
+        </h2>
+        <div id="collapseData"
+             class="accordion-collapse collapse"
+             [class.show]="isAccordionOpen('data')"
+             aria-labelledby="headingData">
+          <div class="accordion-body p-2">
+            <div class="components-grid">
+              <div
+                *ngFor="let template of getFilteredComponentsByCategory('data'); trackBy: trackByType"
+                class="component-item"
+                draggable="true"
+                (dragstart)="onDragStart($event, template)"
+                (dragend)="onDragEnd()"
+                [title]="template.description">
+
+                <div class="component-icon">
+                  <i [class]="getIconClass(template)"></i>
+                </div>
+                <div class="component-info">
+                  <div class="component-name">{{ template.label }}</div>
+                  <div class="component-description">{{ template.description }}</div>
+                </div>
+                <div class="drag-indicator">
+                  <i class="bi bi-grip-vertical"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Custom Components -->
+      <div class="accordion-item">
+        <h2 class="accordion-header" id="headingCustom">
+          <button class="accordion-button"
+                  [class.collapsed]="!isAccordionOpen('custom')"
+                  type="button"
+                  (click)="toggleAccordion('custom')"
+                  [attr.aria-expanded]="isAccordionOpen('custom')">
+            <i class="bi bi-gear me-2"></i>
+            Customizados
+            <span class="badge bg-warning ms-2">{{ getComponentsByCategory('custom').length }}</span>
+          </button>
+        </h2>
+        <div id="collapseCustom"
+             class="accordion-collapse collapse"
+             [class.show]="isAccordionOpen('custom')"
+             aria-labelledby="headingCustom">
+          <div class="accordion-body p-2">
+            <div class="components-grid">
+              <div
+                *ngFor="let template of getFilteredComponentsByCategory('custom'); trackBy: trackByType"
+                class="component-item"
+                draggable="true"
+                (dragstart)="onDragStart($event, template)"
+                (dragend)="onDragEnd()"
+                [title]="template.description">
+
+                <div class="component-icon">
+                  <i [class]="getIconClass(template)"></i>
+                </div>
+                <div class="component-info">
+                  <div class="component-name">{{ template.label }}</div>
+                  <div class="component-description">{{ template.description }}</div>
+                </div>
+                <div class="drag-indicator">
+                  <i class="bi bi-grip-vertical"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Empty State (when search has no results) -->
+    <div class="empty-state text-center py-4" *ngIf="searchTerm && getFilteredComponents().length === 0">
+      <i class="bi bi-search text-muted" style="font-size: 2rem;"></i>
+      <p class="text-muted mt-2 mb-0">No components found</p>
+      <small class="text-muted">Try adjusting your search terms</small>
+    </div>
+  </div>
+
+  <!-- Help Section -->
+  <!-- <div class="palette-help mt-4 p-3 bg-light rounded">
+    <h6 class="fw-semibold mb-2">
+      <i class="bi bi-info-circle me-2"></i>
+      How to Use
+    </h6>
+    <ul class="small text-muted mb-0">
+      <li><strong>Drag & Drop:</strong> Drag components to the form canvas</li>
+      <li><strong>Click to Add:</strong> Click any component to add it directly</li>
+      <li><strong>Search:</strong> Use the search box to find specific components</li>
+      <li><strong>Categories:</strong> Filter by component type for easier browsing</li>
+    </ul>
+  </div> -->
+
+  <!-- Quick Actions -->
+  <!-- <div class="quick-actions mt-3">
+    <div class="d-grid gap-2">
+      <button class="btn btn-outline-success btn-sm" (click)="addMostUsed()">
+        <i class="bi bi-lightning me-1"></i>
+        Add Most Used
+      </button>
+      <button class="btn btn-outline-info btn-sm" (click)="addFormTemplate()">
+        <i class="bi bi-file-earmark-text me-1"></i>
+        Use Template
+      </button>
+    </div>
+  </div> -->
+</div>

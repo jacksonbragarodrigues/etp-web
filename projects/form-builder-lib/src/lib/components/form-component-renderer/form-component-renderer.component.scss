@@ -1,0 +1,1033 @@
+.form-component-rendered {
+  position: relative;
+  transition: all 0.2s ease;
+
+  &.design-mode {
+    border: 1px solid transparent;
+    border-radius: 0.375rem;
+    padding: 8px;
+    
+    &:hover {
+      border-color: #007bff;
+      background-color: rgba(0, 123, 255, 0.02);
+    }
+
+    &.selected {
+      border-color: #007bff;
+      background-color: rgba(0, 123, 255, 0.05);
+      box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+    }
+
+    &.hovered {
+      border-color: #007bff;
+      background-color: rgba(0, 123, 255, 0.02);
+      box-shadow: 0 2px 8px rgba(0, 123, 255, 0.15);
+    }
+  }
+
+  // Panel specific styles
+  .card {
+    position: relative;
+    
+    .panel-content {
+      min-height: 80px;
+      transition: all 0.3s ease;
+      
+      &.drag-over {
+        border: 2px dashed #28a745;
+        background-color: rgba(40, 167, 69, 0.1);
+        border-radius: 0.375rem;
+      }
+      
+      .empty-panel {
+        border: 2px dashed #dee2e6;
+        border-radius: 0.375rem;
+        transition: all 0.3s ease;
+        
+        &:hover {
+          border-color: #007bff;
+          background-color: rgba(0, 123, 255, 0.05);
+        }
+        
+        i {
+          font-size: 2rem;
+          opacity: 0.3;
+        }
+      }
+    }
+  }
+
+  // Form controls styling
+  .form-control,
+  .form-select {
+    transition: all 0.2s ease;
+
+    &:focus {
+      border-color: #ced4da;
+      box-shadow: none;
+      outline: none;
+    }
+  }
+
+  // Required field indicator
+  .required::after {
+    content: ' *';
+    color: #dc3545;
+    font-weight: bold;
+  }
+
+  // Validation indicators in design mode
+  .design-overlay {
+    position: absolute;
+    top: 0;
+    right: 0;
+    z-index: 10;
+    
+    .component-info {
+      display: none;
+      position: absolute;
+      top: -8px;
+      right: -8px;
+      background: #343a40;
+      color: white;
+      padding: 4px 8px;
+      border-radius: 0.25rem;
+      font-size: 0.75rem;
+      white-space: nowrap;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+      
+      .component-type {
+        font-weight: 600;
+        text-transform: uppercase;
+      }
+      
+      .component-id {
+        opacity: 0.7;
+        margin-left: 8px;
+        font-size: 0.7rem;
+      }
+    }
+    
+    .validation-indicators {
+      position: absolute;
+      top: -12px;
+      right: -12px;
+      display: flex;
+      gap: 4px;
+      
+      .badge {
+        font-size: 0.65rem;
+        padding: 2px 6px;
+        
+        i {
+          font-size: 0.7rem;
+        }
+      }
+    }
+  }
+
+  &:hover .design-overlay .component-info {
+    display: none;
+  }
+
+  // Component toolbar styling
+  .component-toolbar {
+    position: absolute;
+    top: -12px;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 20;
+    opacity: 1;
+    transition: opacity 0.2s ease;
+    
+    .toolbar-left {
+      .component-type-badge {
+        background: #007bff;
+        color: white;
+        padding: 2px 8px;
+        border-radius: 0.25rem;
+        font-size: 0.7rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+      }
+    }
+    
+    .toolbar-right {
+      display: flex;
+      gap: 4px;
+
+      .btn-xs {
+        padding: 2px 6px;
+        font-size: 0.7rem;
+        line-height: 1.2;
+        border-radius: 0.25rem;
+
+        i {
+          font-size: 0.7rem;
+        }
+
+        &.btn-outline-success {
+          border-color: #28a745;
+          color: #28a745;
+
+          &:hover {
+            background-color: #28a745;
+            color: white;
+          }
+        }
+
+        &.btn-outline-warning {
+          border-color: #ffc107;
+          color: #856404;
+
+          &:hover {
+            background-color: #ffc107;
+            color: #212529;
+          }
+        }
+      }
+    }
+  }
+
+  .component-toolbar {
+    opacity: 1;
+  }
+
+  // Conditional logic styling
+  &[style*="opacity: 0.5"] {
+    .design-overlay::before {
+      content: 'Hidden by conditional logic';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(220, 53, 69, 0.9);
+      color: white;
+      padding: 4px 8px;
+      border-radius: 0.25rem;
+      font-size: 0.75rem;
+      font-weight: 500;
+      white-space: nowrap;
+      z-index: 30;
+      pointer-events: none;
+    }
+  }
+
+  // Collapse icon styling for panels
+  .collapse-icon {
+    user-select: none;
+    
+    i {
+      transition: transform 0.2s ease;
+    }
+    
+    &:hover i {
+      transform: scale(1.1);
+    }
+  }
+
+  // Input groups with prefix
+  .input-group {
+    .input-group-text {
+      background-color: #f8f9fa;
+      border-color: #ced4da;
+      color: #495057;
+      font-weight: 500;
+    }
+  }
+
+  // Horizontal layout for radio/checkbox/select
+  .d-flex.flex-wrap.gap-3 {
+    .form-check {
+      margin-bottom: 0;
+      
+      .form-check-input {
+        margin-top: 0.125em;
+      }
+      
+      .form-check-label {
+        padding-left: 0.5rem;
+        font-weight: 400;
+      }
+    }
+  }
+
+  // Character count styling
+  .form-text {
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+    
+    &:empty {
+      display: none;
+    }
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+  .form-component-rendered {
+    &.design-mode {
+      padding: 6px;
+    }
+    
+    .component-toolbar {
+      .toolbar-left .component-type-badge {
+        font-size: 0.65rem;
+        padding: 1px 6px;
+      }
+      
+      .toolbar-right .btn-xs {
+        padding: 1px 4px;
+        font-size: 0.65rem;
+        
+        i {
+          font-size: 0.65rem;
+        }
+      }
+    }
+    
+    .design-overlay {
+      .component-info {
+        font-size: 0.7rem;
+        padding: 2px 6px;
+        
+        .component-id {
+          display: none;
+        }
+      }
+      
+      .validation-indicators .badge {
+        font-size: 0.6rem;
+        padding: 1px 4px;
+      }
+    }
+  }
+}
+
+// Animation for new components
+.form-component-rendered {
+  animation: componentFadeIn 0.3s ease-out;
+}
+
+@keyframes componentFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// Focus states for accessibility
+.form-component-rendered:focus-within {
+  outline: none;
+}
+
+// High contrast mode support
+@media (prefers-contrast: high) {
+  .form-component-rendered {
+    &.design-mode {
+      border-width: 2px;
+      
+      &.selected {
+        border-width: 3px;
+      }
+    }
+    
+    .component-toolbar {
+      .component-type-badge {
+        border: 1px solid white;
+      }
+    }
+  }
+}
+
+// Reduced motion support
+@media (prefers-reduced-motion: reduce) {
+  .form-component-rendered,
+  .form-control,
+  .form-select,
+  .component-toolbar,
+  .collapse-icon i {
+    transition: none;
+  }
+  
+  .form-component-rendered {
+    animation: none;
+  }
+}
+
+// Rich Text Editor (CKEditor) specific styles
+.rich-text-editor-wrapper {
+  // CKEditor styling overrides
+  ::ng-deep {
+    .ck-editor {
+      .ck-toolbar {
+        border-top: 1px solid #c4c4c4;
+        border-left: 1px solid #c4c4c4;
+        border-right: 1px solid #c4c4c4;
+        border-radius: 0.375rem 0.375rem 0 0;
+        background: #f8f9fa;
+      }
+
+      .ck-content {
+        border-bottom: 1px solid #c4c4c4;
+        border-left: 1px solid #c4c4c4;
+        border-right: 1px solid #c4c4c4;
+        border-radius: 0 0 0.375rem 0.375rem;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        font-size: 14px;
+        line-height: 1.6;
+        min-height: var(--ck-editor-height, 200px);
+
+        &:focus {
+          border-color: #c4c4c4;
+          box-shadow: none;
+          outline: none;
+        }
+      }
+
+      &.ck-focused {
+        .ck-toolbar {
+          border-color: #c4c4c4;
+        }
+
+        .ck-content {
+          border-color: #c4c4c4;
+        }
+      }
+
+      &.ck-read-only {
+        .ck-toolbar {
+          display: none;
+        }
+
+        .ck-content {
+          background-color: #f8f9fa;
+          border-radius: 0.375rem;
+        }
+      }
+    }
+  }
+
+  // Ensure proper spacing in design mode
+  .design-mode & {
+    margin-bottom: 0.5rem;
+  }
+
+  // Disabled state styling
+  &:has([disabled]) {
+    ::ng-deep .ck-editor {
+      opacity: 0.6;
+      pointer-events: none;
+    }
+  }
+}
+
+// Print styles
+@media print {
+  .form-component-rendered {
+    .design-overlay,
+    .component-toolbar {
+      display: none !important;
+    }
+
+    &.design-mode {
+      border: none !important;
+      padding: 0 !important;
+      background: none !important;
+      box-shadow: none !important;
+    }
+
+    .rich-text-toolbar {
+      display: none !important;
+    }
+  }
+}
+
+// Columns specific styles
+.columns-container {
+  position: relative;
+
+  .columns-main-label {
+    color: #495057;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    display: block;
+    font-size: 1rem;
+
+    .text-danger {
+      color: #dc3545 !important;
+    }
+
+    .fa-question-circle {
+      cursor: help;
+    }
+  }
+
+  .columns-label h6 {
+    color: #495057;
+    font-weight: 600;
+    margin-bottom: 1rem;
+  }
+
+  .row {
+    &.drag-over {
+      border: 2px dashed #28a745;
+      background-color: rgba(40, 167, 69, 0.05);
+      border-radius: 0.375rem;
+      padding: 8px;
+    }
+
+    .column-content {
+      // min-height: 100px;
+      border: 1px solid transparent;
+      border-radius: 0.375rem;
+      padding: 2px;
+      transition: all 0.3s ease;
+      background-color: rgba(248, 249, 250, 0.3);
+
+      &.empty-column {
+        border-style: dashed;
+        border-color: #dee2e6;
+      }
+
+      &.drag-over-column {
+        border: 2px dashed #28a745;
+        background-color: rgba(40, 167, 69, 0.1);
+      }
+
+      &:hover.empty-column {
+        border-color: #007bff;
+        background-color: rgba(0, 123, 255, 0.05);
+      }
+
+      .empty-column-indicator {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        min-height: 80px;
+
+        i {
+          margin-bottom: 8px;
+          opacity: 0.6;
+        }
+
+        p {
+          font-size: 0.8rem;
+          opacity: 0.7;
+          line-height: 1.2;
+        }
+      }
+    }
+  }
+
+  .columns-config {
+    padding: 8px 12px;
+    background-color: rgba(248, 249, 250, 0.8);
+    border-radius: 0.25rem;
+    border: 1px solid #e9ecef;
+    font-size: 0.75rem;
+
+    small {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+
+      span {
+        font-weight: 500;
+        color: #495057;
+      }
+    }
+
+    .column-controls {
+      display: flex;
+      align-items: center;
+
+      .btn-sm {
+        padding: 2px 6px;
+        font-size: 0.7rem;
+        line-height: 1.2;
+
+        i {
+          font-size: 0.7rem;
+        }
+      }
+    }
+  }
+}
+
+// DataGrid specific styles
+.datagrid-container {
+  position: relative;
+
+  .datagrid-label h6 {
+    color: #495057;
+    font-weight: 600;
+    margin-bottom: 1rem;
+  }
+
+  // Builder Mode Styles
+  .datagrid-builder {
+    .datagrid-columns-container {
+      border: 1px solid #dee2e6;
+      border-radius: 0.375rem;
+      overflow: hidden;
+
+      .table {
+        margin-bottom: 0;
+
+        .columns-row {
+          .column-cell {
+            padding: 0.5rem;
+            background-color: rgba(248, 249, 250, 0.3);
+            border: 1px solid #dee2e6;
+            vertical-align: top;
+            min-width: 200px;
+
+            .form-component-rendered {
+              margin-bottom: 0;
+
+              &.design-mode {
+                border: 1px solid transparent;
+                border-radius: 0.375rem;
+                transition: all 0.2s ease;
+
+                &:hover {
+                  border-color: #007bff;
+                  background-color: rgba(0, 123, 255, 0.02);
+                  box-shadow: 0 2px 8px rgba(0, 123, 255, 0.15);
+                }
+
+                &.selected {
+                  border-color: #007bff;
+                  background-color: rgba(0, 123, 255, 0.05);
+                  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+                }
+              }
+
+              .component-toolbar {
+                position: absolute;
+                top: -8px;
+                right: -8px;
+                z-index: 20;
+              }
+
+              .design-overlay {
+                .component-info {
+                  font-size: 0.7rem;
+                  padding: 2px 6px;
+                }
+              }
+            }
+          }
+
+          .add-column-zone-cell {
+            background-color: #f8f9fa;
+            border: 2px dashed #dee2e6;
+            text-align: center;
+            width: 150px;
+            transition: all 0.3s ease;
+            vertical-align: middle;
+
+            &.drag-over {
+              border-color: #28a745;
+              background-color: rgba(40, 167, 69, 0.1);
+            }
+
+            .add-column-placeholder {
+              padding: 1rem 0.5rem;
+              color: #6c757d;
+              font-size: 0.8rem;
+
+              i {
+                display: block;
+                font-size: 1.2rem;
+                margin-bottom: 0.25rem;
+              }
+            }
+          }
+        }
+      }
+    }
+
+    .datagrid-empty-state {
+      border: 2px dashed #dee2e6;
+      border-radius: 0.375rem;
+
+      .empty-state-content {
+        .empty-drop-zone {
+          display: inline-flex;
+          flex-direction: column;
+          align-items: center;
+          padding: 1.5rem 2rem;
+          border: 2px dashed #dee2e6;
+          border-radius: 0.375rem;
+          background-color: #f8f9fa;
+          transition: all 0.3s ease;
+          cursor: pointer;
+
+          &.drag-over {
+            border-color: #28a745;
+            background-color: rgba(40, 167, 69, 0.1);
+          }
+
+          i {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            color: #6c757d;
+          }
+
+          span {
+            font-size: 0.9rem;
+            color: #6c757d;
+          }
+        }
+      }
+    }
+
+    .datagrid-config {
+      padding: 0.5rem;
+      background-color: rgba(248, 249, 250, 0.8);
+      border-radius: 0.25rem;
+      border: 1px solid #e9ecef;
+
+      small {
+        font-size: 0.75rem;
+        color: #6c757d;
+      }
+    }
+  }
+
+  // Preview Mode Styles
+  .datagrid-preview {
+    .datagrid-table-container {
+      border: 1px solid #dee2e6;
+      border-radius: 0.375rem;
+      overflow: hidden;
+
+      .table {
+        margin-bottom: 0;
+
+        .table-dark th {
+          background-color: #343a40;
+          color: white;
+          border-color: #495057;
+          font-weight: 600;
+          font-size: 0.875rem;
+          padding: 0.75rem 0.5rem;
+        }
+
+        td {
+          border-color: #dee2e6;
+          padding: 0.375rem 0.5rem;
+          vertical-align: middle;
+
+          .form-component-rendered {
+            margin-bottom: 0;
+
+            .form-control, .form-select {
+              font-size: 0.875rem;
+              padding: 0.375rem 0.5rem;
+            }
+
+            .component-toolbar, .design-overlay {
+              display: none;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+// Empty state styling for DataGrid
+.datagrid-container .table td[colspan] {
+  background-color: #f8f9fa;
+
+  i {
+    font-size: 2rem;
+    color: #dee2e6;
+  }
+
+  p {
+    color: #6c757d;
+    font-size: 0.9rem;
+  }
+
+  small {
+    color: #adb5bd;
+    font-size: 0.8rem;
+  }
+}
+
+// Responsive adjustments for DataGrid
+@media (max-width: 768px) {
+  .datagrid-container {
+    .table {
+      font-size: 0.75rem;
+
+      th, td {
+        padding: 0.375rem 0.25rem;
+      }
+
+      .reorder-column {
+        display: none;
+      }
+
+      .data-cell .form-control,
+      .data-cell .form-select {
+        font-size: 0.75rem;
+        padding: 0.25rem 0.375rem;
+      }
+    }
+
+    .datagrid-add-top .btn,
+    .datagrid-add-bottom .btn {
+      font-size: 0.75rem;
+      padding: 0.375rem 0.75rem;
+    }
+  }
+}
+
+// Select chips styling
+.chips-container {
+  min-height: 2.5rem;
+  padding: 0.5rem 0.75rem;
+  transition: all 0.2s ease;
+  background-color: #fff;
+
+  &.disabled {
+    background-color: #e9ecef;
+    opacity: 0.65;
+    pointer-events: none;
+  }
+
+  &:focus-within {
+    border-color: #ced4da;
+    box-shadow: none;
+  }
+
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    line-height: 1;
+    border-radius: 1rem;
+    margin: 0.125rem;
+    transition: all 0.2s ease;
+    max-width: 100%;
+
+    .chip-label {
+      flex: 1 1 auto;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      max-width: 100%;
+    }
+
+    &:hover {
+      background-color: #0056b3 !important;
+      transform: translateY(-1px);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .btn-close {
+      font-size: 0.7rem;
+      padding: 0;
+      width: 0.8rem;
+      height: 0.8rem;
+      margin-left: 0.375rem;
+      opacity: 0.8;
+      transition: all 0.2s ease;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+
+      &:hover {
+        opacity: 1;
+        background-color: rgba(255, 255, 255, 0.2);
+        transform: scale(1.1);
+      }
+
+      &:focus {
+        outline: 2px solid rgba(255, 255, 255, 0.5);
+        outline-offset: 1px;
+      }
+
+      &:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+      }
+    }
+  }
+
+  .text-muted {
+    font-size: 0.875rem;
+    line-height: 1.5;
+    color: #6c757d !important;
+  }
+}
+
+// Responsive adjustments for chips
+@media (max-width: 768px) {
+  .chips-container {
+    .chip {
+      font-size: 0.8rem;
+      padding: 0.2rem 0.4rem;
+      max-width: 100%;
+
+      .chip-label {
+        max-width: 100%;
+      }
+
+      .btn-close {
+        font-size: 0.65rem;
+        width: 0.7rem;
+        height: 0.7rem;
+        margin-left: 0.25rem;
+      }
+    }
+  }
+}
+
+// High contrast mode support for chips
+@media (prefers-contrast: high) {
+  .chips-container {
+    .chip {
+      border: 1px solid #ffffff;
+
+      .btn-close {
+        border: 1px solid rgba(255, 255, 255, 0.5);
+      }
+    }
+  }
+}
+
+// Animation for chip addition/removal
+.chip {
+  animation: chipFadeIn 0.2s ease-out;
+}
+
+@keyframes chipFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+// Focus management for chips
+.chips-container:focus-within .chip:last-child {
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.5);
+}
+
+// Print styles for chips
+@media print {
+  .chips-container {
+    border: 1px solid #000 !important;
+
+    .chip {
+      background-color: #000 !important;
+      color: #fff !important;
+
+      .btn-close {
+        display: none !important;
+      }
+    }
+  }
+}
+
+// Validation error message styles
+.text-danger.small {
+  font-weight: 500;
+  line-height: 1.4;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.25rem;
+
+  i {
+    flex-shrink: 0;
+    margin-top: 0.125rem;
+    font-size: 0.9rem;
+  }
+
+  // Animation when error appears
+  animation: validationErrorSlideIn 0.3s ease-out;
+}
+
+@keyframes validationErrorSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+    max-height: 0;
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    max-height: 50px;
+  }
+}
+
+// Form control validation state styling
+.form-control.is-invalid,
+.form-select.is-invalid {
+  border-color: #dc3545;
+
+  &:focus {
+    border-color: #dc3545;
+    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+  }
+}
+
+.form-label {
+   font-weight: bold !important;
+}
+
+.form-check {
+  padding-left: 0.9em !important;
+}
+
+// Text Help Link styling for preview mode
+.text-help-link-container {
+  margin: 0.5rem 0;
+}
+
+.text-help-link {
+  font-size: 0.875rem;
+  color: #007bff;
+  text-decoration: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem 0;
+  transition: all 0.2s ease;
+
+  &:hover,
+  &:focus {
+    color: #0056b3;
+    text-decoration: underline;
+  }
+
+  i {
+    font-size: 0.9rem;
+    opacity: 0.85;
+  }
+}

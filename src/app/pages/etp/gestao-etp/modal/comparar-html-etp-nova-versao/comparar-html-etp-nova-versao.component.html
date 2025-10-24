@@ -1,0 +1,46 @@
+<ng-template #htmlNovaVersao class="modal modal-xl fade">
+  <div class="modal-header">
+    <span class="font-title text-center">Comparação de versões</span>
+  </div>
+  <div class="modal-body">
+    <div class="mensagem-warnning">
+      Esse ETP possui uma nova versão do modelo, verifique as alterações abaixo
+      e se desejar utilize a nova versão.
+    </div>
+    <div class="botoes-comparacao">
+      <button
+        (click)="aceitarNovaVersaoHtml()"
+        title="Utilizar a nova versão"
+        type="button"
+        class="btn btn-success btn-size"
+        style="color: white"
+      >
+        <em
+          _ngcontent-cfm-c345=""
+          class="fas fa-arrow-down float-center icons-btn icons-btn"
+        ></em
+        >Utilizar a nova versão
+      </button>
+      <button
+        (click)="cancelarNovaVersaoHtml()"
+        title="Sair"
+        type="button"
+        class="btn btn-danger btn-size"
+        style="color: white"
+      >
+        <em
+          _ngcontent-cfm-c345=""
+          class="fas fa-minus-circle float-center icons-btn icons-btn"
+        ></em
+        >Cancelar
+      </button>
+    </div>
+    <div class="form-group">
+      <div
+        id="compararHtmlNovo"
+        class="overflow-auto border p-2"
+        style="max-height: 400px"
+      ></div>
+    </div>
+  </div>
+</ng-template>

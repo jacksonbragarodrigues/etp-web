@@ -1,0 +1,179 @@
+<div class="steps-wizard">
+  <!-- <div class="d-flex align-items-center justify-content-between mb-3">
+    <h6 class="mb-0 fw-semibold text-muted">
+      <i class="bi bi-list-ol me-2"></i>
+      Form Steps
+    </h6>
+    <button 
+      class="btn btn-primary btn-sm"
+      (click)="onAddStep()"
+      title="Add New Step">
+      <i class="bi bi-plus me-1"></i>
+      Add Step
+    </button>
+  </div> -->
+
+  <div class="steps-container">
+
+    <!-- Steps Scrollable Area -->
+    <div class="steps-scroll-area">
+      <div class="steps-scroll-container" *ngIf="state.formSchema.steps.length > 0">
+        <ng-container *ngFor="let step of state.formSchema.steps; trackBy: trackByStepId">
+          <div
+            *ngIf="shouldShowStep(step)"
+            class="step-item"
+            [class.active]="isStepActive(step.id)"
+            [class.selected]="isStepSelected(step.id)"
+            [class.disabled]="isStepDisabled(step)"
+            (mousedown)="!isStepDisabled(step) && onStepPress(step.id, $event)">
+
+            <!-- Step Content -->
+            <div class="step-content">
+
+              <!-- Step Actions Toolbar (Floating) -->
+              <div class="step-toolbar" *ngIf="editingStepId !== step.id" (mousedown)="$event.stopPropagation()">
+                <div class="toolbar-actions">
+                  <button
+                    class="btn btn-outline-secondary btn-xs"
+                    [disabled]="!canMoveLeft(step)"
+                    (mousedown)="$event.stopPropagation()"
+                    (click)="onMoveStep(step.id, 'left', $event)"
+                    title="Move Left">
+                    <i class="bi bi-chevron-left"></i>
+                  </button>
+                  <button
+                    class="btn btn-outline-primary btn-xs"
+                    (mousedown)="$event.stopPropagation()"
+                    (click)="onStartEdit(step, $event)"
+                    title="Edit Title">
+                    <i class="bi bi-pencil"></i>
+                  </button>
+                  <button
+                    class="btn btn-outline-secondary btn-xs"
+                    [disabled]="!canMoveRight(step)"
+                    (mousedown)="$event.stopPropagation()"
+                    (click)="onMoveStep(step.id, 'right', $event)"
+                    title="Move Right">
+                    <i class="bi bi-chevron-right"></i>
+                  </button>
+                  <button
+                    class="btn btn-outline-danger btn-xs"
+                    [disabled]="state.formSchema.steps.length <= 1"
+                    (mousedown)="$event.stopPropagation()"
+                    (click)="onRemoveStep(step.id, $event)"
+                    title="Remove Step">
+                    <i class="bi bi-trash"></i>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Save/Cancel Toolbar (Floating) -->
+              <div class="step-toolbar" *ngIf="editingStepId === step.id" (mousedown)="$event.stopPropagation()">
+                <div class="toolbar-actions">
+                  <button
+                    class="btn btn-success btn-xs"
+                    (mousedown)="$event.stopPropagation()"
+                    (click)="onSaveEdit()"
+                    title="Save">
+                    <i class="bi bi-check"></i>
+                  </button>
+                  <button
+                    class="btn btn-secondary btn-xs"
+                    (mousedown)="$event.stopPropagation()"
+                    (click)="onCancelEdit()"
+                    title="Cancel">
+                    <i class="bi bi-x"></i>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Step Header (number + title) -->
+              <div class="step-header d-flex align-items-center" *ngIf="editingStepId !== step.id">
+                <div class="step-number me-2">
+                  {{ getStepNumber(step) }}
+                </div>
+                <div class="step-title">
+                  {{ step.title }}
+                  <i class="bi bi-code-slash text-info ms-2"
+                     *ngIf="!state.previewMode && hasStepConditionalLogic(step)"
+                     title="Este step tem lógica condicional configurada"
+                     data-bs-toggle="tooltip"
+                     data-bs-placement="top"></i>
+                  <i *ngIf="shouldShowValidationIcon(step)"
+                     [class]="getValidationIcon(step) + ' validation-icon ms-2'"
+                     [title]="isStepValid(step) ? 'Step válido' : 'Step com campos obrigatórios não preenchidos'"></i>
+                  <!-- <small class="component-count text-muted ms-1" *ngIf="step.components">
+                    ({{ step.components.length }})
+                  </small> -->
+                </div>
+              </div>
+
+              <!-- Step Header Editor -->
+              <div class="step-header d-flex align-items-center" *ngIf="editingStepId === step.id">
+                <div class="step-number me-2">
+                  {{ getStepNumber(step) }}
+                </div>
+                <div class="step-title-editor flex-grow-1">
+                  <input
+                    type="text"
+                    class="form-control form-control-sm"
+                    [(ngModel)]="editingTitle"
+                    (keydown)="onKeyPress($event)"
+                    (blur)="onSaveEdit()"
+                    #titleInput>
+                </div>
+              </div>
+            </div>
+
+            <!-- Active Step Indicator -->
+            <div class="active-indicator" *ngIf="isStepActive(step.id)">
+              <i class="bi bi-caret-down-fill"></i>
+            </div>
+          </div>
+        </ng-container>
+      </div>
+
+      <!-- Empty State -->
+      <div class="empty-state text-center py-4" *ngIf="state.formSchema.steps.length === 0">
+        <i class="bi bi-plus-circle text-muted" style="font-size: 2rem;"></i>
+        <p class="text-muted mt-2 mb-0">No steps created yet</p>
+        <small class="text-muted">Click "Add Step" to get started</small>
+      </div>
+    </div>
+
+    <!-- Fixed Add Button -->
+    <div class="add-step-button">
+      <button
+        class="btn btn-primary btn-sm"
+        (click)="onAddStep()"
+        title="Add New Step">
+        <i class="bi bi-plus me-1"></i>
+        Novo
+      </button>
+    </div>
+
+  </div>
+
+  <!-- Steps Navigation (for large number of steps) -->
+  <!-- <div class="steps-navigation mt-3" *ngIf="state.formSchema.steps.length > 5">
+    <nav aria-label="Steps navigation">
+      <ul class="pagination pagination-sm justify-content-center mb-0">
+        <li class="page-item" [class.disabled]="!canNavigatePrevious()">
+          <button class="page-link" (click)="navigatePrevious()" aria-label="Previous">
+            <i class="bi bi-chevron-left"></i>
+          </button>
+        </li>
+        <li class="page-item active">
+          <span class="page-link">
+            {{ getCurrentStepNumber() }} of {{ state.formSchema.steps.length }}
+          </span>
+        </li>
+        <li class="page-item" [class.disabled]="!canNavigateNext()">
+          <button class="page-link" (click)="navigateNext()" aria-label="Next">
+            <i class="bi bi-chevron-right"></i>
+          </button>
+        </li>
+      </ul>
+    </nav>
+  </div> -->
+</div>

@@ -1,0 +1,690 @@
+<div class="form-builder-container d-flex flex-column">
+  <!-- Modal de Apontamentos e Notas -->
+  <app-annotations-modal #annotationsModal></app-annotations-modal>
+  <!-- CKEditor Modal for Analysis Rich Text -->
+  <app-ck-editor-modal #ckEditorModal></app-ck-editor-modal>
+
+  <!-- Edit Mode Layout -->
+  <div *ngIf="!state.previewMode && !state.analysisMode">
+    <!-- Top Panel: Steps Wizard -->
+    <div class="top-panel bg-white border-bottom p-1">
+      <!-- <div class="d-flex justify-content-between align-items-center">
+        <div class="d-flex gap-2">
+
+          <button
+            class="btn btn-outline-primary btn-sm" [hidden]="!ioEnabled"
+            [hidden]="!ioEnabled" (click)="onExportForm()">
+            <i class="bi bi-download me-1"></i>
+            Export
+          </button>
+          <button
+            class="btn btn-outline-warning btn-sm"
+            [hidden]="!ioEnabled" (click)="onClearData()"
+            title="Limpar todos os dados digitados no formulário">
+            <i class="bi bi-trash me-1"></i>
+            Limpar Dados
+          </button>
+          <label class="btn btn-outline-success btn-sm mb-0" [hidden]="!ioEnabled">
+            <i class="bi bi-upload me-1"></i>
+            Import
+            <input
+              type="file"
+              accept=".json"
+              class="d-none"
+              (change)="onImportForm($event)">
+          </label>
+        </div>
+      </div> -->
+      <div class="mt-1">
+        <app-steps-wizard></app-steps-wizard>
+      </div>
+    </div>
+
+    <!-- Main Content Area -->
+    <div class="main-content d-flex flex-grow-1" style="height: calc(100vh - 120px);">
+
+      <!-- Left Panel: Component Palette -->
+      <div class="left-panel bg-white border-end" style="width: 280px; min-width: 280px;">
+        <div class="panel-header border-bottom p-3">
+          <h6 class="mb-0 fw-semibold">
+            <i class="bi bi-palette me-2"></i>
+            Componentes
+          </h6>
+        </div>
+        <div class="panel-body h-100 overflow-auto custom-scrollbar">
+          <app-component-palette></app-component-palette>
+        </div>
+      </div>
+
+      <!-- Center Panel: Form Canvas -->
+      <div class="center-panel flex-grow-1 bg-light position-relative">
+        <div class="panel-header bg-white border-bottom p-3">
+          <h6 class="mb-0 fw-semibold">
+            <i class="bi bi-pencil-square me-2"></i>
+            <span class="mb-0 fw-semibold" *ngIf="state.currentStep && getCurrentStepLabel()">
+              {{ getCurrentStepLabel() }}
+            </span>
+          </h6>
+        </div>
+        <div class="panel-body h-100 overflow-auto custom-scrollbar p-1">
+          <app-form-canvas></app-form-canvas>
+        </div>
+      </div>
+
+      <!-- Right Panel: Properties & Hierarchy -->
+      <div class="right-panel bg-white border-start" style="width: 350px; min-width: 350px;">
+        <app-properties-panel></app-properties-panel>
+      </div>
+
+    </div>
+
+    <!-- Status Bar (Optional) -->
+    <div class="status-bar bg-light border-top px-3 py-2 small text-muted">
+      <div class="d-flex justify-content-between">
+        <span>
+          Components: {{ getCurrentStepComponentsCount() }}
+        </span>
+        <span *ngIf="state.selectedComponent">
+          Selected: {{ getSelectedComponentLabel() }}
+        </span>
+        <span>
+          Steps: {{ getStepsCount() }}
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Global loading overlay -->
+  <div class="builder-global-overlay" *ngIf="isStepLoading">
+    <div class="spinner-border text-primary" role="status" aria-label="Carregando"></div>
+  </div>
+
+  <!-- Preview Mode Layout with 5 Panels -->
+  <div *ngIf="state.previewMode" class="preview-layout d-flex flex-column" style="height: 100vh;">
+
+    <!-- 1. Top Panel: FORMULÁRIO -->
+    <!-- <div class="preview-top-panel bg-primary text-white p-3"> -->
+    <!-- <div class="d-flex justify-content-between align-items-center"> -->
+    <!-- <div class="d-flex gap-2"> -->
+    <!-- Botões para gerenciar dados -->
+    <!-- <button
+            class="btn btn-outline-light btn-sm"
+            [hidden]="!ioEnabled" (click)="onExportData()"
+            title="Exportar dados digitados">
+            <i class="bi bi-download me-1"></i>
+            Dados
+          </button>
+          <button
+            class="btn btn-outline-warning btn-sm"
+            [hidden]="!ioEnabled" (click)="onDebugExportData()"
+            title="Debug exporta��ão de dados (console)">
+            <i class="bi bi-bug me-1"></i>
+            Debug
+          </button>
+          <label class="btn btn-outline-light btn-sm mb-0" title="Importar dados digitados" [hidden]="!ioEnabled">
+            <i class="bi bi-upload me-1"></i>
+            Dados
+            <input
+              type="file"
+              accept=".json"
+              class="d-none"
+              (change)="onImportData($event)">
+          </label>
+          <button
+            class="btn btn-outline-warning btn-sm"
+            [hidden]="!ioEnabled" (click)="onClearData()"
+            title="Limpar todos os dados digitados">
+            <i class="bi bi-trash me-1"></i>
+            Limpar
+          </button>
+        </div> -->
+    <!-- </div> -->
+    <!-- </div> -->
+
+    <!-- Main Content with 2 or 3 panels -->
+    <div class="preview-main-content d-flex flex-grow-1">
+
+      <!-- 2. Left Panel: Menu Principal -->
+      <div class="preview-left-panel bg-light border-end p-3" style="width: 350px; min-width: 350px;">
+        <h6 class="mb-3 fw-semibold">
+          <i class="bi bi-list-ol me-2"></i>
+          Menu Principal
+        </h6>
+        <div class="steps-menu">
+          <div *ngFor="let step of state.formSchema.steps; let i = index" class="step-item mb-2">
+            <button class="btn w-100 text-start" [class.btn-primary]="step.id === state.currentStep"
+              [class.btn-outline-secondary]="step.id !== state.currentStep"
+              (mousedown)="onPreviewStepPress(step.id, $event)">
+              <!-- <i class="bi bi-check-circle me-2" *ngIf="step.id !== state.currentStep"></i>
+              <i class="bi bi-arrow-right me-2" *ngIf="step.id === state.currentStep"></i> -->
+              {{ step.title }}
+              <i *ngIf="shouldShowValidationIcon(step)"
+                [class]="getValidationIcon(step) + ' validation-icon ms-2 float-end'"
+                [title]="isStepValid(step) ? 'Step válido' : 'Step com campos obrigatórios não preenchidos'"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3. Center Panel: Form Content -->
+      <div class="preview-center-panel flex-grow-1 bg-white p-4">
+        <div class="form-preview-container">
+          <h5 class="mb-4" *ngIf="getCurrentStepLabel()">{{ getCurrentStepLabel() }}</h5>
+          <app-form-canvas></app-form-canvas>
+          <div class="preview-bottom-panel bg-white border-top p-3">
+            <div class="d-flex justify-content-between align-items-center">
+              <button class="btn btn-outline-secondary" [disabled]="!canGoPrevious()" (click)="onPreviousStep()">
+                <i class="bi bi-chevron-left me-1"></i>
+                Anterior
+              </button>
+
+              <div class="step-indicator">
+                <span class="text-muted">
+                  Passo {{ getCurrentStepIndex() + 1 }} de {{ state.formSchema.steps.length }}
+                </span>
+              </div>
+
+              <div class="d-flex gap-2">
+                <button class="btn btn-outline-primary" (click)="onClosePreview()">
+                  <i class="bi bi-x-circle me-1"></i>
+                  Fechar
+                </button>
+                <button class="btn btn-primary" [disabled]="!canGoNext()" (click)="onNextStep()">
+                  {{ isLastStep() ? 'Finalizar' : 'Próximo' }}
+                  <i class="bi bi-chevron-right ms-1" *ngIf="!isLastStep()"></i>
+                  <i class="bi bi-check-circle ms-1" *ngIf="isLastStep()"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- 4. Right Panel: AJUDA (only visible when help content is shown) -->
+      <div *ngIf="isHelpPanelOpen && !isReportPanelOpen" class="preview-right-panel bg-light border-start p-3"
+        style="width: 550px; min-width: 550px;">
+        <!-- <div class="d-flex justify-content-between align-items-center mb-3">
+          <h6 class="mb-0 fw-semibold">
+            <i class="bi bi-question-circle me-2"></i>
+            AJUDA
+          </h6>
+          <button type="button"
+                  class="btn-close btn-close-sm"
+                  (click)="onCloseHelpPanel()"
+                  title="Fechar ajuda"></button>
+        </div> -->
+
+        <!-- Help content when available -->
+        <div *ngIf="currentHelpContent" class="help-content">
+          <div class="help-title mb-2  d-flex align-items-center">
+            <strong class="text-primary">{{ currentHelpContent.title }}</strong>
+            <div class="ms-auto d-flex align-items-center gap-2">
+              <button type="button" class="btn btn-outline-secondary btn-sm" (click)="onOpenHelpInNewTab()"
+                title="Abrir ajuda em nova aba">
+                <i class="fas fa-up-right-from-square"></i>
+              </button>
+              <button type="button" class="btn-close btn-close-sm" (click)="onCloseHelpPanel()" title="Fechar"></button>
+            </div>
+          </div>
+          <div class="help-text p-1 bg-transparent" style="max-height: 700px; overflow-y: auto; text-align: justify;"
+            [innerHTML]="currentHelpContent.content">
+          </div>
+        </div>
+
+        <!-- Default message when no help content -->
+        <div *ngIf="!currentHelpContent" class="help-content text-muted">
+          <p class="mb-2">
+            <i class="bi bi-info-circle me-2"></i>
+            Clique em um link de ajuda para visualizar o conteúdo aqui.
+          </p>
+          <small class="text-muted">
+            Os textos de ajuda marcados como "Público" aparecerão como links clicáveis no formulário.
+          </small>
+        </div>
+      </div>
+
+
+
+    </div>
+
+    <!-- 5. Bottom Panel: Navigation Buttons -->
+    <div class="preview-bottom-panel bg-white border-top p-3">
+      <div class="d-flex justify-content-between align-items-center">
+        <!-- <button class="btn btn-outline-secondary" [disabled]="!canGoPrevious()" (click)="onPreviousStep()">
+          <i class="bi bi-chevron-left me-1"></i>
+          Anterior
+        </button> -->
+
+        <!-- <div class="step-indicator">
+          <span class="text-muted">
+            Passo {{ getCurrentStepIndex() + 1 }} de {{ state.formSchema.steps.length }}
+          </span>
+        </div> -->
+
+        <!-- <div class="d-flex gap-2">
+          <button class="btn btn-outline-primary" (click)="onClosePreview()">
+            <i class="bi bi-x-circle me-1"></i>
+            Fechar
+          </button>
+          <button class="btn btn-primary" [disabled]="!canGoNext()" (click)="onNextStep()">
+            {{ isLastStep() ? 'Finalizar' : 'Próximo' }}
+            <i class="bi bi-chevron-right ms-1" *ngIf="!isLastStep()"></i>
+            <i class="bi bi-check-circle ms-1" *ngIf="isLastStep()"></i>
+          </button>
+        </div> -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Analysis Mode Layout -->
+  <div *ngIf="state.analysisMode" class="preview-layout d-flex flex-column" style="height: 100vh;">
+
+    <!-- Top Panel -->
+    <!-- <div class="preview-top-panel bg-primary text-white p-3">
+      <div class="d-flex justify-content-between align-items-center">
+        <div class="d-flex gap-2">
+        </div>
+      </div>
+    </div> -->
+
+    <div class="preview-main-content d-flex flex-grow-1">
+      <!-- Left summary panel -->
+      <div class="preview-left-panel bg-light border-end p-3" style="width: 350px; min-width: 350px;">
+        <h6 class="mb-3 fw-semibold"><i class="bi bi-layout-sidebar me-2"></i> Sumário</h6>
+        <ng-container *ngIf="buildNumberedItems() as itemsLeft">
+          <div *ngFor="let it of itemsLeft" class="d-flex align-items-center mb-1"
+            [style.paddingLeft.px]="it.depth * 12">
+            <button class="btn btn-link p-0 text-start" (click)="scrollToComponentCenter(it.component.id)"
+              title="Ir para o item">
+              {{ it.number }} - {{ it.component.label || getComponentTypeLabel(it.component.type) }}
+            </button>
+            <span class="badge text-bg-secondary ms-2" *ngIf="getComponentAnnotations(it.component.id).length > 0">{{
+              getComponentAnnotations(it.component.id).length }}</span>
+          </div>
+          <div *ngIf="itemsLeft.length===0" class="text-muted small">Sem itens.</div>
+        </ng-container>
+      </div>
+
+      <!-- Center panel: report-like with annotation actions -->
+      <div class="preview-center-panel flex-grow-1 bg-white p-3">
+        <!-- Global analysis annotations header -->
+        <article class="inner-section small-number mb-2 p-2 border rounded">
+          <div class="d-flex justify-content-between align-items-start">
+            <div class="me-2">
+              <div class="fw-semibold">Análise (geral)</div>
+            </div>
+            <div class="btn-group btn-group-sm">
+              <button class="btn btn-outline-primary" (click)="onClickNewGlobal()">
+                <i class="bi bi-plus-lg me-1"></i> + Novo
+              </button>
+              <button class="btn btn-outline-dark" (click)="onToggleAnnotationsAccordion(globalAnalysisId)">
+                <i class="bi bi-chevron-down me-1"></i>
+                Anotações ({{ getComponentAnnotations(globalAnalysisId).length }})
+              </button>
+            </div>
+          </div>
+        </article>
+
+        <!-- Global analysis accordion -->
+        <div class="mb-3" *ngIf="expandedAnnotations[globalAnalysisId]">
+          <div>
+            <div>
+            </div>
+            <div>
+              <div>
+                <div *ngIf="getComponentAnnotations(globalAnalysisId).length === 0" class="text-muted small">Nenhuma
+                  anotação.</div>
+
+                <div *ngFor="let ann of getTopLevelAnnotations(globalAnalysisId)" class="card card-body p-2 mb-2"
+                  [class.annotation-internal-bg]="ann.internalNote">
+                  <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                      <span class="badge me-1" [class.text-bg-primary]="ann.type==='apontamento'"
+                        [class.text-bg-secondary]="ann.type!=='apontamento'">{{ ann.type }}</span>
+                      <span class="badge text-bg-info me-1" *ngIf="ann.responseType">{{ ann.responseType }}</span>
+                      <span class="badge" [class.text-bg-secondary]="!ann.status || ann.status==='normal'"
+                        [class.text-bg-warning]="ann.status==='pendente'"
+                        [class.text-bg-success]="ann.status==='resolvido' || ann.status==='confirmado'"
+                        [class.text-bg-secondary]="ann.status==='cancelado'">{{ ann.status || 'normal' }}</span>
+                      <span class="badge annotation-internal-badge me-1" *ngIf="ann.internalNote">Nota Interna</span>
+                      <div class="small mt-1" [class.text-decoration-line-through]="ann.status==='cancelado'"
+                        [innerHTML]="ann.content"></div>
+
+                      <div class="mt-2 ms-3 border-start ps-2"
+                        *ngFor="let child of getChildAnnotations(globalAnalysisId, ann.id)"
+                        [class.annotation-internal-bg]="child.internalNote">
+                        <div class="d-flex justify-content-between align-items-start">
+                          <div>
+                            <span class="badge text-bg-secondary me-1">observacao</span>
+                            <span class="badge text-bg-info me-1" *ngIf="child.responseType">{{ child.responseType
+                              }}</span>
+                            <span class="badge" [class.text-bg-secondary]="!child.status || child.status==='normal'"
+                              [class.text-bg-warning]="child.status==='pendente'"
+                              [class.text-bg-success]="child.status==='resolvido' || child.status==='confirmado'"
+                              [class.text-bg-secondary]="child.status==='cancelado'">{{ child.status || 'normal'
+                              }}</span>
+                            <span class="badge annotation-internal-badge me-1" *ngIf="child.internalNote">Nota
+                              Interna</span>
+                            <div class="small mt-1" [class.text-decoration-line-through]="child.status==='cancelado'"
+                              [innerHTML]="child.content"></div>
+                          </div>
+                          <div class="btn-group btn-group-sm">
+                            <button class="btn btn-outline-secondary" title="Pendente"
+                              (click)="setAnnotationStatus(globalAnalysisId, child.id, 'pendente')"><i
+                                class="bi bi-clock"></i></button>
+                            <button class="btn btn-outline-success" title="Resolver"
+                              (click)="setAnnotationStatus(globalAnalysisId, child.id, 'resolvido')"><i
+                                class="bi bi-check-lg"></i></button>
+                            <button class="btn btn-outline-warning" title="Cancelar"
+                              (click)="setAnnotationStatus(globalAnalysisId, child.id, 'cancelado')"><i
+                                class="bi bi-x-lg"></i></button>
+                            <button class="btn btn-outline-primary"
+                              [title]="child.type==='observacao' ? 'Editar Comentário' : 'Editar Anotação'"
+                              (click)="editAnnotation(globalAnalysisId, child)"><i class="bi bi-pencil"></i></button>
+                            <button class="btn btn-outline-danger" title="Remover"
+                              (click)="onDeleteAnnotation(globalAnalysisId, child.id)"><i
+                                class="bi bi-trash"></i></button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="btn-group btn-group-sm">
+                      <button class="btn btn-outline-secondary" title="Pendente"
+                        (click)="setAnnotationStatus(globalAnalysisId, ann.id, 'pendente')"><i
+                          class="bi bi-clock"></i></button>
+                      <button class="btn btn-outline-success" title="Resolver"
+                        (click)="setAnnotationStatus(globalAnalysisId, ann.id, 'resolvido')"><i
+                          class="bi bi-check-lg"></i></button>
+                      <button class="btn btn-outline-warning" title="Cancelar"
+                        (click)="setAnnotationStatus(globalAnalysisId, ann.id, 'cancelado')"><i
+                          class="bi bi-x-lg"></i></button>
+                      <button class="btn btn btn-outline-primary"
+                        [title]="ann.type==='observacao' ? 'Editar Comentário' : 'Editar Anotação'"
+                        (click)="editAnnotation(globalAnalysisId, ann)"><i class="bi bi-pencil"></i></button>
+                      <button class="btn btn-outline-info" title="Adicionar comentário"
+                        (click)="addObservationFor(globalAnalysisId, ann)"><i class="bi bi-chat-left-dots"></i></button>
+                      <button class="btn btn-outline-danger" title="Remover"
+                        (click)="onDeleteAnnotation(globalAnalysisId, ann.id)"><i class="bi bi-trash"></i></button>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <ng-container *ngIf="buildNumberedItems() as items">
+          <div *ngFor="let item of items; let i=index">
+            <ng-container *ngIf="i === 0 || items[i-1].stepNumber !== item.stepNumber">
+              <div class="outer-section mb-2">
+                <div class="outer-header">{{ item.stepNumber }} - {{ state.formSchema.steps[item.stepNumber - 1]?.title
+                  }}</div>
+              </div>
+            </ng-container>
+
+            <article class="inner-section small-number mb-2 p-2 border rounded"
+              [attr.id]="'center-item-'+item.component.id">
+              <div class="d-flex justify-content-between align-items-start">
+                <div class="me-2">
+                  <div class="fw-semibold">{{ item.number }} - {{ item.component.label ||
+                    getComponentTypeLabel(item.component.type) }}</div>
+                  <div class="text-muted small" *ngIf="item.component.type !== 'datagrid'">
+                    <span class="conteudo">{{ getComponentDisplayValue(item.component) }}</span>
+                  </div>
+                </div>
+                <div class="btn-group btn-group-sm">
+                  <button class="btn btn-outline-primary" (click)="onClickNewForItem(item.component)">
+                    <i class="bi bi-plus-lg me-1"></i> + Novo
+                  </button>
+                  <button class="btn btn-outline-dark" (click)="onToggleAnnotationsAccordion(item.component.id)">
+                    <i class="bi bi-chevron-down me-1"></i>
+                    Anotações ({{ getComponentAnnotations(item.component.id).length }})
+                  </button>
+                </div>
+              </div>
+            </article>
+
+            <!-- Accordion for annotations -->
+            <div class="mb-3" *ngIf="expandedAnnotations[item.component.id]">
+              <div>
+                <div>
+                </div>
+                <div>
+                  <div>
+                    <div *ngIf="getComponentAnnotations(item.component.id).length === 0" class="text-muted small">
+                      Nenhuma anotação.</div>
+
+                    <div *ngFor="let ann of getTopLevelAnnotations(item.component.id)" class="card card-body p-2 mb-2"
+                      [class.annotation-internal-bg]="ann.internalNote">
+                      <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                          <span class="badge me-1" [class.text-bg-primary]="ann.type==='apontamento'"
+                            [class.text-bg-secondary]="ann.type!=='apontamento'">{{ ann.type }}</span>
+                          <span class="badge text-bg-info me-1" *ngIf="ann.responseType">{{ ann.responseType }}</span>
+                          <span class="badge" [class.text-bg-secondary]="!ann.status || ann.status==='normal'"
+                            [class.text-bg-warning]="ann.status==='pendente'"
+                            [class.text-bg-success]="ann.status==='resolvido' || ann.status==='confirmado'"
+                            [class.text-bg-secondary]="ann.status==='cancelado'">{{ ann.status || 'normal' }}</span>
+                          <span class="badge annotation-internal-badge me-1" *ngIf="ann.internalNote">Nota
+                            Interna</span>
+                          <div class="small mt-1" [class.text-decoration-line-through]="ann.status==='cancelado'"
+                            [innerHTML]="ann.content"></div>
+
+                          <!-- Observações filhas -->
+                          <div class="mt-2 ms-3 border-start ps-2"
+                            *ngFor="let child of getChildAnnotations(item.component.id, ann.id)"
+                            [class.annotation-internal-bg]="child.internalNote">
+                            <div class="d-flex justify-content-between align-items-start">
+                              <div>
+                                <span class="badge text-bg-secondary me-1">observacao</span>
+                                <span class="badge text-bg-info me-1" *ngIf="child.responseType">{{ child.responseType
+                                  }}</span>
+                                <span class="badge" [class.text-bg-secondary]="!child.status || child.status==='normal'"
+                                  [class.text-bg-warning]="child.status==='pendente'"
+                                  [class.text-bg-success]="child.status==='resolvido' || child.status==='confirmado'"
+                                  [class.text-bg-secondary]="child.status==='cancelado'">{{ child.status || 'normal'
+                                  }}</span>
+                                <span class="badge annotation-internal-badge me-1" *ngIf="child.internalNote">Nota
+                                  Interna</span>
+                                <div class="small mt-1"
+                                  [class.text-decoration-line-through]="child.status==='cancelado'"
+                                  [innerHTML]="child.content"></div>
+                              </div>
+                              <div class="btn-group btn-group-sm">
+                                <button class="btn btn-outline-secondary" title="Pendente"
+                                  (click)="setAnnotationStatus(item.component.id, child.id, 'pendente')"><i
+                                    class="bi bi-clock"></i></button>
+                                <button class="btn btn-outline-success" title="Resolver"
+                                  (click)="setAnnotationStatus(item.component.id, child.id, 'resolvido')"><i
+                                    class="bi bi-check-lg"></i></button>
+                                <button class="btn btn-outline-warning" title="Cancelar"
+                                  (click)="setAnnotationStatus(item.component.id, child.id, 'cancelado')"><i
+                                    class="bi bi-x-lg"></i></button>
+                                <button class="btn btn-outline-primary"
+                                  [title]="child.type==='observacao' ? 'Editar Comentário' : 'Editar Anotação'"
+                                  (click)="editAnnotation(item.component.id, child)"><i
+                                    class="bi bi-pencil"></i></button>
+                                <button class="btn btn-outline-danger" title="Remover"
+                                  (click)="onDeleteAnnotation(item.component, child.id)"><i
+                                    class="bi bi-trash"></i></button>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="btn-group btn-group-sm">
+                          <button class="btn btn-outline-secondary" title="Pendente"
+                            (click)="setAnnotationStatus(item.component.id, ann.id, 'pendente')"><i
+                              class="bi bi-clock"></i></button>
+                          <button class="btn btn-outline-success" title="Resolver"
+                            (click)="setAnnotationStatus(item.component.id, ann.id, 'resolvido')"><i
+                              class="bi bi-check-lg"></i></button>
+                          <button class="btn btn-outline-warning" title="Cancelar"
+                            (click)="setAnnotationStatus(item.component.id, ann.id, 'cancelado')"><i
+                              class="bi bi-x-lg"></i></button>
+                          <button class="btn btn btn-outline-primary"
+                            [title]="ann.type==='observacao' ? 'Editar Comentário' : 'Editar Anotação'"
+                            (click)="editAnnotation(item.component.id, ann)"><i class="bi bi-pencil"></i></button>
+                          <button class="btn btn-outline-info" title="Adicionar comentário"
+                            (click)="addObservationFor(item.component.id, ann)"><i
+                              class="bi bi-chat-left-dots"></i></button>
+                          <button class="btn btn-outline-danger" title="Remover"
+                            (click)="onDeleteAnnotation(item.component, ann.id)"><i class="bi bi-trash"></i></button>
+                        </div>
+                      </div>
+                    </div>
+
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </ng-container>
+      </div>
+
+      <!-- Right panel: tabs -->
+      <div class="preview-right-panel bg-light border-start p-3" style="width: 420px; min-width: 420px;">
+        <ul class="nav nav-tabs mb-3">
+          <li class="nav-item">
+            <a class="nav-link" [class.active]="activeAnalysisTab==='lista'" href="javascript:void(0)"
+              (click)="activeAnalysisTab='lista'">Anotações</a>
+          </li>
+          <li class="nav-item" *ngIf="showNewTab()">
+            <a class="nav-link" [class.active]="activeAnalysisTab==='nova'" href="javascript:void(0)"
+              (click)="activeAnalysisTab='nova'">{{ getNewTabTitle() }}</a>
+          </li>
+        </ul>
+
+        <div *ngIf="activeAnalysisTab==='lista'">
+          <div class="small text-muted mb-2">Todas as anotações</div>
+
+          <!-- Global (analysis-level) annotations -->
+          <ng-container *ngIf="getComponentAnnotations(globalAnalysisId).length > 0">
+            <div class="fw-semibold mb-1">Análise (geral)</div>
+            <div *ngFor="let ann of getTopLevelAnnotations(globalAnalysisId)" class="card card-body p-2 mb-2"
+              [class.annotation-internal-bg]="ann.internalNote">
+              <div>
+                <span class="badge me-1" [class.text-bg-primary]="ann.type==='apontamento'"
+                  [class.text-bg-secondary]="ann.type!=='apontamento'">{{ ann.type }}</span>
+                <span class="badge text-bg-info me-1" *ngIf="ann.responseType">{{ ann.responseType }}</span>
+                <span class="badge" [class.text-bg-secondary]="!ann.status || ann.status==='normal'"
+                  [class.text-bg-warning]="ann.status==='pendente'"
+                  [class.text-bg-success]="ann.status==='resolvido' || ann.status==='confirmado'"
+                  [class.text-bg-secondary]="ann.status==='cancelado'">{{ ann.status || 'normal' }}</span>
+                <span class="badge annotation-internal-badge me-1" *ngIf="ann.internalNote">Nota Interna</span>
+                <div class="small mt-1" [class.text-decoration-line-through]="ann.status==='cancelado'"
+                  [innerHTML]="ann.content"></div>
+
+                <div class="mt-2 ms-3 border-start ps-2"
+                  *ngFor="let child of getChildAnnotations(globalAnalysisId, ann.id)"
+                  [class.annotation-internal-bg]="child.internalNote">
+                  <div>
+                    <span class="badge text-bg-secondary me-1">observacao</span>
+                    <span class="badge text-bg-info me-1" *ngIf="child.responseType">{{ child.responseType }}</span>
+                    <span class="badge" [class.text-bg-secondary]="!child.status || child.status==='normal'"
+                      [class.text-bg-warning]="child.status==='pendente'"
+                      [class.text-bg-success]="child.status==='resolvido' || child.status==='confirmado'"
+                      [class.text-bg-secondary]="child.status==='cancelado'">{{ child.status || 'normal' }}</span>
+                    <span class="badge annotation-internal-badge me-1" *ngIf="child.internalNote">Nota Interna</span>
+                    <div class="small mt-1" [class.text-decoration-line-through]="child.status==='cancelado'"
+                      [innerHTML]="child.content"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </ng-container>
+
+          <ng-container *ngFor="let it of buildNumberedItems()">
+            <ng-container *ngIf="getComponentAnnotations(it.component.id).length > 0">
+              <div class="fw-semibold mb-1"><a href="javascript:void(0)"
+                  (click)="scrollToComponentCenter(it.component.id)" title="Ir para o item">{{ it.number }} - {{
+                  it.component.label || getComponentTypeLabel(it.component.type) }}</a></div>
+
+              <div *ngFor="let ann of getTopLevelAnnotations(it.component.id)" class="card card-body p-2 mb-2"
+                [class.annotation-internal-bg]="ann.internalNote">
+                <div>
+                  <span class="badge me-1" [class.text-bg-primary]="ann.type==='apontamento'"
+                    [class.text-bg-secondary]="ann.type!=='apontamento'">{{ ann.type }}</span>
+                  <span class="badge text-bg-info me-1" *ngIf="ann.responseType">{{ ann.responseType }}</span>
+                  <span class="badge" [class.text-bg-secondary]="!ann.status || ann.status==='normal'"
+                    [class.text-bg-warning]="ann.status==='pendente'"
+                    [class.text-bg-success]="ann.status==='resolvido' || ann.status==='confirmado'"
+                    [class.text-bg-secondary]="ann.status==='cancelado'">{{ ann.status || 'normal' }}</span>
+                  <span class="badge annotation-internal-badge me-1" *ngIf="ann.internalNote">Nota Interna</span>
+                  <div class="small mt-1" [class.text-decoration-line-through]="ann.status==='cancelado'"
+                    [innerHTML]="ann.content"></div>
+
+                  <div class="mt-2 ms-3 border-start ps-2"
+                    *ngFor="let child of getChildAnnotations(it.component.id, ann.id)"
+                    [class.annotation-internal-bg]="child.internalNote">
+                    <div>
+                      <span class="badge text-bg-secondary me-1">observacao</span>
+                      <span class="badge text-bg-info me-1" *ngIf="child.responseType">{{ child.responseType }}</span>
+                      <span class="badge" [class.text-bg-secondary]="!child.status || child.status==='normal'"
+                        [class.text-bg-warning]="child.status==='pendente'"
+                        [class.text-bg-success]="child.status==='resolvido' || child.status==='confirmado'"
+                        [class.text-bg-secondary]="child.status==='cancelado'">{{ child.status || 'normal' }}</span>
+                      <span class="badge annotation-internal-badge me-1" *ngIf="child.internalNote">Nota Interna</span>
+                      <div class="small mt-1" [class.text-decoration-line-through]="child.status==='cancelado'"
+                        [innerHTML]="child.content"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </ng-container>
+          </ng-container>
+
+          <div *ngIf="getAllAnnotationsList().length===0" class="text-muted small">Nenhuma anotação.</div>
+        </div>
+
+        <div *ngIf="activeAnalysisTab==='nova' && showNewTab()">
+          <div class="mb-2">
+            <label class="form-label small">Item do relatório</label>
+            <select class="form-select form-select-sm" [(ngModel)]="newAnnTargetId">
+              <ng-container *ngIf="buildNumberedItems() as items2">
+                <option *ngFor="let it of items2" [ngValue]="it.component.id">{{ it.number }} - {{ it.component.label ||
+                  getComponentTypeLabel(it.component.type) }}</option>
+              </ng-container>
+            </select>
+          </div>
+          <div class="row g-2">
+            <div class="col-6">
+              <label class="form-label small">Tipo</label>
+              <select class="form-select form-select-sm" [(ngModel)]="newAnnType">
+                <option [ngValue]="'apontamento'">Apontamento</option>
+                <option [ngValue]="'observacao'">Observação</option>
+              </select>
+            </div>
+            <div class="col-6">
+              <label class="form-label small">Tipo de resposta</label>
+              <select class="form-select form-select-sm" [(ngModel)]="newAnnResponseType">
+                <option *ngFor="let opt of responseTypeOptions" [ngValue]="opt.value">{{ opt.label }}</option>
+              </select>
+            </div>
+          </div>
+          <div class="mt-2">
+            <label class="form-label small">Conteúdo</label>
+            <div class="d-flex align-items-center gap-2 mb-2">
+              <button class="btn btn-outline-primary btn-sm" (click)="openEditorModalForNew()"><i
+                  class="bi bi-pencil-square me-1"></i> Abrir editor</button>
+              <div class="form-check ms-auto">
+                <input class="form-check-input" type="checkbox" id="newAnnInternal" [(ngModel)]="newAnnInternal">
+                <label class="form-check-label small" for="newAnnInternal">Nota Interna</label>
+              </div>
+            </div>
+            <div class="border rounded p-2 bg-white" style="min-height: 120px;">
+              <div class="small text-muted" *ngIf="!newAnnContent">Pré-visualização será exibida aqui...</div>
+              <div [innerHTML]="newAnnContent"></div>
+            </div>
+          </div>
+          <div class="d-flex justify-content-end mt-2">
+            <button class="btn btn-primary btn-sm" (click)="addAnnotationFromForm()"><i class="bi bi-plus-lg me-1"></i>
+              {{ editingAnnId ? 'Salvar' : 'Adicionar' }}</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>

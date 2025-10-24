@@ -1,0 +1,25 @@
+
+.modal-content {
+  width: 800px !important;
+}
+
+
+.modal-custom-size {
+  max-width: 85%!important; /* ou defina um valor fixo como 700px */
+  width: 60%!important;
+}
+
+
+
+.botoes {
+  background-color: #fff;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 5px;
+  margin-top: 5px;
+  button {
+    margin-left: 2px;
+    margin-right: 2px;
+  }
+}

@@ -1,0 +1,877 @@
+<div class="properties-panel h-100 d-flex flex-column">
+
+  <!-- Panel Header with Tabs -->
+  <div class="panel-header border-bottom">
+    <nav class="nav nav-tabs">
+      <button class="nav-link" [class.active]="activeTab === 'hierarchy'" (click)="setActiveTab('hierarchy')">
+        <i class="bi bi-diagram-3 me-2"></i>
+        Componentes
+      </button>
+      <button class="nav-link" [class.active]="activeTab === 'properties'" (click)="setActiveTab('properties')">
+        <i class="bi bi-gear me-2"></i>
+        Propriedades
+      </button>
+    </nav>
+  </div>
+
+  <!-- Tab Content -->
+  <div class="tab-content flex-grow-1 overflow-auto custom-scrollbar">
+
+    <!-- Properties Tab -->
+    <div class="tab-pane h-100" [class.active]="activeTab === 'properties'">
+
+      <!-- No Selection State -->
+      <div class="no-selection text-center p-4" *ngIf="!state.selectedComponent && !state.selectedStep">
+        <i class="bi bi-hand-index display-4 text-muted mb-3"></i>
+        <h6 class="text-muted">Nenhuma Seleção</h6>
+        <p class="text-muted small">
+          Selecione um componente no canvas ou um step para editar suas propriedades
+        </p>
+      </div>
+
+      <!-- Step Properties -->
+      <div class="step-properties p-3" *ngIf="state.selectedStep && !state.selectedComponent">
+
+        <!-- Step Info Header -->
+        <div class="step-info mb-3 p-3 bg-light rounded">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <h6 class="mb-1 fw-semibold">Propriedades do Step</h6>
+              <small class="text-muted">{{ state.selectedStep.title }}</small>
+            </div>
+            <span class="badge bg-success">Step</span>
+          </div>
+        </div>
+
+        <!-- Step Basic Properties -->
+        <div class="property-section mb-4">
+          <h6 class="section-title" style="font-weight: bold;">
+            <i class="bi bi-tag me-2"></i>
+            PROPRIEDADES DO STEP
+          </h6>
+
+          <!-- Title -->
+          <div class="form-group mb-3">
+            <label class="form-label">Título</label>
+            <textarea class="form-control form-control-sm" [(ngModel)]="stepTitle" (input)="onStepTitleChange()"
+              placeholder="Digite o título do step">
+            </textarea>
+          </div>
+
+          <!-- Disabled -->
+          <div class="form-check mb-3">
+            <input class="form-check-input" type="checkbox" id="stepDisabled" [(ngModel)]="stepDisabled"
+              (change)="onStepDisabledChange()">
+            <label class="form-check-label" for="stepDisabled">
+              Desabilitado
+            </label>
+          </div>
+
+          <!-- Invisible -->
+          <div class="form-check mb-3">
+            <input class="form-check-input" type="checkbox" id="stepInvisible" [(ngModel)]="stepInvisible"
+              (change)="onStepInvisibleChange()">
+            <label class="form-check-label" for="stepInvisible">
+              Invisível
+            </label>
+          </div>
+        </div>
+
+        <!-- Step Conditional Logic -->
+        <div class="property-section mb-4">
+          <h6 class="section-title" style="font-weight: bold;">
+            <i class="bi bi-code-slash me-2"></i>
+            LÓGICA CONDICIONAL
+            <button class="btn btn-sm btn-outline-secondary ms-2" (click)="clearStepConditionalLogic()"
+              title="Limpar lógica condicional">
+              <i class="bi bi-x"></i>
+            </button>
+          </h6>
+
+          <div class="form-group mb-3">
+            <label class="form-label">Mostrar</label>
+            <select class="form-select form-select-sm" [(ngModel)]="stepConditionalShow"
+              (change)="onStepConditionalShowChange()">
+              <option value="true">Verdadeiro</option>
+              <option value="false">Falso</option>
+            </select>
+          </div>
+
+          <!-- <div class="form-group mb-3">
+            <label class="form-label">Quando</label>
+            <select class="form-select form-select-sm" [(ngModel)]="stepConditionalWhen"
+              (change)="onStepConditionalWhenChange()">
+              <option value="">Selecione um componente...</option>
+              <option *ngFor="let item of availableComponentKeysValues" [value]="item.key">
+                {{ item.value.trim() }}
+              </option>
+            </select>
+          </div> -->
+
+          <div class="form-group mb-3">
+            <label class="form-label">Quando</label>
+
+
+            <ngx-select-dropdown [config]="config" [options]="availableComponentKeysValues"
+            (change)="onStepConditionalWhenChange()"
+            [(ngModel)]="stepConditionalWhen" [multiple]="true" ></ngx-select-dropdown>
+
+            <!-- <select class="form-select form-select-sm" [(ngModel)]="stepConditionalWhen"
+              (change)="onStepConditionalWhenChange()">
+              <option value="">Selecione um componente...</option>
+              <option *ngFor="let item of availableComponentKeysValues" [value]="item.key">
+                {{ item.value.trim() }}
+              </option>
+            </select> -->
+          </div>
+
+          <div class="form-group mb-3">
+            <label class="form-label">Igual a</label>
+
+            <!-- Show select dropdown if the when component has options -->
+            <select class="form-select form-control-sm" [(ngModel)]="stepConditionalEq"
+              (change)="onStepConditionalEqChange()" *ngIf="hasStepConditionalWhenComponentOptions()">
+              <option value="">Selecione um valor...</option>
+              <option *ngFor="let option of stepConditionalWhenComponentOptions" [value]="option.value">
+                {{ option.label }}
+              </option>
+            </select>
+
+            <!-- Show text input if the when component doesn't have options -->
+            <input type="text" class="form-control form-control-sm" [(ngModel)]="stepConditionalEq"
+              (input)="onStepConditionalEqChange()" placeholder="Valor de comparação"
+              *ngIf="!hasStepConditionalWhenComponentOptions()">
+          </div>
+        </div>
+      </div>
+
+      <!-- Component Properties -->
+      <div class="component-properties p-3" *ngIf="state.selectedComponent">
+
+        <!-- Component Info Header -->
+        <!-- <div class="component-info mb-3 p-3 bg-light rounded">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <h6 class="mb-1 fw-semibold">{{ state.selectedComponent.type | titlecase }}</h6>
+              <small class="text-muted">ID: {{ componentId }}</small> 
+            </div>
+            <span class="badge bg-primary">{{ state.selectedComponent.type }}</span>
+          </div>
+        </div> -->
+
+        <!-- Basic Properties -->
+        <div class="property-section mb-4">
+          <h6 class="section-title" style="font-weight: bold;">
+            <i class="bi bi-tag me-2"></i>
+            BÁSICAS
+          </h6>
+
+          <!-- Label -->
+          <div class="form-group mb-3">
+            <label class="form-label">Rótulo</label>
+            <textarea class="form-control form-control-sm" [(ngModel)]="componentLabel" (input)="onLabelChange()"
+              placeholder="Digite o rótulo">
+            </textarea>
+          </div>
+
+          <!-- Placeholder -->
+          <div class="form-group mb-3" *ngIf="isInputType() || isTextareaType() || isSelectType()">
+            <label class="form-label">Texto quando vazio</label>
+            <textarea class="form-control form-control-sm" [(ngModel)]="componentPlaceholder"
+              (input)="onPlaceholderChange()" placeholder="Digite o texto">
+              </textarea>
+          </div>
+
+          <!-- Tooltip -->
+          <div class="form-group mb-3">
+            <label class="form-label">Texto do Balão de Ajuda</label>
+            <textarea class="form-control form-control-sm" [(ngModel)]="componentTooltip" (input)="onTooltipChange()"
+              placeholder="Digite o texto">
+              </textarea>
+          </div>
+
+          <!-- Help Text -->
+          <div class="form-group mb-3">
+            <label class="form-label">Texto de Ajuda</label>
+            <textarea class="form-control form-control-sm" [(ngModel)]="componentHelpText" (input)="onHelpTextChange()"
+              rows="2" placeholder="Digite o texto">
+            </textarea>
+          </div>
+
+          <!-- Prefix (for input/textarea/number) -->
+          <div class="form-group mb-3" *ngIf="canHavePrefix()">
+            <label class="form-label">Prefixo</label>
+            <input type="text" class="form-control form-control-sm" [(ngModel)]="componentPrefix"
+              (input)="onPrefixChange()" placeholder="e.g., @, $, etc.">
+            <div class="form-text">
+              Texto que aparece antes do campo de entrada
+            </div>
+          </div>
+
+          <!-- Mask (for input/number) -->
+          <div class="form-group mb-3" *ngIf="canHaveMask()">
+            <label class="form-label">Máscara</label>
+            <input type="text" class="form-control form-control-sm" [(ngModel)]="componentMask" (input)="onMaskChange()"
+              placeholder="e.g., (999) 999-9999">
+            <div class="form-text">
+              <strong>Exemplos:</strong><br>
+              • <code>000-000</code> - Número com Híphen (123-456)<br>
+              • <code>(00) 00000-0000</code> - Telefone <br>
+              • <code>00/00/0000</code> - Data<br>
+              • <code>AAA-0000</code> - Letras + números (ABC-1234)<br>
+              <small><strong>Padrões:</strong> 0/9 = número, A = LETRA, a = letra</small>
+            </div>
+          </div>
+
+          <!-- Disabled -->
+          <div class="form-check mb-3">
+            <input class="form-check-input" type="checkbox" id="disabled" [(ngModel)]="componentDisabled"
+              (change)="onDisabledChange()">
+            <label class="form-check-label" for="disabled">
+              Desabilitado
+            </label>
+          </div>
+
+          <!-- Readonly -->
+          <div class="form-check mb-3" *ngIf="isInputType() || isTextareaType()">
+            <input class="form-check-input" type="checkbox" id="readonly" [(ngModel)]="componentReadonly"
+              (change)="onReadonlyChange()">
+            <label class="form-check-label" for="readonly">
+              Apenas Leitura
+            </label>
+          </div>
+
+          <!-- Hidden -->
+          <div class="form-check mb-3">
+            <input class="form-check-input" type="checkbox" id="hidden" [(ngModel)]="componentHidden"
+              (change)="onHiddenChange()">
+            <label class="form-check-label" for="hidden">
+              Invisível
+            </label>
+          </div>
+
+          <!-- Hide Label -->
+          <div class="form-check mb-3">
+            <input class="form-check-input" type="checkbox" id="hideLabel" [(ngModel)]="componentHideLabel"
+              (change)="onHideLabelChange()">
+            <label class="form-check-label" for="hideLabel">
+              Ocultar rótulo
+            </label>
+          </div>
+
+          <!-- Allows Confidentiality -->
+          <div class="form-check mb-3" *ngIf="canHaveConfidentiality()">
+            <input class="form-check-input" type="checkbox" id="allowsConfidentiality"
+              [(ngModel)]="allowsConfidentiality" (change)="onAllowsConfidentialityChange()">
+            <label class="form-check-label" for="allowsConfidentiality">
+              Permitir Sigilo
+            </label>
+          </div>
+
+        </div>
+
+
+        <!-- Validation Properties -->
+        <div class="property-section mb-4"
+          *ngIf="canHaveRequired() || canHaveMinMaxLength() || canHaveMinMax() || canHavePattern()">
+          <h6 class="section-title" style="font-weight: bold;">
+            <i class="bi bi-shield-check me-2"></i>
+            VALIDAÇÃO
+          </h6>
+
+          <!-- Required -->
+          <div class="form-check mb-3">
+            <input class="form-check-input" type="checkbox" id="required" [(ngModel)]="componentRequired"
+              (change)="onRequiredChange()">
+            <label class="form-check-label" for="required">
+              Preenchimento Obrigatório
+            </label>
+          </div>
+
+          <!-- Min/Max Length -->
+          <div class="row" *ngIf="canHaveMinMaxLength()">
+            <div class="col-6">
+              <div class="form-group mb-3">
+                <label class="form-label">Tamanho Mínimo</label>
+                <input type="number" class="form-control form-control-sm" [(ngModel)]="minLength"
+                  (input)="onMinLengthChange()" min="0">
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="form-group mb-3">
+                <label class="form-label">Tamanho Máximo</label>
+                <input type="number" class="form-control form-control-sm" [(ngModel)]="maxLength"
+                  (input)="onMaxLengthChange()" min="1">
+              </div>
+            </div>
+          </div>
+
+          <!-- Min/Max Value -->
+          <div class="row" *ngIf="canHaveMinMax()">
+            <div class="col-6">
+              <div class="form-group mb-3">
+                <label class="form-label">Valor Mínimo</label>
+                <input type="number" class="form-control form-control-sm" [(ngModel)]="minValue"
+                  (input)="onMinValueChange()">
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="form-group mb-3">
+                <label class="form-label">Valor Máximo</label>
+                <input type="number" class="form-control form-control-sm" [(ngModel)]="maxValue"
+                  (input)="onMaxValueChange()">
+              </div>
+            </div>
+          </div>
+
+          <!-- Pattern -->
+          <!-- <div class="form-group mb-3" *ngIf="canHavePattern()">
+            <label class="form-label">Pattern (Regex)</label>
+            <input 
+              type="text" 
+              class="form-control form-control-sm"
+              [(ngModel)]="pattern"
+              (input)="onPatternChange()"
+              placeholder="Enter regex pattern">
+            <div class="form-text">
+              Regular expression for validation (e.g., [0-9]{{ '{' }}3{{ '}' }}-[0-9]{{ '{' }}3{{ '}' }}-[0-9]{{ '{' }}4{{ '}' }})
+            </div>
+          </div> -->
+
+        </div>
+
+        <!-- Component Specific Properties -->
+        <div class="property-section mb-4"
+          *ngIf="isPanelComponent() || isTextareaType() || isFileType() || isNumberType() || isRichTextType()">
+          <h6 class="section-title" style="font-weight: bold;">
+            <i class="bi bi-sliders me-2"></i>
+            OUTRAS
+          </h6>
+
+          <!-- Textarea Rows/Cols -->
+          <div class="row" *ngIf="isTextareaType()">
+            <div class="col-6">
+              <div class="form-group mb-3">
+                <label class="form-label">Número de Linhas</label>
+                <input type="number" class="form-control form-control-sm" [(ngModel)]="textareaRows"
+                  (input)="onRowsChange()" min="1" max="20">
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="form-group mb-3">
+                <label class="form-label">Número de Colunas</label>
+                <input type="number" class="form-control form-control-sm" [(ngModel)]="textareaCols"
+                  (input)="onColsChange()" min="1" max="100">
+              </div>
+            </div>
+          </div>
+
+          <!-- File Accept -->
+          <div class="form-group mb-3" *ngIf="isFileType()">
+            <label class="form-label">Accepted File Types</label>
+            <input type="text" class="form-control form-control-sm" [(ngModel)]="fileAccept" (input)="onAcceptChange()"
+              placeholder="e.g., .jpg,.png,.pdf or image/*">
+            <div class="form-text">
+              Specify file types (MIME types or extensions)
+            </div>
+          </div>
+
+
+
+          <!-- Number Step -->
+          <div class="form-group mb-3" *ngIf="isNumberType()">
+            <label class="form-label">Step</label>
+            <input type="number" class="form-control form-control-sm" [(ngModel)]="numberStep" (input)="onStepChange()"
+              min="0.01" step="0.01">
+            <div class="form-text">
+              Step interval for number input
+            </div>
+          </div>
+
+
+          <!-- Collapsible Panel Options -->
+          <div *ngIf="isPanelComponent()">
+            <!-- Collapsible -->
+            <div class="form-check mb-3">
+              <input class="form-check-input" type="checkbox" id="collapsible" [(ngModel)]="componentCollapsible"
+                (change)="onCollapsibleChange()">
+              <label class="form-check-label" for="collapsible">
+                Colapsável
+              </label>
+              <div class="form-text">
+                Permitir que o painel seja recolhido/expandido
+              </div>
+            </div>
+
+            <!-- Initially Collapsed -->
+            <div class="form-check mb-3" *ngIf="componentCollapsible">
+              <input class="form-check-input" type="checkbox" id="initCollapsed" [(ngModel)]="componentInitCollapsed"
+                (change)="onInitCollapsedChange()">
+              <label class="form-check-label" for="initCollapsed">
+                Inicialmente recolhido
+              </label>
+              <div class="form-text">
+                Inicie o painel no estado recolhido
+              </div>
+            </div>
+          </div>
+
+          <!-- CKEditor Configuration -->
+          <div *ngIf="isRichTextType()">
+            <!-- Editor Height -->
+            <div class="form-group mb-3">
+              <label class="form-label">Altura do Editor (px)</label>
+              <input type="number" class="form-control form-control-sm" [(ngModel)]="ckEditorHeight"
+                (input)="onCkEditorHeightChange()" min="100" max="800" step="10">
+              <div class="form-text">
+                Altura em pixels do editor CKEditor
+              </div>
+            </div>
+
+            <!-- Language -->
+            <div class="form-group mb-3">
+              <label class="form-label">Idioma</label>
+              <select class="form-select form-control-sm" [(ngModel)]="ckEditorLanguage"
+                (change)="onCkEditorLanguageChange()">
+                <option value="pt-br">Português (Brasil)</option>
+                <option value="en">English</option>
+                <option value="es">Español</option>
+                <option value="fr">Français</option>
+              </select>
+            </div>
+
+            <!-- Toolbar Configuration -->
+            <div class="form-group mb-3">
+              <label class="form-label">Configuração da Barra de Ferramentas</label>
+              <textarea class="form-control form-control-sm" [(ngModel)]="ckEditorToolbarString"
+                (input)="onCkEditorToolbarChange()" rows="3"
+                placeholder="heading,|,bold,italic,link,bulletedList,numberedList">
+              </textarea>
+              <div class="form-text">
+                <small>
+                  <strong>Elementos disponíveis:</strong><br>
+                  • <code>heading</code> - Títulos<br>
+                  • <code>bold, italic, underline</code> - Formatação<br>
+                  • <code>link</code> - Links<br>
+                  • <code>bulletedList, numberedList</code> - Listas<br>
+                  • <code>outdent, indent</code> - Indentação<br>
+                  • <code>blockQuote</code> - Citação<br>
+                  • <code>insertTable</code> - Tabelas<br>
+                  • <code>undo, redo</code> - Desfazer/Refazer<br>
+                  • <code>|</code> - Separador
+                </small>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- API Configuration (for SELECT_API) -->
+        <div class="property-section mb-4" *ngIf="isSelectApiType()">
+          <h6 class="section-title" style="font-weight: bold;">
+            <i class="bi bi-cloud-download me-2"></i>
+            CONFIGURAÇÃO DA API
+          </h6>
+
+          <!-- API URL -->
+          <div class="form-group mb-3">
+            <label class="form-label">URL do Endpoint <span class="text-danger">*</span></label>
+            <textarea class="form-control form-control-sm" [(ngModel)]="apiUrl" (input)="onApiUrlChange()" rows="2"
+              placeholder="https://api.exemplo.com/items">
+            </textarea>
+            <div class="form-text">
+              URL completa do endpoint da API que retorna os dados
+            </div>
+          </div>
+
+          <!-- HTTP Method -->
+          <div class="form-group mb-3">
+            <label class="form-label">Método HTTP</label>
+            <select class="form-select form-control-sm" [(ngModel)]="apiMethod" (change)="onApiMethodChange()">
+              <option value="GET">GET</option>
+              <option value="POST">POST</option>
+              <option value="PUT">PUT</option>
+              <option value="DELETE">DELETE</option>
+            </select>
+          </div>
+
+          <!-- JWT Token -->
+          <div class="form-group mb-3">
+            <label class="form-label">Token JWT</label>
+            <textarea class="form-control form-control-sm" [(ngModel)]="apiToken" (input)="onApiTokenChange()" rows="2"
+              placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...">
+            </textarea>
+            <div class="form-text">
+              Token de autenticação JWT (será enviado como Bearer token)
+            </div>
+          </div>
+
+          <!-- Field Mappings -->
+          <div class="row">
+            <div class="col-6">
+              <div class="form-group mb-3">
+                <label class="form-label">Campo para Label</label>
+                <input type="text" class="form-control form-control-sm" [(ngModel)]="apiLabelField"
+                  (input)="onApiLabelFieldChange()" placeholder="name">
+                <div class="form-text">
+                  Campo do objeto que será exibido como texto
+                </div>
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="form-group mb-3">
+                <label class="form-label">Campo para Value</label>
+                <input type="text" class="form-control form-control-sm" [(ngModel)]="apiValueField"
+                  (input)="onApiValueFieldChange()" placeholder="id">
+                <div class="form-text">
+                  Campo do objeto que será usado como valor
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Custom Headers -->
+          <div class="form-group mb-3">
+            <label class="form-label">Headers Personalizados</label>
+            <textarea class="form-control form-control-sm" [(ngModel)]="apiHeaders" (input)="onApiHeadersChange()"
+              rows="3" placeholder='{"Content-Type": "application/json", "X-Custom-Header": "valor"}'>
+            </textarea>
+            <div class="form-text">
+              Headers HTTP adicionais em formato JSON
+            </div>
+          </div>
+
+          <!-- Request Body (for POST/PUT) -->
+          <div class="form-group mb-3" *ngIf="apiMethod === 'POST' || apiMethod === 'PUT'">
+            <label class="form-label">Corpo da Requisição</label>
+            <textarea class="form-control form-control-sm" [(ngModel)]="apiRequestBody"
+              (input)="onApiRequestBodyChange()" rows="3" placeholder='{"filtro": "ativo", "limite": 100}'>
+            </textarea>
+            <div class="form-text">
+              Dados a serem enviados no corpo da requisição (JSON)
+            </div>
+          </div>
+
+          <!-- Cache Settings -->
+          <div class="form-check mb-3">
+            <input class="form-check-input" type="checkbox" id="apiCache" [(ngModel)]="apiCache"
+              (change)="onApiCacheChange()">
+            <label class="form-check-label" for="apiCache">
+              Habilitar Cache
+            </label>
+          </div>
+
+          <div class="form-group mb-3" *ngIf="apiCache">
+            <label class="form-label">Tempo de Cache (minutos)</label>
+            <input type="number" class="form-control form-control-sm" [(ngModel)]="apiCacheTimeout"
+              (input)="onApiCacheTimeoutChange()" min="1" max="1440" step="1">
+            <div class="form-text">
+              Por quanto tempo os dados ficam em cache (1 a 1440 minutos)
+            </div>
+          </div>
+        </div>
+
+        <!-- API Select Options (Multiple Selection & Layout) -->
+        <div class="property-section mb-4" *ngIf="isSelectApiType()">
+          <h6 class="section-title" style="font-weight: bold;">
+            <i class="bi bi-ui-checks me-2"></i>
+            OPÇÕES DE SELEÇÃO
+          </h6>
+
+          <!-- Multiple Selection -->
+          <div class="form-check mb-3">
+            <input class="form-check-input" type="checkbox" id="multiple-api" [(ngModel)]="multipleSelection"
+              (change)="onMultipleChange()">
+            <label class="form-check-label" for="multiple-api">
+              Permite múltipla seleção
+            </label>
+          </div>
+
+          <!-- Layout Horizontal (for select/radio) -->
+          <div class="form-check mb-3">
+            <input class="form-check-input" type="checkbox" id="layoutHorizontal-api"
+              [(ngModel)]="componentLayoutHorizontal" (change)="onLayoutHorizontalChange()">
+            <label class="form-check-label" for="layoutHorizontal-api">
+              Layout Horizontal
+            </label>
+            <div class="form-text">
+              Exibir opções em layout horizontal em vez de vertical
+            </div>
+          </div>
+        </div>
+
+        <!-- Options Management -->
+        <div class="property-section mb-4" *ngIf="hasOptions() && !isSelectApiType()">
+          <h6 class="section-title" style="font-weight: bold;">
+            <i class="bi bi-list-ul me-2"></i>
+            OPÇÕES
+          </h6>
+
+
+          <!-- Existing Options -->
+          <div class="options-list mb-3" *ngIf="options.length > 0">
+            <div class="option-item mb-2 p-2 border rounded" *ngFor="let option of options; let i = index">
+              <div class="row align-items-center">
+                <div class="col-12 mb-1">
+                  <textarea class="form-control form-control-sm" [value]="option.label"
+                    (input)="onOptionLabelChange($event, i)" placeholder="Label">
+                  </textarea>
+                </div>
+                <div class="col-12 mb-1">
+                  <textarea class="form-control form-control-sm" [value]="option.value"
+                    (input)="onOptionValueChange($event, i)" placeholder="Value">
+                  </textarea>
+                </div>
+                <div class="col-3">
+                  <div class="btn-group btn-group-sm">
+                    <button class="btn btn-outline-secondary" (click)="moveOption(i, 'up')" [disabled]="i === 0"
+                      title="Move Up">
+                      <i class="bi bi-chevron-up"></i>
+                    </button>
+                    <button class="btn btn-outline-secondary" (click)="moveOption(i, 'down')"
+                      [disabled]="i === options.length - 1" title="Move Down">
+                      <i class="bi bi-chevron-down"></i>
+                    </button>
+                    <button class="btn btn-outline-danger" (click)="removeOption(i)" title="Remove">
+                      <i class="bi bi-trash"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Add New Option -->
+          <div class="add-option mb-3">
+            <div class="row">
+              <div class="col-12 mb-1">
+                <textarea class="form-control form-control-sm" [(ngModel)]="newOptionLabel" placeholder="Rótulo"
+                  (keydown.enter)="addOption()">
+                </textarea>
+              </div>
+              <div class="col-12 mb-1">
+                <textarea type="text" class="form-control form-control-sm" [(ngModel)]="newOptionValue"
+                  placeholder="Valor" (keydown.enter)="addOption()">
+                  </textarea>
+              </div>
+              <div class="col-3">
+                <button class="btn btn-primary btn-sm w-100" (click)="addOption()" [disabled]="!newOptionLabel.trim()">
+                  <i class="bi bi-plus"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Multiple Selection -->
+          <div class="form-check mb-3" *ngIf="canHaveMultiple()">
+            <input class="form-check-input" type="checkbox" id="multiple" [(ngModel)]="multipleSelection"
+              (change)="onMultipleChange()">
+            <label class="form-check-label" for="multiple">
+              Permite múltipla seleção
+            </label>
+          </div>
+
+          <!-- Layout Horizontal (for select/radio/checkbox) -->
+          <div class="form-check mb-3" *ngIf="canHaveLayoutHorizontal()">
+            <input class="form-check-input" type="checkbox" id="layoutHorizontal"
+              [(ngModel)]="componentLayoutHorizontal" (change)="onLayoutHorizontalChange()">
+            <label class="form-check-label" for="layoutHorizontal">
+              Layout Horizontal
+            </label>
+            <div class="form-text">
+              Exibir opções em layout horizontal em vez de vertical
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Styling Properties -->
+        <!-- <div class="property-section mb-4">
+          <h6 class="section-title">
+            <i class="bi bi-palette me-2"></i>
+            Styling
+          </h6> -->
+
+        <!-- CSS Classes -->
+        <!-- <div class="form-group mb-3">
+            <label class="form-label">CSS Classes</label>
+            <input 
+              type="text" 
+              class="form-control form-control-sm"
+              [(ngModel)]="componentClasses"
+              (input)="onClassesChange()"
+              placeholder="class1 class2 class3">
+            <div class="form-text">
+              Space-separated CSS class names
+            </div>
+          </div>
+
+
+        </div> -->
+
+        <!-- Text Help Properties -->
+        <div class="property-section mb-4" *ngIf="isTextHelpType()">
+          <h6 class="section-title" style="font-weight: bold;">
+            <i class="bi bi-question-circle me-2"></i>
+            CONTEÚDO DA AJUDA
+          </h6>
+
+          <!-- Help Text with CKEditor -->
+          <div class="form-group mb-3">
+            <label class="form-label mb-2">Texto de Ajuda</label>
+            <div class="d-grid">
+              <button type="button" class="btn btn-outline-primary" (click)="openHelpTextModal()"
+                title="Abrir editor de texto de ajuda">
+                <i class="bi bi-pencil-square me-2"></i>
+                {{ helpText ? 'Editar Texto de Ajuda' : 'Adicionar Texto de Ajuda' }}
+              </button>
+            </div>
+            <div class="form-text mt-2">
+              <small class="text-muted">
+                <i class="bi bi-info-circle me-1"></i>
+                Use o editor visual para criar texto formatado com formatação rica
+              </small>
+            </div>
+            <!-- Preview do conteúdo quando existe -->
+            <div *ngIf="helpText" class="mt-2 p-2 border rounded bg-light">
+              <small class="text-muted d-block mb-1">Preview:</small>
+              <div class="help-text-preview" [innerHTML]="helpText"
+                style="max-height: 100px; overflow-y: auto; font-size: 0.85em;"></div>
+            </div>
+          </div>
+
+          <!-- Only Internal Flag -->
+          <div class="form-check mb-3">
+            <input class="form-check-input" type="checkbox" id="onlyInternal" [(ngModel)]="onlyInternal"
+              (change)="onOnlyInternalChange()">
+            <label class="form-check-label" for="onlyInternal">
+              Apenas Interno
+            </label>
+            <div class="form-text">
+              Se marcado, o texto será amarelo (interno). Se desmarcado, será azul (público).
+            </div>
+          </div>
+        </div>
+
+        <!-- Conditional Logic Properties -->
+        <div class="property-section mb-4">
+          <h6 class="section-title" style="font-weight: bold;">
+            <i class="bi bi-code-slash me-2"></i>
+            LÓGICA CONDICIONAL
+            <button class="btn btn-outline-secondary btn-xs ms-2" (click)="clearConditionalLogic()"
+              title="Clear conditional logic">
+              <i class="bi bi-x"></i>
+            </button>
+          </h6>
+
+          <!-- Show/Hide -->
+          <div class="form-group mb-3">
+            <label class="form-label">Ação</label>
+            <select class="form-select form-control-sm" [(ngModel)]="conditionalShow"
+              (change)="onConditionalShowChange()">
+              <option value="true">Mostrar componente quando a condição for atendida</option>
+              <option value="false">Ocultar componente quando a condição for atendida</option>
+            </select>
+          </div>
+
+          <!-- When Field -->
+          <div class="form-group mb-3">
+            <label class="form-label">Quando campo</label>
+
+                <ngx-select-dropdown [config]="config" [options]="availableComponentKeysValues"
+            (change)="onConditionalWhenChange()"
+            [(ngModel)]="conditionalWhen" [multiple]="false" ></ngx-select-dropdown>
+
+            <!-- <select class="form-select form-control-sm" [(ngModel)]="conditionalWhen"
+              (change)="onConditionalWhenChange()">
+              <option value="">Selecione o campo...</option>
+              <option *ngFor="let item of availableComponentKeysValues" [value]="item.key">
+                {{ item.value.trim() }}
+              </option>
+            </select> -->
+            <div class="form-text">
+              O campo para observar mudanças
+            </div>
+          </div>
+          
+
+          <!-- Equals Value -->
+          <div class="form-group mb-3" *ngIf="conditionalWhen">
+            <label class="form-label">Valor igual</label>
+
+            <!-- Show select dropdown if the when component has options -->
+            <select class="form-select form-control-sm" [(ngModel)]="conditionalEq"
+              (change)="onConditionalEqChange()" *ngIf="hasConditionalWhenComponentOptions()">
+              <option value="">Selecione um valor...</option>
+              <option *ngFor="let option of conditionalWhenComponentOptions" [value]="option.value">
+                {{ option.label }}
+              </option>
+            </select>
+
+            <!-- Show text input if the when component doesn't have options -->
+            <input type="text" class="form-control form-control-sm" [(ngModel)]="conditionalEq"
+              (input)="onConditionalEqChange()" placeholder="Digite o valor de comparação"
+              *ngIf="!hasConditionalWhenComponentOptions()">
+
+            <div class="form-text">
+              O componente será mostrado/ocultado quando o campo monitorado for igual a este valor
+            </div>
+          </div>
+
+          <!-- Preview -->
+          <!-- <div class="alert alert-info p-2" *ngIf="conditionalWhen && conditionalEq">
+            <small>
+              <strong>Rule:</strong>
+              {{ conditionalShow === 'true' ? 'Show' : 'Hide' }} this component
+              when <code>{{ conditionalWhen }}</code> equals <code>"{{ conditionalEq }}"</code>
+            </small>
+          </div> -->
+
+          <!-- Help -->
+          <!-- <div class="alert alert-light p-2" *ngIf="!conditionalWhen">
+            <small class="text-muted">
+              <i class="bi bi-info-circle me-1"></i>
+              Conditional logic allows you to show/hide components based on the values of other fields.
+              Select a field to watch and specify the target value.
+            </small>
+          </div> -->
+        </div>
+
+        <!-- Conditional Logic Properties -->
+        <div class="property-section mb-4">
+          <h6 class="section-title" style="font-weight: bold;">
+            <i class="bi bi-code-slash me-2"></i>
+            REFERÊNCIAS
+          </h6>
+
+          <!-- Component Key -->
+          <div class="form-group mb-3">
+            <label class="form-label">Identificador Chave</label>
+            <input type="text" class="form-control form-control-sm" [(ngModel)]="componentKey" (input)="onKeyChange()"
+              placeholder="Unique key for this component">
+            <div class="form-text">
+              Identificador exclusivo usado para lógica condicional e vinculação de dados
+            </div>
+          </div>
+
+          <!-- Component Id -->
+          <div class="form-group mb-3">
+            <label class="form-label">ID: {{ componentId }}</label>
+          </div>
+
+        </div>
+
+      </div>
+
+
+    </div>
+
+    <!-- Hierarchy Tree Tab -->
+    <div class="tab-pane h-100" [class.active]="activeTab === 'hierarchy'">
+      <app-hierarchy-tree></app-hierarchy-tree>
+    </div>
+  </div>
+
+  <!-- CKEditor Modal -->
+  <app-ck-editor-modal></app-ck-editor-modal>
+</div>

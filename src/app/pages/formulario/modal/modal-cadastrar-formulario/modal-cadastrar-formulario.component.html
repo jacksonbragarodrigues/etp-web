@@ -1,0 +1,111 @@
+<ng-template #modalCadastrarFormularioComponent class="modal modal-xl fade">
+  <div class="modal-header">
+    <span>{{ titulo }}</span>
+  </div>
+
+  <div class="modal-body">
+    <form [formGroup]="gestaoFormularioModalForm">
+      <div class="row row-form m-12">
+        <div class="row m-12">
+          <div class="col-sm-12 col-md-6 col-lg-12 col-xl-12 mt-2">
+            <label for="descricao">Descrição</label>
+            <textarea
+              formControlName="descricao"
+              placeholder="Descrição Formulário"
+              class="form-control"
+              id="descricaoFormulario"
+              name="descricaoFormulario"
+              rows="5"
+              maxlength="255"
+            ></textarea>
+            <app-error-mensage
+              [descricao]="'Descrição'"
+              [form]="gestaoFormularioModalForm"
+              [controlName]="'descricao'"
+            ></app-error-mensage>
+          </div>
+        </div>
+
+        <div class="row m-12" style="margin-top: 10px">
+          <div class="col-sm-12 col-md-4 col-lg-6 col-xl-6">
+            <label for="situacao">Situação</label>
+            <select formControlName="situacaoId" class="form-select">
+              <option
+                *ngFor="let item of situacaoList"
+                selected
+                [value]="item.id"
+              >
+                {{ item.descricao }}
+              </option>
+            </select>
+            <app-error-mensage
+              [descricao]="'Situação'"
+              [form]="gestaoFormularioModalForm"
+              [controlName]="'situacaoId'"
+            ></app-error-mensage>
+          </div>
+
+          <div class="col-sm-12 col-md-4 col-lg-6 col-xl-6">
+            <label for="assunto" class="text">Assunto</label>
+            <select formControlName="assuntoId" class="form-select">
+              <option
+                *ngFor="let item of assuntoList"
+                selected
+                [value]="item.id"
+              >
+                {{ item.descricao }}
+              </option>
+            </select>
+            <app-error-mensage
+              [descricao]="'Assunto'"
+              [form]="gestaoFormularioModalForm"
+              [controlName]="'assuntoId'"
+            ></app-error-mensage>
+          </div>
+        </div>
+      </div>
+      <div class="row row-form" style="margin-top: 30px">
+        <div class="col">
+          <button
+            noDoubleClick
+            [disabled]="!gestaoFormularioModalForm.valid"
+            (click)="gravar()"
+            type="button"
+            class="w-100 success-btn-color btn btn-success"
+            type="submit"
+          >
+            <em class="fa fa-lg fa-check float-center pt-1"></em> Gravar
+          </button>
+        </div>
+        <div class="col">
+          <button
+            noDoubleClick
+            (click)="close()"
+            type="button"
+            class="w-100 btn btn-danger"
+            data-bs-dismiss="modal"
+          >
+            <em class="fa fa-lg fa-minus-circle float-center pt-1"></em>
+            Cancelar
+          </button>
+        </div>
+      </div>
+      <div *ngIf="setarPadrao" class="row row-form" style="margin-top: 30px">
+        <div class="col">
+          <button
+            noDoubleClick
+            [disabled]="!gestaoFormularioModalForm.valid"
+            (click)="salvarAssuntoJsonPadrao()"
+            style="color: white"
+            type="button"
+            class="w-100 btn btn-info"
+            type="submit"
+          >
+            <em class="fa fa-lg fa-check float-center pt-1"></em> Setar como
+            Padrão
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+</ng-template>

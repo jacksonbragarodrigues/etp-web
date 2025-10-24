@@ -1,0 +1,330 @@
+<ng-template #enviarSeiModal class="modal modal-xl fade">
+  <div class="modal-header">
+
+    <span *ngIf="!isEtapaAnalise()" class="font-title titulo">Envio de ETP para o SEI/Análise</span>
+    <span *ngIf="isEtapaAnalise()" class="font-title titulo">Envio de Termo de Orientação para o SEI/Retorno para Gestor</span>
+
+  </div>
+  <div *ngIf="temEtp()" class="row info">
+    <div class="col-sm-12 col-md-12 col-lg-12 col-xl-12">
+      <span class="fontsei">Processo SEI:</span> {{ etp?.etp?.processoSei }}
+    </div>
+    <div class="col-sm-12 col-md-12 col-lg-12 col-xl-12">
+      <span class="fontsei">Número do ETP:</span> {{ etp?.etp?.numeroEtp }}
+    </div>
+  </div>
+  <div class="modal-body">
+    <div class="container-main">
+      <div class="col-sm-12 callout t-18 text-center">
+        @if (statusSituacao()) {
+          <div class="form-group">
+            <div class="row">
+              <div class="tabela table-container">
+                <table class="table table-striped" aria-describedby="Envio de ETP/Termo de Orientação para o SEI">
+                  <thead class="table-dark">
+                  <tr>
+                    <th class="linha-tabela" scope="col">Protocolo</th>
+                    <th class="linha-tabela" scope="col">Tipo de Documento</th>
+                    <th class="linha-tabela" scope="col">Assinatura</th>
+                    <th class="linha-tabela" scope="col">Data/Hora</th>
+                    <th class="linha-tabela" scope="col">Usuário</th>
+                    <th class="linha-tabela"></th>
+                  </tr>
+                  </thead>
+                  <tbody>
+                  <tr *ngFor="let envio of listaEnvios">
+                    <td
+                      class="linha-tabela"
+                      [ngClass]="
+                        envio.situacao === 1 || envio.situacao === 2
+                          ? 'tachar'
+                          : ''
+                      "
+                    >
+                      <a [href]="envio.linkSei" target="_blank">{{
+                          envio.protocoloSei
+                        }}</a>
+                    </td>
+
+                    <td
+                      [ngClass]="
+                        envio.situacao === 1 || envio.situacao === 2
+                          ? 'tachar'
+                          : ''
+                      "
+                      class="linha-tabela"
+                    >
+                      {{ getTipoDocumento(envio.tipoDocumento) }}
+                    </td>
+
+
+                    <td
+                      class="linha-tabela"
+                      [ngClass]="
+                        envio.situacao === 1 || envio.situacao === 2
+                          ? 'tachar'
+                          : ''
+                      "
+                    >
+                      <div
+                        *ngIf="
+                          envio != null &&
+                          envio.documentoSei != undefined &&
+                          envio.documentoSei.assinaturas != undefined &&
+                          envio.documentoSei.assinaturas != null &&
+                          envio.documentoSei.assinaturas.length > 0
+                        "
+                      >
+                        <span
+                          *ngFor="
+                            let assinatura of envio.documentoSei.assinaturas
+                          "
+                        >
+                          {{ assinatura.nome }} em {{ assinatura.dataHora }}
+                        </span>
+                      </div>
+
+                      <div
+                        *ngIf="
+                          envio.documentoSei == undefined ||
+                          envio.documentoSei.assinaturas == undefined ||
+                          envio.documentoSei.assinaturas == null ||
+                          envio.documentoSei.assinaturas.length == 0
+                        "
+                      >
+                        {{ getSituacao(envio.situacao) }}
+                      </div>
+                    </td>
+                    <td
+                      [ngClass]="
+                        envio.situacao === 1 || envio.situacao === 2
+                          ? 'tachar'
+                          : ''
+                      "
+                      class="linha-tabela"
+                    >
+                      {{ envio.dataRegistro }}
+                    </td>
+                    <td
+                      [ngClass]="
+                        envio.situacao === 1 || envio.situacao === 2
+                          ? 'tachar'
+                          : ''
+                      "
+                      class="linha-tabela"
+                    >
+                      {{ envio.usuarioRegistro }}
+                    </td>
+                    <td
+                      *ngIf="envio.situacao !== 0 && envio.situacao !== 1"
+                    ></td>
+                    <td
+                      class="botoes-sei"
+                      *ngIf="envio.situacao === 0 || envio.situacao === 1"
+                    >
+                      <!-- <div> -->
+                      <button
+                        (click)="updateEtpSei(envio.id, 1)"
+                        *ngIf="envio.situacao === 0"
+                        title="Registrar Cancelamento executado no SEI"
+                        type="button"
+                        class="btn btn-danger btn-size"
+                        style="color: white"
+                      >
+                        <em
+                          style="text-decoration: none"
+                          _ngcontent-cfm-c345=""
+                          class="fas fa-minus-circle float-center icons-btn icons-btn"
+                        ></em
+                        >Registrar Cancelamento
+                      </button>
+                      <button
+                        (click)="updateEtpSei(envio.id, 2)"
+                        *ngIf="envio.situacao === 0 || envio.situacao === 1"
+                        title="Registrar a Exclusão realizada no SEI"
+                        type="button"
+                        class="btn btn-warning btn-size"
+                        style="color: white"
+                      >
+                        <em
+                          _ngcontent-cfm-c345=""
+                          class="fas fa-times float-center icons-btn icons-btn"
+                        ></em
+                        >Registrar Exclusão
+                      </button>
+                    </td>
+                  </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <div class="botoes">
+                <div>
+                  <button
+                    (click)="openRegistrar()"
+                    title="Registro de envio para o SEI fora do ETP"
+                    type="button"
+                    class="btn btn-warning btn-size"
+                    style="color: white"
+                  >
+                    <em
+                      _ngcontent-cfm-c345=""
+                      class="fas fa-file-contract float-center icons-btn icons-btn"
+                    ></em
+                    >Registrar Protocolo
+                  </button>
+                </div>
+                <div>
+                  <button
+                    (click)="enviarSei(true)"
+                    title="Enviar ETP para o SEI desbloqueado"
+                    type="button"
+                    class="btn btn-success btn-size"
+                    style="color: white"
+                    *ngIf="hasUnlockSEIPermission"
+                  >
+                    <em
+                      _ngcontent-cfm-c345=""
+                      class="fas fa-paper-plane float-center icons-btn icons-btn"
+                    ></em
+                    >Enviar desbloqueado
+                  </button>
+
+                  <button
+                    (click)="enviarAnalise()"
+                    title="Enviar ETP para Análise"
+                    type="button"
+                    class="btn btn-primary btn-size"
+                    style="color: white"
+                    *ngIf="podeEnviarAnalise()"
+                  >
+
+                    <em
+                      _ngcontent-cfm-c345=""
+                      class="fas fa-edit float-center icons-btn icons-btn"
+                    ></em
+                    >Enviar para Análise
+                  </button>
+
+                  <button
+                    (click)="retornarAnalise()"
+                    title="Retornar ETP e Termo de Orientação para Gestor"
+                    type="button"
+                    class="btn btn-primary btn-size"
+                    style="color: white"
+                    *ngIf="podeRetornarAnalise()"
+                  >
+                    <em
+                      _ngcontent-cfm-c345=""
+                      class="fas fa-arrow-left float-center icons-btn icons-btn"
+                    ></em
+                    >Retornar ETP e Termo de Orientação
+                  </button>
+
+                  <button
+                    (click)="enviarSei()"
+                    title="Enviar ETP para o SEI"
+                    type="button"
+                    class="btn btn-success btn-size"
+                    style="color: white"
+                    *ngIf="!isEtapaAnalise()"
+                  >
+                    <em
+                      _ngcontent-cfm-c345=""
+                      class="fas fa-paper-plane float-center icons-btn icons-btn"
+                    ></em
+                    >Enviar ETP
+                  </button>
+
+                  <button
+                    (click)="enviarTermoSei()"
+                    title="Enviar Termo de Orientação para o SEI"
+                    type="button"
+                    class="btn btn-success btn-size"
+                    style="color: white"
+                    *ngIf="isEtapaAnalise()"
+                  >
+                    <em
+                      _ngcontent-cfm-c345=""
+                      class="fas fa-paper-plane float-center icons-btn icons-btn"
+                    ></em
+                    >Enviar Termo de Orientação
+                  </button>
+
+                  <button
+                    (click)="close()"
+                    title="Sair"
+                    type="button"
+                    class="btn btn-danger btn-size"
+                    style="color: white"
+                  >
+                    <em
+                      _ngcontent-cfm-c345=""
+                      class="fas fa-minus-circle float-center icons-btn icons-btn"
+                    ></em
+                    >Cancelar
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        }
+      </div>
+    </div>
+  </div>
+</ng-template>
+<ng-template #registrarSeiModal class="modal modal-xl fade">
+  <div class="modal-header">
+    <span class="font-title titulo"
+    >Registrar Documento/Protocolo do Sistema SEI</span
+    >
+  </div>
+  <div class="modal-body">
+    <div class="row pt-4">
+      <div class="col-sm-6 col-md-6 col-lg-6 col-xl-6 text-end">
+        <label for="documento">Protocolo no Sistema SEI:</label>
+      </div>
+      <div class="col-sm-6 col-md-6 col-lg-6 col-xl-6">
+        <input
+          [(ngModel)]="documento"
+          style="width: 130px"
+          type="text"
+          size="10"
+          id="documento"
+          class="form-control"
+        />
+      </div>
+    </div>
+    <br />
+    <hr />
+    <div class="botoes-sei">
+      <button
+        (click)="registrarEnvioseiEtp()"
+        title="Registrar Envio do ETP para o SEI"
+        type="button"
+        class="btn btn-success btn-size"
+        style="color: white"
+      >
+        <em
+          _ngcontent-cfm-c345=""
+          class="fas fa-arrow-down float-center icons-btn icons-btn"
+        ></em
+        >Transferir
+      </button>
+      <button
+        (click)="closeRegistrar()"
+        title="Sair"
+        type="button"
+        class="btn btn-danger btn-size"
+        style="color: white"
+      >
+        <em
+          _ngcontent-cfm-c345=""
+          class="fas fa-minus-circle float-center icons-btn icons-btn"
+        ></em
+        >Cancelar
+      </button>
+    </div>
+  </div>
+</ng-template>

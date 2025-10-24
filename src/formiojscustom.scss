@@ -1,0 +1,376 @@
+:fullscreen {
+  background-color: #fbfbfb;
+  overflow: scroll !important;
+}
+
+.col-form-label {
+  font-weight: bold !important;
+}
+
+.formio-dialog-button {
+  background: #dc3545 !important;
+}
+
+.ck.ck-reset,
+.ck.ck-reset_all,
+.ck.ck-reset_all * {
+  flex-wrap: wrap !important;
+}
+
+.ck-rounded-corners
+.ck.ck-dropdown
+.ck-dropdown__panel
+.ck-list
+.ck-list__item:first-child
+.ck-button,
+.ck.ck-dropdown
+.ck-dropdown__panel
+.ck-list
+.ck-list__item:first-child
+.ck-button.ck-rounded-corners {
+  max-width: 100% !important;
+}
+
+.nav-link-vertical {
+  width: 300px !important;
+}
+
+.open-modal-button {
+  width: 70px !important;
+  text-align: left !important;
+  white-space: normal !important;
+  height: auto !important;
+  font-weight: bold !important;
+  float: right !important;
+  background: #1c74d9 !important;
+  color: #ffffff !important;
+}
+
+.open-modal-button:hover {
+  background: #0056b3 !important;
+  color: #ffffff !important;
+}
+
+.required:after {
+  content: "" !important;
+  color: #dc3545;
+  font-weight: 100;
+}
+
+.formio-wizard-nav-container {
+  display: flex !important;
+  margin-left: 40%;
+  margin-top: 2%;
+}
+
+.formio-component-allowMultipleMasks {
+  display: none !important;
+}
+
+.formio-component-autocomplete {
+  display: none !important;
+}
+
+.formio-component-errorLabel {
+  display: none !important;
+}
+
+.formio-component-customOptions {
+  display: none !important;
+}
+
+.formio-component-checkbox .formio-component-ignoreCache {
+  display: none !important;
+}
+
+.formio-component-checkbox .formio-component-useExactSearch {
+  display: none !important;
+}
+
+.formio-component-valueProperty {
+  display: none !important;
+}
+
+.formio-component-searchDebounce {
+  display: none !important;
+}
+
+.formio-component-selectThreshold {
+  display: none !important;
+}
+
+.formio-component-dataSrc {
+  display: none !important;
+}
+
+.formio-component-shortcut {
+  display: none !important;
+}
+
+.formio-component-redrawOn {
+  display: none !important;
+}
+
+.formio-component-enableRowGroups {
+  display: none !important;
+}
+
+.formio-component-theme {
+  display: none !important;
+}
+
+.formio-component-dataType {
+  display: none !important;
+}
+
+.formio-component-selectValues {
+  display: none !important;
+}
+
+.formio-component-noRefreshOnScroll {
+  display: none !important;
+}
+
+.formio-component-readOnlyValue {
+  display: none !important;
+}
+
+.formio-component-authenticate {
+  display: none !important;
+}
+
+.formio-component-cloneRows {
+  display: none !important;
+}
+
+.formio-component-calculateServer {
+  display: none !important;
+}
+
+.formio-component-allowCalculateOverride {
+  display: none !important;
+}
+
+.formio-component-custom-validation-js {
+  display: none !important;
+}
+
+.formio-component-json-validation-json {
+  display: none !important;
+}
+
+.formio-component-errors {
+  display: none !important;
+}
+
+.formio-component-customConditionalPanel {
+  display: none !important;
+}
+
+.formio-component-tags {
+  display: none !important;
+}
+
+.formio-component-properties {
+  display: none !important;
+}
+
+.formio-component-customClass {
+  display: none !important;
+}
+
+.formio-component-ignoreCache {
+  display: none !important;
+}
+
+.formio-component-widget {
+  display: none !important;
+}
+
+.formio-form {
+  /* Estilos base para a navegação */
+  .pagination {
+    display: flex !important;
+    justify-content: start !important; /* Alinhamento à esquerda */
+    padding-left: 0 !important;
+    list-style: none !important;
+    position: relative !important;
+  }
+
+  /* Estilo dos itens da página */
+  .page-item {
+    border-radius: 50% !important;
+    margin: 5px !important;
+    position: relative !important;
+  }
+
+  /* Desenha uma seta entre os botões */
+  .page-item:not(:last-child)::after {
+    content: "" !important;
+    position: absolute !important;
+    top: 50% !important;
+    right: -15px !important;
+    border: 10px solid transparent !important;
+    border-left-color: #ccc !important;
+    transform: translateY(-50%) !important;
+  }
+
+  /* Remova a seta do último elemento */
+  .page-item:last-child::after {
+    content: none !important;
+  }
+}
+
+/* Estilos personalizados para form-control desabilitado */
+.form-control[disabled="disabled"] {
+  background-color: #e9ecef !important; /* Altere para a cor desejada */
+  //color: #888888; /* Altere para a cor de texto desejada */
+  cursor: not-allowed;
+}
+
+/* Estilos personalizados para ui fluid selection dropdown desabilitado */
+.ui.fluid.selection.dropdown[disabled="disabled"] {
+  background-color: #e9ecef !important; /* Altere para a cor desejada */
+  //color: #888888; /* Altere para a cor de texto desejada */
+  cursor: not-allowed;
+}
+
+/* Estilos adicionais para itens de seleção desabilitados */
+.ui.fluid.selection.dropdown[disabled="disabled"] .menu .item {
+  background-color: #e9ecef !important;
+}
+
+.formio-notainterna {
+  color: #ffa500 !important;
+  background-color: lightyellow !important;
+  border: 2px solid yellow !important;
+  padding: 10px !important;
+  margin: 9px !important;
+  border-radius: 7px !important;
+  text-align: left !important;
+}
+
+.card-title-custom {
+  background-color: #004164; /* Blue background */
+  color: #fff; /* White text */
+  padding: 5px 10px;
+  margin-bottom: 5px;
+  font-size: 18px;
+  text-align: center;
+}
+
+.btn-wizard-nav-cancel {
+  display: none !important;
+}
+
+.ck-link_selected {
+  color: blue !important;
+  background-color: transparent !important;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.ck-content a {
+  color: blue !important;
+  background-color: transparent !important;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.formio-component-htmlelement a {
+  color: blue !important;
+  background-color: transparent !important;
+  text-decoration: underline;
+  cursor: pointer;
+
+}
+
+.link-builder-ajuda {
+  background: none;
+  border: none;
+  color: blue;
+  font-weight: bold;
+  font-size: 24px !important;
+}
+
+.link-button {
+  background: none;
+  border: none;
+  color: blue;
+  text-decoration: underline;
+  cursor: pointer;
+  // font-weight: bold;
+  font-size: 20px !important;
+}
+
+.link-button:hover {
+  color: darkblue;
+}
+
+.link-button:focus {
+  outline: none;
+}
+
+.formio-component-htmlelement {
+  word-wrap: break-word;
+  color: inherit !important;
+  background-color: transparent !important;
+  border: none !important;
+  padding: 5px !important;
+  margin: 5px !important;
+  border-radius: none !important;
+  text-align: none !important;
+}
+
+/* Estilo do botão */
+.btn-modal {
+  background-color: transparent;
+  color: white;
+  padding: 10px 15px;
+  cursor: pointer;
+  font-size: 1.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+/* Botão com texto branco */
+.btn-modal-white {
+  color: white;
+}
+
+/* Efeito de hover */
+.btn-modal:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-color: white;
+}
+
+.modal-header-buttons {
+  display: flex;
+  justify-content: flex-end; /* Alinha os botões à direita */
+  gap: 10px; /* Espaço entre os botões */
+}
+
+blockquote {
+  overflow: hidden;
+  padding-right: 1.5em;
+  padding-left: 1.5em;
+  margin-left: 0;
+  margin-right: 0;
+  font-style: italic;
+  border-left: 5px solid #ccc;
+}
+
+.input-group-prepend {
+  height: 35px !important;
+}
+
+/* Pega todos os painéis cuja classe contém 'formio-component-PAINEL_ANALISE_' e termina com '_PAINEL' */
+div[class*="PAINEL_ANALISE_"][class*="_PAINEL"] .card-header {
+  background-color: #FFEE8C;
+}
+
+.choices__list {
+  z-index: 9999 !important;
+}

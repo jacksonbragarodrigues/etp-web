@@ -1,0 +1,171 @@
+<ng-template
+  #etpPrazo
+  class="modal modal-xl fade"
+  data-bs-backdrop="static"
+  xmlns="http://www.w3.org/1999/html"
+>
+  <div class="modal-header">
+    <span>{{ titulo }}</span>
+  </div>
+
+  <div class="modal-body">
+    <form [formGroup]="prazoForm">
+      <div class="row row-form m-12">
+        <div class="col-sm-12 col-md-4 col-lg-12 col-xl-12">
+          <label for="etapaId" class="text">Etapa</label>
+          <select formControlName="etapaId" id="etapaId" class="form-select">
+            <option *ngFor="let item of etapasList" selected [value]="item.id">
+              {{ item.id + " - " + item.descricao }}
+            </option>
+          </select>
+          <app-error-mensage
+            [descricao]="'Etapa'"
+            [form]="prazoForm"
+            [controlName]="'etapaId'"
+          ></app-error-mensage>
+        </div>
+      </div>
+      <div class="row row-form m-12">
+        <div class="col-sm-12 col-md-6 col-lg-12 col-xl-12 mt-2">
+          <label for="prioridadeId" class="text">Prioridade</label>
+          <select formControlName="prioridadeId" class="form-select">
+            <option
+              *ngFor="let item of prioridadesList"
+              selected
+              [value]="item.id"
+            >
+              {{ item.descricao }}
+            </option>
+          </select>
+          <app-error-mensage
+            [descricao]="'Prioridade'"
+            [form]="prazoForm"
+            [controlName]="'prioridadeId'"
+          ></app-error-mensage>
+        </div>
+        <div class="col-sm-12 col-md-3 col-lg-4 col-xl-4">
+          <label for="qtdDiasLimiteRevisor">Dias Limite Revisor</label>
+          <input
+            formControlName="qtdDiasLimiteRevisor"
+            type="number"
+            min="0"
+            maxlength="9"
+            id="qtdDiasLimiteRevisor"
+            class="form-control text-center"
+          />
+          <app-error-mensage
+            [descricao]="'Dias Limite Revisor'"
+            [form]="prazoForm"
+            [controlName]="'qtdDiasLimiteRevisor'"
+          >
+          </app-error-mensage>
+        </div>
+        <div class="col-sm-12 col-md-3 col-lg-4 col-xl-4">
+          <label for="qtdDiasLimiteAnalista">Dias Limite Analista</label>
+          <input
+            formControlName="qtdDiasLimiteAnalista"
+            type="number"
+            min="0"
+            maxlength="9"
+            id="qtdDiasLimiteAnalista"
+            class="form-control text-center"
+          />
+          <app-error-mensage
+            [descricao]="'Dias Limite Analista'"
+            [form]="prazoForm"
+            [controlName]="'qtdDiasLimiteAnalista'"
+          >
+          </app-error-mensage>
+        </div>
+        <div class="col-sm-12 col-md-6 col-lg-12 col-xl-12 mt-2">
+          <label for="indStRegistro" class="text">Status</label>
+          <select formControlName="indStRegistro" class="form-select">
+            <option *ngFor="let item of statusList" selected [value]="item.id">
+              {{ item.descricao }}
+            </option>
+          </select>
+          <app-error-mensage
+            [descricao]="'Status'"
+            [form]="prazoForm"
+            [controlName]="'indStRegistro'"
+          ></app-error-mensage>
+        </div>
+        <div class="col-sm-12 col-md-6 col-lg-12 col-xl-12 mt-2">
+          <label for="motivacaoPrazo">Motivação</label>
+          <textarea
+            formControlName="motivacaoPrazo"
+            placeholder="Motivação"
+            class="form-control"
+            id="motivacaoPrazo"
+            name="motivacaoPrazo"
+            rows="5"
+            maxlength="255"
+          ></textarea>
+          <app-error-mensage
+            [descricao]="'Motivação'"
+            [form]="prazoForm"
+            [controlName]="'motivacaoPrazo'"
+          ></app-error-mensage>
+        </div>
+      </div>
+    </form>
+    <div class="row row-form" style="margin-top: 30px; padding-right: 2%">
+      <div class="botoes">
+        <div></div>
+        <div>
+          <button
+            style="margin: 5px"
+            noDoubleClick
+            [disabled]="prazoForm.invalid"
+            (click)="enviarPrazoSelecionado()"
+            type="button"
+            class="btn btn-success btn-size"
+            type="submit"
+          >
+            <em class="fa-solid fa-floppy-disk"></em> Salvar
+          </button>
+
+          <button
+            style="margin: 5px"
+            noDoubleClick
+            (click)="close()"
+            type="button"
+            class="btn btn-danger btn-size"
+            data-bs-dismiss="modal"
+          >
+            <em class="fa fa-lg fa-minus-circle float-center pt-1"></em>
+            Cancelar
+          </button>
+          <button
+            *ngIf="botaoInativar"
+            style="margin: 5px"
+            noDoubleClick
+            (click)="ativarInativarPrazo('A')"
+            aria-label="Ativar prazo"
+            ngbTooltip="Ativar prazo"
+            type="button"
+            class="btn btn btn-info"
+            data-bs-dismiss="modal"
+          >
+            <em class="fa fa-lg fa-plus-circle float-center pt-1"></em>
+            Ativar
+          </button>
+          <button
+            *ngIf="!botaoInativar"
+            style="margin: 5px"
+            noDoubleClick
+            (click)="ativarInativarPrazo('I')"
+            aria-label="Inativar prazo"
+            ngbTooltip="Inativar prazo"
+            type="button"
+            class="btn btn btn-secondary"
+            data-bs-dismiss="modal"
+          >
+            <em class="fa fa-lg fa-minus-circle float-center pt-1"></em>
+            Inativar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-template>

@@ -1,0 +1,80 @@
+.custom-ckeditor-container {
+  width: 100%;
+  min-height: 200px;
+  
+  // Ensure proper styling for the CKEditor
+  :host ::ng-deep .ck-editor__editable {
+    min-height: var(--ck-editor-height, 200px);
+    border-radius: 0.375rem;
+    border: 1px solid #dee2e6;
+    
+    &:focus {
+      border-color: #86b7fe;
+      outline: 0;
+      box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+    }
+  }
+  
+  :host ::ng-deep .ck.ck-editor {
+    width: 100%;
+    
+    .ck-toolbar {
+      border-top-left-radius: 0.375rem;
+      border-top-right-radius: 0.375rem;
+      border: 1px solid #dee2e6;
+      border-bottom: none;
+    }
+    
+    .ck-content {
+      border-bottom-left-radius: 0.375rem;
+      border-bottom-right-radius: 0.375rem;
+    }
+  }
+  
+  // Ensure balloon panels and dropdowns stay above modals
+  :host ::ng-deep .ck.ck-balloon-panel {
+    z-index: 1060 !important;
+  }
+  
+  :host ::ng-deep .ck.ck-dropdown__panel {
+    z-index: 1060 !important;
+  }
+  
+  :host ::ng-deep .ck.ck-tooltip {
+    z-index: 1060 !important;
+  }
+  
+  // Disabled state styling
+  &.disabled {
+    :host ::ng-deep .ck-editor__editable {
+      background-color: #e9ecef;
+      opacity: 1;
+      cursor: not-allowed;
+    }
+    
+    :host ::ng-deep .ck-toolbar {
+      background-color: #f8f9fa;
+      
+      .ck-button {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+    }
+  }
+  
+  // Custom height support
+  &[data-height] {
+    :host ::ng-deep .ck-editor__editable {
+      min-height: attr(data-height);
+    }
+  }
+}
+
+// Support for rich text editor wrapper styling from the original component
+.rich-text-editor-wrapper {
+  .custom-ckeditor-container {
+    :host ::ng-deep .ck-editor__editable {
+      min-height: var(--ck-editor-height);
+    }
+  }
+}

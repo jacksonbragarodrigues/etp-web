@@ -1,0 +1,102 @@
+<ng-template #logsEtp class="modal modal-xl fade">
+  <div class="modal-header">
+    <div class="col text-center">
+      <span class="font-title">Histórico do ETP</span>
+    </div>
+    <div class="col-auto text-end">
+      <button
+        title="Fechar"
+        type="button"
+        (click)="close()"
+        style="color: white"
+        class="btn btn-close-modal"
+      >
+        <i class="fa fa-xl fa-times"></i>
+      </button>
+    </div>
+  </div>
+
+  <div class="modal-body">
+    <app-table
+      #table
+      height="550px"
+      paginationClass="d-flex justify-content-end"
+      tableClass="table table-hover table-striped table-bordered"
+      [responsive]="true"
+      [pagination]="true"
+      [paginationTop]="false"
+      [page]="pageLogEtp"
+      [scrollable]="false"
+      [paginationSelection]="true"
+      paginationPrevious="<"
+      paginationNext=">"
+      (lazyLoad)="tableLazyLoadingLogEtp($event)"
+    >
+      <div *ngIf="listaLogsEtp.length === 0" empty>
+        Nenhum registro foi encontrado
+      </div>
+      <thead header>
+        <th class="text-center">ID</th>
+        <th class="text-center">Tipo operação</th>
+        <th class="text-center">Tipo de Contratação</th>
+        <th class="text-center">Descrição</th>
+        <th class="text-center">Processo SEI</th>
+        <th lass="text-center">Numeração ETP</th>
+        <th class="text-center">Unidade</th>
+        <th class="text-center">Situação</th>
+        <th class="text-center">Versão</th>
+        <th class="text-center">Motivo Versionamento</th>
+        <th class="text-center">Modificado</th>
+      </thead>
+      <tbody body>
+        <ng-container
+          *ngFor="let itemLogEtp of pageLogEtp?.content; let i = index"
+        >
+          <tr>
+            <td class="text-center">
+              {{ itemLogEtp.sqEtp }}
+            </td>
+            <td class="text-center">
+              {{ itemLogEtp.tipoOperacao }}
+            </td>
+            <td class="text-center motivo">
+              {{ itemLogEtp.tipoContratacao }}
+            </td>
+            <td class="text-center" title="{{ itemLogEtp.descricao }}">
+              {{ itemLogEtp.descricao }}
+            </td>
+            <td class="text-center">
+              {{ itemLogEtp.processoSei }}
+            </td>
+            <td class="text-center">
+              {{ itemLogEtp.numeroEtp }}
+            </td>
+            <td class="text-center">
+              {{ itemLogEtp.unidade }}
+            </td>
+            <td class="text-center">
+              {{ itemLogEtp.situacao }}
+            </td>
+            <td class="text-center">
+              {{ itemLogEtp.versao }}
+            </td>
+            <td
+              class="text-center motivo"
+              title="{{ itemLogEtp.dsMotivoVersionamento }} {{
+                itemLogEtp.dtVersionamento
+              }} {{ itemLogEtp.cdUsuarioVersionamento }}"
+            >
+              {{ itemLogEtp.dsMotivoVersionamento }}
+              {{ itemLogEtp.dtVersionamento }}
+              {{ itemLogEtp.cdUsuarioVersionamento }}
+            </td>
+            <td class="text-center">
+              {{ getDataModificacaoLogEtp(itemLogEtp) }}
+              {{ getUsuarioModificacaoLogEtp(itemLogEtp) }}
+            </td>
+          </tr>
+        </ng-container>
+      </tbody>
+    </app-table>
+  </div>
+</ng-template>

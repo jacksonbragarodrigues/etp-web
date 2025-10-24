@@ -1,0 +1,102 @@
+<div class="modal-body">
+  <div class="header-default respopnsivo-style">
+    <div class="row m-0 d-flex w-100 align-middle py-2 header-table">
+      <div
+        class="col-sm-12 col-md-12 col-lg-12 col-xl-12 callout text-left titulo-table-mobile"
+      >
+        <div class="row align-items-center">
+          <!-- Texto centralizado -->
+          <div class="col text-center">
+            <span class="font-title">{{ titulo }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <app-table
+      #table
+      height="550px"
+      paginationClass="d-flex justify-content-end"
+      tableClass="table table-hover table-striped table-bordered"
+      [responsive]="false"
+      [pagination]="true"
+      [paginationTop]="false"
+      [page]="pageFormularioBloqueados"
+      [scrollable]="false"
+      [paginationSelection]="true"
+      paginationPrevious="<"
+      paginationNext=">"
+      (lazyLoad)="tableLazyLoading($event)"
+    >
+      <div *ngIf="formularioList.length == 0">
+        Nenhum registro foi encontrado
+      </div>
+      <thead header>
+        <th class="text-left">ID</th>
+        <th class="text-left">Assunto</th>
+        <th class="text-left">Situação</th>
+        <th class="text-left">Descrição</th>
+        <th class="text-left">Versão</th>
+        <th class="text-left">Bloqueado Por</th>
+        <th class="text-left">Data Bloqueio</th>
+        <th class="text-left">Motivo Versionamento</th>
+        <th class="text-left">Modificado</th>
+        <th class="text-left">Ações</th>
+      </thead>
+      <tbody body>
+        <ng-container
+          *ngFor="
+            let itemFormulario of pageFormularioBloqueados?.content;
+            let i = index
+          "
+        >
+          <tr>
+            <td class="text-left">
+              {{ itemFormulario.id }}
+            </td>
+            <td class="text-left">
+              {{ itemFormulario.assunto.descricao }}
+            </td>
+            <td class="text-left">
+              {{ itemFormulario.situacao.descricao }}
+            </td>
+            <td class="text-left">
+              {{ itemFormulario.descricao }}
+            </td>
+            <td class="text-left">
+              {{ itemFormulario.versao }}
+            </td>
+            <td class="text-left">
+              {{ itemFormulario.bloqueadoPor }}
+            </td>
+            <td class="text-left">
+              {{ itemFormulario.dataBloqueio }}
+            </td>
+            <td
+              class="text-left"
+              title="{{ itemFormulario.motivoVersionamento }} {{
+                itemFormulario.dataVersionamento
+              }} {{ itemFormulario.cdUsuarioVersionamento }}"
+            >
+              {{ itemFormulario.motivoVersionamento }}
+              {{ itemFormulario.dataVersionamento }}
+              {{ itemFormulario.cdUsuarioVersionamento }}
+            </td>
+            <td class="text-left">
+              {{ gestaoBase.getDataModificacao(itemFormulario) }}
+              {{ gestaoBase.getUsuarioModificacao(itemFormulario) }}
+            </td>
+            <td class="text-left">
+              <button
+                (click)="desbloquearEtp(itemFormulario.id)"
+                class="btn btn-ligth p-0 me-1"
+                ngbTooltip="Desbloquear ETP"
+              >
+                <em class="fa fa-solid fa-unlock"></em>
+              </button>
+            </td>
+          </tr>
+        </ng-container>
+      </tbody>
+    </app-table>
+  </div>
+</div>

@@ -1,0 +1,99 @@
+<ng-template #modalCadastrarAssuntoComponent class="modal fade">
+  <div class="modal-header">
+    <span>{{ titulo }}</span>
+  </div>
+
+  <div class="modal-body">
+    <form [formGroup]="gestaoAssuntoModalForm">
+      <div class="row row-form m-12">
+        <div class="row m-12">
+          <div class="col-sm-12 col-md-6 col-lg-12 col-xl-12 mt-2">
+            <label for="descricao">Descrição</label>
+            <textarea
+              formControlName="descricao"
+              placeholder="Descrição do assunto"
+              class="form-control"
+              id="descricaoAssunto"
+              name="descricaoAssunto"
+              rows="5"
+              maxlength="255"
+            ></textarea>
+          </div>
+          <app-error-mensage
+            [descricao]="'Descrição'"
+            [form]="gestaoAssuntoModalForm"
+            [controlName]="'descricao'"
+          ></app-error-mensage>
+        </div>
+        <div class="col-sm-12 col-md-6 col-lg-12 col-xl-12 mt-2">
+          <label for="chave">Chave</label>
+          <textarea
+            formControlName="chave"
+            placeholder="Chave do assunto"
+            class="form-control"
+            id="chaveAssunto"
+            name="chaveAssunto"
+            appForceUppercase
+            rows="1"
+            maxlength="255"
+          ></textarea>
+          <app-error-mensage
+            [descricao]="'Chave'"
+            [form]="gestaoAssuntoModalForm"
+            [controlName]="'chave'"
+          ></app-error-mensage>
+        </div>
+        <div class="col-sm-12 col-md-6 col-lg-12 col-xl-12">
+            <label for="sqFormularioAnalise" class="text">Formulário Análise</label>
+            <select
+              formControlName="sqFormularioAnalise"
+              id="sqFormularioAnalise"
+              class="form-select"
+            >
+              <option
+                *ngFor="let item of formularioList"
+                selected
+                [value]="item.id"
+              >
+                {{
+                  item.id + " - " + item.descricao + " - Versão: " + item.versao
+                }}
+              </option>
+            </select>
+            <app-error-mensage
+              [descricao]="'Formulário'"
+              [form]="gestaoAssuntoModalForm"
+              [controlName]="'sqFormularioAnalise'"
+            ></app-error-mensage>
+          </div>
+      </div>
+      <div class="row row-form" style="margin-top: 30px">
+        <div class="col">
+          <button
+            noDoubleClick
+            [disabled]="!gestaoAssuntoModalForm.valid"
+            (click)="gravar()"
+            type="button"
+            class="w-100 success-btn-color btn btn-success"
+            type="submit"
+          >
+            <em class="fa fa-lg fa-check float-center pt-1"></em> Gravar
+          </button>
+        </div>
+
+        <div class="col">
+          <button
+            noDoubleClick
+            (click)="close()"
+            type="button"
+            class="w-100 btn btn-danger"
+            data-bs-dismiss="modal"
+          >
+            <em class="fa fa-lg fa-minus-circle float-center pt-1"></em>
+            Cancelar
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+</ng-template>

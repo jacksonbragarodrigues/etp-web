@@ -1,0 +1,14 @@
+{
+  "name": "form-builder-lib",
+  "version": "0.0.1",
+  "peerDependencies": {
+    "@angular/common": "^18.2.13",
+    "@angular/core": "^18.2.13",
+    "@angular/forms": "^18.2.13",
+    "rxjs": "^7.8.0"
+  },
+  "dependencies": {
+    "ngx-select-dropdown": "^3.3.2",
+    "tslib": "^2.3.0"
+  }
+}

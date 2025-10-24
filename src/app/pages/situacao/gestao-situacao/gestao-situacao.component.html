@@ -1,0 +1,178 @@
+<div class="container-main">
+  <!-- Filtros -->
+  <div class="header-default">
+    <form [formGroup]="gestaoSituacaoFiltroForm">
+      <div
+        class="row m-0 d-flex w-100 align-middle py-2 listagem-guias-pesquisa"
+        style="background-color: #004164; align-items: center; margin-left: 1px"
+      >
+        <div class="col-sm-12 callout t-18 text-left">
+          <span class="font-title">Gestão de Situações</span>
+        </div>
+      </div>
+      <div class="form-group">
+        <div class="row row-form m-12">
+          <div class="col-sm-12 col-md-6 col-lg-4 col-xl-4">
+            <label for="situacao">Situação</label>
+            <input
+              type="text"
+              id="descricao"
+              class="form-control"
+              formControlName="descricao"
+            />
+          </div>
+
+          <div class="col-sm-12 col-md-2 col-lg-2 col-xl-2 botoes">
+            <button
+              (click)="tableLazyLoading()"
+              type="button"
+              class="btn btn-secondary btn-info btn-size w-100"
+              style="color: white"
+            >
+              <em
+                _ngcontent-cfm-c345=""
+                class="fas fa-search float-center icons-btn icons-btn"
+              ></em
+              >Pesquisar
+            </button>
+          </div>
+          <div class="col-sm-12 col-md-2 col-lg-2 col-xl-2 botoes">
+            <button
+              (click)="limparCampos()"
+              type="button"
+              class="btn btn-secondary btn-size w-100"
+              style="margin-bottom: 0"
+            >
+              <em
+                _ngcontent-cfm-c345=""
+                class="fas fa-eraser float-center icons-btn icons-btn"
+              ></em
+              >Limpar
+            </button>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <!-- Header tabela -->
+  <div class="header-default respopnsivo-style">
+    <div class="row m-0 d-flex w-100 align-middle py-2 header-table">
+      <div
+        class="col-sm-12 col-md-12 col-lg-12 col-xl-12 callout text-left titulo-table-mobile"
+      >
+        <div class="row align-items-center">
+          <!-- Texto centralizado -->
+          <div class="col text-center">
+            <span class="font-title">Situções</span>
+          </div>
+
+          <!-- Botão alinhado à direita -->
+          <div class="col-auto text-end">
+            <button
+              noDoubleClick
+              style="width: 35%; min-width: 100px"
+              title="Novo"
+              type="button"
+              class="btn btn-success success-btn-color"
+              (click)="cadastrarSituacao()"
+            >
+              <em
+                class="fa fa-lg fa-plus float-center pt-1 pr-1 icons-btn"
+                style="font-size: 15px"
+              ></em>
+              <span style="font-size: 15px">Novo</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabela -->
+    <app-table
+      #table
+      height="550px"
+      paginationClass="d-flex justify-content-end"
+      tableClass="table table-hover table-striped table-bordered"
+      [responsive]="false"
+      [pagination]="true"
+      [paginationTop]="false"
+      [page]="page"
+      [scrollable]="false"
+      [paginationSelection]="true"
+      paginationPrevious="<"
+      paginationNext=">"
+      (lazyLoad)="tableLazyLoading($event)"
+    >
+      <div empty>Nenhum registro foi encontrado</div>
+      <thead header>
+        <th sortable="id" (sort)="onSort($event)" class="text-left ps-4 pe-4">
+          ID
+        </th>
+        <th
+          sortable="descricao"
+          (sort)="onSort($event)"
+          class="text-left ps-4 pe-5"
+        >
+          Descrição
+        </th>
+        <th
+          sortable="chave"
+          (sort)="onSort($event)"
+          class="text-left ps-4 pe-5"
+        >
+          Chave
+        </th>
+        <th class="text-left ps-4 pe-5">Data de modificação</th>
+        <th class="text-left ps-4 pe-5">Usuário de modificação</th>
+        <th class="text-left">Ações</th>
+      </thead>
+      <tbody body>
+        <ng-container *ngFor="let item of page?.content; let i = index">
+          <tr>
+            <td class="text-left">
+              {{ item.id }}
+            </td>
+            <td class="text-left ps-4 pe-5">
+              {{ item.descricao }}
+            </td>
+            <td class="text-left ps-4 pe-5">
+              {{ item.chave }}
+            </td>
+            <td class="text-left ps-4 pe-5">
+              {{ gestaoBase.getDataModificacao(item) }}
+            </td>
+            <td class="text-left ps-4 pe-5">
+              {{ gestaoBase.getUsuarioModificacao(item) }}
+            </td>
+            <td style="font-weight: unset" class="text-left pe-3">
+              <button
+                (click)="editarSituacao(item)"
+                style="border: none"
+                class="btn btn-ligth p-0 me-1 cursor-pointer"
+                ngbTooltip="Alterar"
+                noDoubleClick
+              >
+                <em class="fa-solid fa-file-pen"></em>
+              </button>
+              <button
+                (click)="excluirSituacao(item)"
+                noDoubleClick
+                style="border: none"
+                class="btn btn-ligth p-0 me-1"
+                ngbTooltip="Excluir"
+              >
+                <em class="fa-solid fa-trash"></em>
+              </button>
+            </td>
+          </tr>
+        </ng-container>
+      </tbody>
+    </app-table>
+  </div>
+</div>
+
+<app-modal-cadastrar-situacao
+  #cadastrar_situacao
+  (cadastrarSituacao)="gravarSituacao($event)"
+></app-modal-cadastrar-situacao>

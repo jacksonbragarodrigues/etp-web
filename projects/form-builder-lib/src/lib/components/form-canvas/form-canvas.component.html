@@ -1,0 +1,183 @@
+<div class="form-canvas">
+
+  <!-- Preview Mode -->
+  <div class="preview-container" *ngIf="state.previewMode">
+    <!-- <div class="preview-header bg-primary text-white p-3 rounded-top">
+      <h5 class="mb-0">
+        <i class="bi bi-eye me-2"></i>
+        Form Preview
+      </h5>
+    </div> -->
+
+    <!-- Validation Messages -->
+    <div class="validation-messages-container" *ngIf="hasValidationErrors()">
+      <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <div class="d-flex align-items-start">
+          <i class="bi bi-exclamation-triangle-fill me-2 text-danger fs-5"></i>
+          <div class="flex-grow-1">
+            <h6 class="alert-heading mb-2">
+              <strong>Existem {{ getValidationErrorsCount() }} erro(s) de validação:</strong>
+            </h6>
+            <div class="validation-errors-list">
+              <div
+                *ngFor="let error of currentStepValidationErrors"
+                class="validation-error-item mb-1">
+                <a
+                  href="javascript:void(0)"
+                  class="text-danger text-decoration-none fw-semibold"
+                  (click)="onValidationErrorClick(error)"
+                  [title]="'Clique para ir para ' + error.componentLabel + ' ' + error.componentId">
+                  <i class="bi bi-arrow-right-circle me-1"></i>
+                  {{ error.message }}
+                </a>
+              </div>
+            </div>
+            <small class="text-muted d-block mt-2">
+              <i class="bi bi-info-circle me-1"></i>
+              Clique nas mensagens acima para navegar para o campo com erro.
+            </small>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="preview-body bg-white p-4 rounded-bottom shadow">
+      <form>
+        <ng-container *ngFor="let component of getCurrentStepComponents(); trackBy: trackByComponentId">
+          <app-form-component-renderer
+            [component]="component"
+            [previewMode]="true"
+            [showValidationError]="showValidationErrors && hasComponentValidationError(component.id)"
+            [validationErrorMessage]="getComponentValidationError(component.id)">
+          </app-form-component-renderer>
+        </ng-container>
+      </form>
+    </div>
+  </div>
+
+  <!-- Design Mode -->
+  <div class="design-container" *ngIf="!state.previewMode">
+    
+    <!-- Canvas Header -->
+    <!-- <div class="canvas-header mb-3">
+      <div class="d-flex justify-content-between align-items-center">
+        <h6 class="mb-0 text-muted">
+          <i class="bi bi-layout-wtf me-2"></i>
+          Form Designer Canvas
+        </h6>
+        <div class="canvas-actions">
+          <button class="btn btn-outline-secondary btn-sm me-2" (click)="clearCanvas()" title="Clear All">
+            <i class="bi bi-trash"></i>
+          </button>
+          <button class="btn btn-outline-info btn-sm" (click)="validateForm()" title="Validate Form">
+            <i class="bi bi-check-circle"></i>
+          </button>
+        </div>
+      </div>
+    </div> -->
+
+    <!-- Drop Zone Area -->
+    <div 
+      class="canvas-drop-area"
+      [class]="getDropZoneClass(-1)"
+      (dragover)="onDragOver($event, 0)"
+      (drop)="onDrop($event, 0)">
+
+
+      
+
+
+      <!-- Empty State -->
+      <div class="empty-canvas" *ngIf="getCurrentStepComponents().length === 0">
+        <div class="empty-content text-center">
+          <i class="bi bi-plus-circle-dotted display-4 text-muted mb-3"></i>
+          <h5 class="text-muted">Comece a construir seu formulário</h5>
+          <p class="text-muted">
+            Arraste os componentes do painel esquerdo
+          </p>
+          <!-- <div class="quick-add-buttons mt-3">
+            <button class="btn btn-outline-primary btn-sm me-2" (click)="addQuickComponent('input')">
+              <i class="bi bi-input-cursor-text me-1"></i>
+              Add Text Input
+            </button>
+          </div> -->
+        </div>
+      </div>
+
+      <!-- Form Components -->
+      <div class="form-components" *ngIf="getCurrentStepComponents().length > 0">
+        
+        <ng-container *ngFor="let component of getCurrentStepComponents(); trackBy: trackByComponentId; let i = index">
+          
+          <!-- Drop Zone Before Component -->
+          <div 
+            class="component-drop-zone"
+            [class]="getDropZoneClass(i)"
+            (dragover)="onDragOver($event, i)"
+            (drop)="onDrop($event, i)">
+            <div class="drop-indicator">
+              <i class="bi bi-plus"></i>
+              <!-- <span>Drop component here</span> -->
+            </div> 
+          </div>
+
+          <!-- Form Component Wrapper -->
+          <div
+            class="form-component-wrapper"
+            [class.selected]="isComponentSelected(component.id)"
+            [class.hovered]="isComponentHovered(component.id)"
+            [class.dragging]="state.dragInProgress"
+            draggable="true"
+            (dragstart)="onComponentDragStart($event, component, i)"
+            (dragend)="onComponentDragEnd()"
+            (click)="onComponentSelect(component)"
+            (mouseenter)="onComponentHover(component.id)"
+            (mouseleave)="onComponentUnhover()">
+
+            <!-- Component Renderer -->
+            <div class="component-content">
+              <app-form-component-renderer
+                [component]="component"
+                [selected]="isComponentSelected(component.id)"
+                [hovered]="isComponentHovered(component.id)"
+                [previewMode]="false"
+                [showToolbar]="isComponentHovered(component.id) || isComponentSelected(component.id)"
+                (openProperties)="onOpenProperties(component)"
+                (deleteComponent)="onComponentDelete(component.id)">
+              </app-form-component-renderer>
+            </div>
+
+            <!-- Selection Indicator -->
+            <div class="selection-indicator" *ngIf="isComponentSelected(component.id)"></div>
+          </div>
+        </ng-container>
+
+        <!-- Final Drop Zone -->
+        <div 
+          class="component-drop-zone final-drop-zone"
+          [class]="getDropZoneClass(getCurrentStepComponents().length)"
+          (dragover)="onDragOver($event, getCurrentStepComponents().length)"
+          (drop)="onDrop($event, getCurrentStepComponents().length)">
+
+         <div class="drop-indicator">
+            <i class="bi bi-plus"></i>
+            <!-- <span>Drop component at end</span> -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Canvas Footer -->
+    <div class="canvas-footer mt-4 p-3 bg-light rounded">
+      <div class="d-flex justify-content-between align-items-center text-muted small">
+        <span>
+          <i class="bi bi-info-circle me-1"></i>
+          {{ getCurrentStepComponents().length }} component(s) in this step
+        </span>
+        <span *ngIf="state.selectedComponent">
+          Selected: {{ state.selectedComponent.label || state.selectedComponent.type }}
+        </span>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,250 @@
+<ng-template
+  #delegarAcessoComponent
+  class="modal modal-xl fade"
+  data-bs-backdrop="static">
+
+  <div class="modal-header">
+    <span>{{ titulo }}</span>
+  </div>
+
+  <div>
+    <p-tabView [activeIndex]="index"
+               (onChange)="onTabChange($event)"
+               styleClass="p-2">
+      <p-tabPanel header="Busca por Unidade" leftIcon="fa-solid fa-briefcase">
+        <form class="form-horizontal" [formGroup]="delegacaoForm">
+          <div class="row">
+            <div class="col-sm-12">
+              <label class="form-label fw-bolder">Usuário</label>
+            </div>
+            <div class="col-sm-12">
+              <p-autoComplete field="nomeServidor"
+                              id="nomeServidor"
+                              inputStyleClass="w-100"
+                              styleClass="w-100"
+                              [(ngModel)]="servidorSelecionado"
+                              [ngModelOptions]="{standalone: true}"
+                              [suggestions]="servidorListFilter"
+                              [minLength]="3"
+                              (completeMethod)="buscarServidoresPorNome($event)"
+                              (onSelect)="onServidorSelecionado($event)"
+                              [forceSelection]="true"
+                              (onClear)="clearServidoresSelecionados()"
+                              (onUnselect)="clearServidoresSelecionados()">
+
+              </p-autoComplete>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-12">
+              <label for="unidade" class="form-label fw-bolder">Unidade</label>
+            </div>
+            <div class="col-sm-12">
+              <p-autoComplete field="descricaoSigla"
+                              id="unidade"
+                              styleClass="w-100"
+                              inputStyleClass="w-100"
+                              [(ngModel)]="unidade"
+                              [ngModelOptions]="{standalone: true}"
+                              [suggestions]="unidadeListFilter"
+                              [minLength]="3"
+                              (completeMethod)="buscarUnidades($event)"
+                              [forceSelection]="true"
+                              (onSelect)="onUnidadeSelecionada($event)"
+                              (onClear)="clearServidoresSelecionados()"
+                              (onUnselect)="clearServidoresSelecionados()"
+                              [baseZIndex]="9999999">
+
+              </p-autoComplete>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-sm-6">
+              <label class="form-label fw-bolder">Data Inicial</label>
+              <p-calendar id="dataInicial"
+                          formControlName="dataInicial"
+                          [style]="{ width: '100%' }"
+                          dateFormat="dd/mm/yy"
+                          placeholder="Data Inicial da Permissão"
+                          [readonlyInput]="true"
+                          required>
+
+              </p-calendar>
+            </div>
+            <div class="col-sm-6">
+              <label class="form-label fw-bolder">Data Final</label>
+              <p-calendar id="dataFinal"
+                          formControlName="dataFinal"
+                          dateFormat="dd/mm/yy"
+                          placeholder="Data Final da Permissão"
+                          [style]="{ width: '100%' }"
+                          [showButtonBar]="true"
+                          [minDate]="dataInicial"
+                          [readonlyInput]="true"
+                          [disabled]="(dataInicial === undefined)">
+              </p-calendar>
+
+            </div>
+          </div>
+        </form>
+
+        <div class="row pt-4">
+          <div class=" col-sm-12">
+
+            <p-table styleClass="table table-hover table-striped table-bordered"
+                     [value]="servidoresSelecionados"
+                     scrollHeight="252px"
+                     [scrollable]="true" [rows]="10">
+              <ng-template pTemplate="caption">
+                Lista de Servidores
+              </ng-template>
+              <ng-template pTemplate="header">
+                <tr>
+                  <th class="text-center" scope="col">Nome do Servidor</th>
+                  <th class="text-center" scope="col" style="width:15%;">Data de Início</th>
+                  <th class="text-center" scope="col" style="width:15%;">Data de Fim</th>
+                  <th class="text-center" scope="col" style="width:20%;">Tipo de Delegação</th>
+                  <th class="text-center" scope="col" style="width:20%;">Tipo de Permissão</th>
+                  <th class="text-center" scope="col" style="width:15%;">
+                    Delegar? &nbsp;
+                    <p-checkbox class="permitirTodos"
+                                name="group1"
+                                [(ngModel)]="setarTodosServidores"
+                                (onChange)="setarTodos()"
+                                [binary]="true"></p-checkbox>
+                  </th>
+                </tr>
+              </ng-template>
+              <ng-template pTemplate="body" let-usuario>
+                <tr>
+                  <td>{{ usuario.nomeServidor }}</td>
+
+
+
+                  <td class="text-center" style="width:15%;">{{ usuario.dataInicioPermissao }}</td>
+                  <td class="text-center" style="width:15%;">{{ usuario.dataFimPermissao  }}</td>
+                  <td class="text-center" style="width:20%;">
+                    <select class="form-select"
+                            [(ngModel)]="usuario.idTipoDelegacao"
+                            [disabled]="true"
+                            (change)="onDelegacaoChange(usuario, $event)"
+                            [value]="usuario.idTipoDelegacao">
+                      <option
+                        *ngFor="let d of tipoDelegacaoList"
+                        [value]="d.id">
+                        {{ d.descricao }}
+                      </option>
+                    </select>
+                  </td>
+                  <td class="text-center" style="width:20%;">
+                    <select class="form-select"
+                            [(ngModel)]="usuario.idTipoPermissao"
+                            (change)="onPermissaoChange(usuario, $event)"
+                            [value]="usuario.idTipoPermissao">
+                      <option
+                        *ngFor="let p of tipoPermisaoList"
+                        [selected]="p.id === 3"
+                        [value]="p.id">
+                        {{ p.descricao }}
+                      </option>
+                    </select>
+                  </td>
+                  <td class="text-center" style="width:15%;">
+                    <p-checkbox name="group3" (onChange)="definirPermisao(usuario)"
+                                [(ngModel)]="usuario.delegar"
+                                [binary]="true">
+                    </p-checkbox>
+                  </td>
+                </tr>
+              </ng-template>
+            </p-table>
+          </div>
+        </div>
+      </p-tabPanel>
+
+      <!-- USUÁRIOS AUTORIZADOS -->
+      <p-tabPanel class="usuarios_autorizados"
+                  header="Usuários Autorizados"
+                  leftIcon="fa-solid fa-lock-open">
+        <div class="row">
+          <p-table styleClass="table table-hover table-striped table-bordered"
+                   [value]="servidoresAutorizadosList"
+                   emptymessage="Nenhum usuário autorizado foi encontrado"
+                   scrollHeight="450px"
+                   [scrollable]="true"
+                   [rows]="10">
+            <ng-template pTemplate="caption">
+              Lista de Usuários Autorizados
+            </ng-template>
+            <ng-template pTemplate="header">
+              <tr>
+                <th class="text-center" scope="col" style="width:10%;">Matrícula</th>
+                <th class="text-center" scope="col" style="width:30%;">Nome do Servidor</th>
+                <th class="text-center" scope="col" style="width:30%;">Unidade</th>
+                <th class="text-center" scope="col" style="width:10%;">Início</th>
+                <th class="text-center" scope="col" style="width:10%;">Fim</th>
+                <th class="text-center" scope="col" style="width:20%;">Tipo de Delegação</th>
+                <th class="text-center" scope="col" style="width:20%;">Tipo de Permissão</th>
+                <th class="text-center" scope="col" style="width:10%;">Ações</th>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-usuario>
+              <tr>
+                <td class="text-center" style="width:10%;">{{ usuario.codMatriculaDelegado }}</td>
+                <td style="width:30%;">{{ usuario.nomeServidor }}</td>
+                <td style="width:30%;">{{ usuario.nomeUnidadeDelegado }}</td>
+                <td class="text-center" style="width:10%;">{{ usuario.dataInicioPermissao }}</td>
+                <td class="text-center" style="width:10%;">{{ usuario.dataFimPermissao }}</td>
+                <td class="text-center" style="width:10%;">{{ usuario.descDelegacao }}</td>
+                <td class="text-center" style="width:10%;">{{ usuario.descPermisao }}</td>
+                <td class="text-center">
+                  <button
+                    (click)="remover(usuario)"
+                    style="border: none"
+                    class="btn btn-ligth p-0 me-1"
+                    ngbTooltip="Revogar acesso ao {{delegacao.tipo}}">
+                    <em class="fa fa-solid fa-trash-can"></em>
+                  </button>
+                </td>
+              </tr>
+            </ng-template>
+          </p-table>
+        </div>
+      </p-tabPanel>
+    </p-tabView>
+  </div>
+
+    <div class="row row-form" style="margin-top: 30px; padding-right: 2%;">
+      <div class="botoes">
+        <div></div>
+        <div>
+          <button
+            style="margin: 5px"
+            noDoubleClick
+            (click)="salvar()"
+            [disabled]="this.servidoresSelecionados.length === 0"
+            *ngIf="index === 0"
+            type="button"
+            class="btn btn-success btn-size"
+            type="submit"
+          >
+            <em class="fa-solid fa-floppy-disk"></em> Salvar
+          </button>
+
+          <button
+            style="margin: 5px"
+            noDoubleClick
+            (click)="close()"
+            type="button"
+            class="btn btn-danger btn-size"
+            data-bs-dismiss="modal"
+          >
+            <em class="fa fa-lg fa-minus-circle float-center pt-1"></em>
+            Cancelar
+          </button>
+
+        </div>
+      </div>
+    </div>
+</ng-template>

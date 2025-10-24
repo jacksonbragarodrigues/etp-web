@@ -1,0 +1,18 @@
+.centraliza-checkbox {
+  position: relative;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.modal {
+  width: 100% !important;
+  --bs-modal-width: 100% !important;
+}
+
+.modal-content {
+  width: 800px !important;
+}
+
+.remodal {
+  max-width: 100% !important;
+}

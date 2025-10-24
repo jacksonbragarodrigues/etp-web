@@ -1,0 +1,122 @@
+<ng-template #formularioEtpComponent class="modal modal-xl fade" tabindex="-1">
+  <div class="card">
+    <p-menubar [model]="items"></p-menubar>
+  </div>
+
+  <div class="modal-body">
+    <div style="margin-bottom: 5px" class="card py-2 ps-2 pe-4 border shadow">
+      <div class="row">
+        <div class="col">
+          <strong>Tipo de Contratação:</strong> {{ tipoContratacao }}
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col">
+          <strong>Descrição:</strong> {{ descricao }}
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col">
+          <strong>Processo SEI:</strong> {{ processoSei }}
+          <strong>Numeração:</strong> {{ numeroEtp }}
+          <strong>Numeração Termo de Orientação:</strong> {{ etpNumeracaoTermoOrientacao }}
+          <strong>Situação:</strong> {{ descricaoSituacao }}
+          <strong>Etapa:</strong> {{ etapaEtp.descricao }}
+          <strong>Versão:</strong> {{ dadosEtp.versao }}
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div id="conteudoMenu" class="col-12 py-2 ps-2 pe-4 border shadow">
+        <div *ngIf="menuIndex == 0">
+          <formio [form]="formRender" [options]="options" (render)="renderFormio()" id="formulario"></formio>
+        </div>
+
+        <div *ngIf="menuIndex == 1">
+          <app-template-html [idForm]="this.dadosEtp.id" [jsonForm]="this.etp.jsonForm"
+                             [descricao]="this.dadosEtp.descricao" [jsonDados]="this.etp.jsonDados" [type]="'ETP'"
+                             [nomeRelatorio]="nomeArquivo" [usarSigilo]="this.usarSigilo" (fecharModal)="close()"></app-template-html>
+        </div>
+
+        <div *ngIf="menuIndex == 8">
+          <app-comparar-html-etp [idEtp]="this.dadosEtp.id"></app-comparar-html-etp>
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-template>
+<app-versionar [executaVersionarGestao]="executaVersionar.bind(this)" #versionar_etp></app-versionar>
+<cadastrar-etp #cadastrar_etp [estaAberto]="estaAberto()" (cadastrarEtp)="gravarEtp($event)"></cadastrar-etp>
+<app-comparar-html-etp-nova-versao #htmlNovaVersao [cancelarNovaVersao]="cancelarNovaVersao.bind(this)"
+                                   [aceitarNovaVersao]="aceitarNovaVersao.bind(this)">
+</app-comparar-html-etp-nova-versao>
+<versoes-etp [desabilitarCampos]="true" #versoes_etp (elaborarEtp)="elaborarEtpVersoes($event)">
+</versoes-etp>
+<app-listar-logs-etp #logsEtp></app-listar-logs-etp>
+<app-envio-sei #enviar_sei [reloadPublicarEtp]="reloadPublicarEtp.bind(this)" [etp]="this.dadosEtpCompleto"
+               [situacao]="this.dadosEtp?.situacao" [id]="this.dadosEtp?.id" [tipo]="'ETP'"></app-envio-sei>
+<app-delegar-acesso #delegar_acesso></app-delegar-acesso>
+
+<ng-template #registrarSeiModalForm class="modal modal-xl fade">
+  <div class="link-popup">
+
+    <div class="modal-header">
+      <h5 class="modal-title">Inserir link do Sistema SEI</h5>
+    </div>
+
+    <div class="modal-body">
+      <div class="form-group">
+        <label for="documento">Protocolo no Sistema SEI:</label>
+        <input [(ngModel)]="documentoForm" type="text" size="10" id="documento"
+               class="form-control" />
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button (click)="registrarEnvioseiEtpForm()" title="Enviar Link SEI para documento" type="button"
+              class="btn btn-success btn-size" style="color: white">
+        <em _ngcontent-cfm-c345="" class="fas fa-arrow-down float-center icons-btn icons-btn"></em>Transferir
+      </button>
+      <button (click)="closeRegistrarForm()" title="Sair" type="button" class="btn btn-danger btn-size"
+              style="color: white">
+        <em _ngcontent-cfm-c345="" class="fas fa-minus-circle float-center icons-btn icons-btn"></em>Cancelar
+      </button>
+    </div>
+  </div>
+
+</ng-template>
+
+<ng-template #registrarLinkCustomModalForm class="modal modal-xl fade">
+  <div class="link-popup">
+
+    <div class="modal-header">
+      <h5 class="modal-title">Inserir Link</h5>
+    </div>
+
+    <div class="modal-body">
+      <div class="form-group">
+        <label for="linkUrl">Link:</label>
+        <input [(ngModel)]="linkCustomForm" type="text" id="linkUrl" name="linkUrl" class="form-control" />
+      </div>
+      <div class="form-group">
+        <label for="linkUrl">Exibir Texto:</label>
+        <input [(ngModel)]="textoLinkCustomForm" type="text" id="texto" name="texto" class="form-control" />
+      </div>
+    </div>
+
+    <div class="modal-footer">
+
+      <button (click)="registrarLinkCustomForm()" title="Enviar Link para documento" type="button"
+              class="btn btn-success btn-size" style="color: white">
+        <em _ngcontent-cfm-c345="" class="fas fa-arrow-down float-center icons-btn icons-btn"></em>Transferir
+      </button>
+      <button (click)="closeRegistrarLinkCustom()" title="Sair" type="button" class="btn btn-danger btn-size"
+              style="color: white">
+        <em _ngcontent-cfm-c345="" class="fas fa-minus-circle float-center icons-btn icons-btn"></em>Cancelar
+      </button>
+
+    </div>
+  </div>
+</ng-template>
