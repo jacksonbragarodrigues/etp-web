@@ -78,6 +78,12 @@
 
     <!-- Drop Zone Area -->
     <div 
+
+
+
+
+
+    
       class="canvas-drop-area"
       [class]="getDropZoneClass(-1)"
       (dragover)="onDragOver($event, 0)"
@@ -111,14 +117,21 @@
           
           <!-- Drop Zone Before Component -->
           <div 
-            class="component-drop-zone"
-            [class]="getDropZoneClass(i)"
+           
+            
+ class="component-drop-zone final-drop-zone"
+  [ngClass]="{ 'drag-over': isDragOver[i] }"
+
+
+
             (dragover)="onDragOver($event, i)"
+             (dragleave)="onDragLeave($event, i)"
             (drop)="onDrop($event, i)">
             <div class="drop-indicator">
               <i class="bi bi-plus"></i>
               <!-- <span>Drop component here</span> -->
             </div> 
+            {{ i }}
           </div>
 
           <!-- Form Component Wrapper -->
@@ -175,7 +188,7 @@
           {{ getCurrentStepComponents().length }} component(s) in this step
         </span>
         <span *ngIf="state.selectedComponent">
-          Selected: {{ state.selectedComponent.label || state.selectedComponent.type }}
+          Selected: {{ state.selectedComponent.label }} - {{ state.selectedComponent.type }}
         </span>
       </div>
     </div>
