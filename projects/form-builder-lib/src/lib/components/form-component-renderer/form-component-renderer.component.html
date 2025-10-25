@@ -847,25 +847,42 @@
     <div class="card-body" [style.display]="isPanelCollapsed() ? 'none' : 'block'">
       <!-- Nested components would go here -->
       <div class="panel-content"
-           [class.drag-over]="dragOverContainer && !previewMode"
-           (dragover)="onContainerDragOver($event)"
-           (dragleave)="onContainerDragLeave($event)"
-           (drop)="onContainerDrop($event)">
-        <app-form-component-renderer
-          *ngFor="let childComponent of component.children || []; trackBy: trackByComponentId"
-          [component]="childComponent"
-          [previewMode]="previewMode"
-          [selected]="isChildSelected(childComponent.id)"
-          [showToolbar]="isChildSelected(childComponent.id)"
-          (openProperties)="onChildOpenProperties(childComponent)"
-          (deleteComponent)="onChildDeleteComponent(childComponent.id)">
-        </app-form-component-renderer>
+           >
+        <ng-container *ngFor="let childComponent of component.children || []; trackBy: trackByComponentId">
+          <!-- Drop Zone Before Child -->
+          <div class="component-drop-zone"
+               [class.drag-over]="dragOverChildId === childComponent.id"
+               (dragover)="onChildDragOver($event, childComponent.id)"
+               (dragleave)="onChildDragLeave($event, childComponent.id)"
+               (drop)="onChildDrop($event, childComponent.id)">
+            <div class="drop-indicator"><i class="bi bi-plus"></i></div>
+          </div>
+
+          <app-form-component-renderer
+            [component]="childComponent"
+            [previewMode]="previewMode"
+            [selected]="isChildSelected(childComponent.id)"
+            [showToolbar]="isChildSelected(childComponent.id)"
+            (openProperties)="onChildOpenProperties(childComponent)"
+            (deleteComponent)="onChildDeleteComponent(childComponent.id)">
+          </app-form-component-renderer>
+        </ng-container>
 
         <!-- Empty panel indicator -->
         <div class="empty-panel text-center text-muted py-3"
              *ngIf="(!component.children || component.children.length === 0) && !previewMode">
           <i class="bi bi-plus-circle-dotted"></i>
           <p class="mb-0 small">Drop components here</p>
+        </div>
+
+        <!-- Final Drop Zone -->
+        <div class="component-drop-zone final-drop-zone"
+             *ngIf="component.children && component.children.length > 0 && !previewMode"
+             [class.drag-over]="dragOverChildId === null"
+             (dragover)="onChildDragOver($event, null)"
+             (dragleave)="onChildDragLeave($event, null)"
+             (drop)="onChildDrop($event, null)">
+          <div class="drop-indicator"><i class="bi bi-plus"></i></div>
         </div>
       </div>
     </div>
@@ -902,18 +919,27 @@
              (drop)="onColumnDrop($event, columnIndex)">
 
           <!-- Column components with hover behavior -->
-          <app-form-component-renderer
-            *ngFor="let columnComponent of getColumnComponents(columnIndex); trackBy: trackByComponentId"
-            [component]="columnComponent"
-            [previewMode]="previewMode"
-            [selected]="isChildSelected(columnComponent.id)"
-            [showToolbar]="isChildSelected(columnComponent.id) || isChildHovered(columnComponent.id)"
-            [hovered]="isChildHovered(columnComponent.id)"
-            (openProperties)="onChildOpenProperties(columnComponent)"
-            (deleteComponent)="onChildDeleteComponent(columnComponent.id)"
-            (mouseenter)="onChildMouseEnter(columnComponent.id)"
-            (mouseleave)="onChildMouseLeave(columnComponent.id)">
-          </app-form-component-renderer>
+          <ng-container *ngFor="let columnComponent of getColumnComponents(columnIndex); trackBy: trackByComponentId">
+            <div class="component-drop-zone"
+                 [class.drag-over]="dragOverChildId === columnComponent.id"
+                 (dragover)="onChildDragOver($event, columnComponent.id)"
+                 (dragleave)="onChildDragLeave($event, columnComponent.id)"
+                 (drop)="onChildDrop($event, columnComponent.id)">
+              <div class="drop-indicator"><i class="bi bi-plus"></i></div>
+            </div>
+
+            <app-form-component-renderer
+              [component]="columnComponent"
+              [previewMode]="previewMode"
+              [selected]="isChildSelected(columnComponent.id)"
+              [showToolbar]="isChildSelected(columnComponent.id) || isChildHovered(columnComponent.id)"
+              [hovered]="isChildHovered(columnComponent.id)"
+              (openProperties)="onChildOpenProperties(columnComponent)"
+              (deleteComponent)="onChildDeleteComponent(columnComponent.id)"
+              (mouseenter)="onChildMouseEnter(columnComponent.id)"
+              (mouseleave)="onChildMouseLeave(columnComponent.id)">
+            </app-form-component-renderer>
+          </ng-container>
 
           <!-- Empty column indicator -->
           <div class="empty-column-indicator text-center text-muted py-4"
@@ -943,19 +969,27 @@
           <!-- Column Components -->
           <tbody>
             <tr class="columns-row">
-              <td *ngFor="let childComponent of component.children || []; trackBy: trackByComponentId"
-                  class="column-cell">
-                <!-- Render each child component properly -->
-                <app-form-component-renderer
-                  [component]="childComponent"
-                  [previewMode]="false"
-                  [selected]="isChildSelected(childComponent.id)"
-                  [showToolbar]="isChildSelected(childComponent.id)"
-                  [hovered]="false"
-                  (openProperties)="onChildOpenProperties(childComponent)"
-                  (deleteComponent)="onChildDeleteComponent(childComponent.id)">
-                </app-form-component-renderer>
-              </td>
+                  <td *ngFor="let childComponent of component.children || []; trackBy: trackByComponentId"
+                      class="column-cell">
+                    <div class="component-drop-zone"
+                         [class.drag-over]="dragOverChildId === childComponent.id"
+                         (dragover)="onChildDragOver($event, childComponent.id)"
+                         (dragleave)="onChildDragLeave($event, childComponent.id)"
+                         (drop)="onChildDrop($event, childComponent.id)">
+                      <div class="drop-indicator"><i class="bi bi-plus"></i></div>
+                    </div>
+
+                    <!-- Render each child component properly -->
+                    <app-form-component-renderer
+                      [component]="childComponent"
+                      [previewMode]="false"
+                      [selected]="isChildSelected(childComponent.id)"
+                      [showToolbar]="isChildSelected(childComponent.id)"
+                      [hovered]="false"
+                      (openProperties)="onChildOpenProperties(childComponent)"
+                      (deleteComponent)="onChildDeleteComponent(childComponent.id)">
+                    </app-form-component-renderer>
+                  </td>
               <!-- Add Column Drop Zone -->
               <td class="add-column-zone-cell"
                   [class.drag-over]="dragOverContainer && !previewMode"

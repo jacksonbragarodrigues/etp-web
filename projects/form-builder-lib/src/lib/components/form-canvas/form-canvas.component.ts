@@ -6,6 +6,7 @@ import { ValidationService, ValidationError } from '../../services/validation.se
 import { FormComponent, FormBuilderState, ComponentType, DragDropData } from '../../models/form-builder.models';
 import { FormComponentRendererComponent } from '../form-component-renderer/form-component-renderer.component';
 
+
 @Component({
   selector: 'app-form-canvas',
   standalone: true,

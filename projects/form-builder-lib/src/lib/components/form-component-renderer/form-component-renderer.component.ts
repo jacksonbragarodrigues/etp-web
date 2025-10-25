@@ -41,6 +41,8 @@ export class FormComponentRendererComponent implements OnInit, OnChanges, AfterV
   draggedRowIndex: number = -1;
   hoveredChildId: string | null = null;
   isHovered: boolean = false;
+  // Drop zone state for children
+  dragOverChildId: string | null = null;
 
   // Custom CKEditor
   private ckEditorInstance: any;
@@ -1266,6 +1268,147 @@ export class FormComponentRendererComponent implements OnInit, OnChanges, AfterV
     if (!this.previewMode) {
       this.isHovered = false;
     }
+  }
+
+  // Child-level drop zone handlers
+  onChildDragOver(event: DragEvent, childId: string | null): void {
+    if (!this.canHaveChildren() || this.previewMode) return;
+
+    event.preventDefault();
+    event.stopPropagation();
+    this.dragOverChildId = childId;
+    event.dataTransfer!.dropEffect = 'copy';
+  }
+
+  onChildDragLeave(event: DragEvent, childId: string | null): void {
+    if (!this.canHaveChildren() || this.previewMode) return;
+
+    const rect = (event.currentTarget as HTMLElement).getBoundingClientRect();
+    const x = event.clientX;
+    const y = event.clientY;
+    if (x < rect.left || x > rect.right || y < rect.top || y > rect.bottom) {
+      if (this.dragOverChildId === childId) this.dragOverChildId = null;
+    }
+  }
+
+  onChildDrop(event: DragEvent, targetChildId: string | null): void {
+    if (!this.canHaveChildren() || this.previewMode) return;
+
+    event.preventDefault();
+    event.stopPropagation();
+    this.dragOverChildId = null;
+
+    let data: DragDropData | null = null;
+    try {
+      const raw = event.dataTransfer!.getData('application/json');
+      data = raw ? JSON.parse(raw) as DragDropData : null;
+    } catch (e) {
+      console.error('Invalid drag data', e);
+      data = null;
+    }
+
+    const state = this.formBuilderService.getCurrentState();
+    // Ensure children array exists
+    if (!this.component.children) this.component.children = [];
+
+    // Determine target index within parent's children array
+    const parentChildren = this.component.children;
+    let targetIndex = parentChildren.length; // default append
+    if (targetChildId) {
+      const idx = parentChildren.findIndex(c => c.id === targetChildId);
+      if (idx >= 0) targetIndex = idx;
+    }
+
+    if (!data) return;
+
+    if (data.componentType) {
+      // Create new component and insert
+      const newComp = this.formBuilderService.createComponent(data.componentType, this.component.id);
+      // If we're inserting into a Columns parent, try to preserve columnIndex
+      if (this.isColumnsType()) {
+        // Determine columnIndex from target child if available
+        let colIndex = 0;
+        if (targetChildId) {
+          const targetChild = parentChildren.find(c => c.id === targetChildId);
+          colIndex = targetChild?.columnIndex ?? 0;
+        } else if (parentChildren.length > 0) {
+          // Use last child's columnIndex as fallback
+          colIndex = parentChildren[Math.max(0, parentChildren.length - 1)]?.columnIndex ?? 0;
+        }
+        newComp.columnIndex = colIndex;
+      }
+
+      parentChildren.splice(targetIndex, 0, newComp);
+
+      // Persist state
+      this.formBuilderService.updateState({ formSchema: { ...state.formSchema }, selectedComponent: newComp });
+      return;
+    }
+
+    if (data.component) {
+      const dragged = data.component;
+
+      // Find and remove dragged component from its current parent array
+      const removed = this.removeComponentFromState(dragged.id, state);
+
+      // If removed from same parent and the removal index was before targetIndex, adjust
+      if (removed && removed.parentId === this.component.id && removed.index < targetIndex) {
+        targetIndex--;
+      }
+
+      // Insert moved component into this component's children at targetIndex
+      const moved = { ...dragged, parentId: this.component.id } as FormComponent;
+      // If dropping into Columns parent, set the columnIndex to match the target child (or fallback)
+      if (this.isColumnsType()) {
+        let colIndex = 0;
+        if (targetChildId) {
+          const targetChild = parentChildren.find(c => c.id === targetChildId);
+          colIndex = targetChild?.columnIndex ?? 0;
+        } else if (parentChildren.length > 0) {
+          colIndex = parentChildren[Math.max(0, parentChildren.length - 1)]?.columnIndex ?? 0;
+        }
+        moved.columnIndex = colIndex;
+      }
+      parentChildren.splice(targetIndex, 0, moved);
+
+      this.formBuilderService.updateState({ formSchema: { ...state.formSchema }, selectedComponent: moved });
+      return;
+    }
+  }
+
+  /**
+   * Remove a component by id directly from the provided state object.
+   * Returns info about the removal: { parentId, index } or null if not found.
+   */
+  private removeComponentFromState(componentId: string, state: any): { parentId?: string | null, index: number } | null {
+    // Search top-level steps
+    for (const step of state.formSchema.steps) {
+      // Top-level
+      const topIdx = step.components.findIndex((c: FormComponent) => c.id === componentId);
+      if (topIdx >= 0) {
+        step.components.splice(topIdx, 1);
+        return { parentId: null, index: topIdx };
+      }
+
+      // Recursive search inside components
+      const stack: { parent: any, arr: FormComponent[] }[] = [{ parent: null, arr: step.components }];
+      while (stack.length > 0) {
+        const { arr } = stack.pop() as { parent: any, arr: FormComponent[] };
+        for (let i = 0; i < arr.length; i++) {
+          const comp = arr[i];
+          if (comp.id === componentId) {
+            // Found inside this array
+            arr.splice(i, 1);
+            return { parentId: comp.parentId || null, index: i };
+          }
+          if (comp.children && comp.children.length > 0) {
+            stack.push({ parent: comp, arr: comp.children });
+          }
+        }
+      }
+    }
+
+    return null;
   }
 
 
