@@ -19,6 +19,14 @@ type ConditionalWhenValue = string | string[] | {id: string, name: string}[] | {
   styleUrls: ['./properties-panel.component.scss']
 })
 export class PropertiesPanelComponent implements OnInit, OnDestroy, AfterViewInit {
+
+    accordionState: { [key: string]: boolean } = {
+    'basic': true,
+    'validation': false,
+    'apiSelect': false,
+    'apiReferences': false
+  };
+
   state: FormBuilderState = {
     currentStep: '',
     selectedComponent: null,
@@ -160,7 +168,7 @@ export class PropertiesPanelComponent implements OnInit, OnDestroy, AfterViewIni
         this.loadStepProperties();
         // Keep properties tab active while there is a selection
         if ((this.state.selectedComponent || this.state.selectedStep) && this.activeTab !== 'properties') {
-          this.activeTab = 'properties';
+          //this.activeTab = 'properties';
         }
       });
 
@@ -693,6 +701,7 @@ export class PropertiesPanelComponent implements OnInit, OnDestroy, AfterViewIni
     this.options[index][field] = value;
     this.updateProperty('properties.options', [...this.options]);
   }
+  
 
   onOptionLabelChange(event: Event, index: number): void {
     const value = (event.target as HTMLInputElement)?.value || '';
@@ -1157,5 +1166,12 @@ export class PropertiesPanelComponent implements OnInit, OnDestroy, AfterViewIni
     return this.stepConditionalWhenComponentOptions.length > 0;
   }
 
+    toggleAccordion(category: string): void {
+    this.accordionState[category] = !this.accordionState[category];
+  }
+
+  isAccordionOpen(category: string): boolean {
+    return this.accordionState[category] || false;
+  }
 
 }
