@@ -876,11 +876,11 @@ export class FormBuilderService {
       }
       case ComponentType.RICH_TEXT: {
         // Map Form.io TextArea to CKEditor-based rich text
-        base.properties.ckEditorConfig = {
-          toolbar: ['heading', '|', 'bold', 'italic', 'link', 'bulletedList', 'numberedList', '|', 'outdent', 'indent', '|', 'blockQuote', 'insertTable', '|', 'undo', 'redo'],
-          height: src.rows ? Math.max(120, Math.min(800, src.rows * 40)) : 200,
-          language: 'pt-br'
-        };
+        // base.properties.ckEditorConfig = {
+        //   toolbar: ['heading', '|', 'bold', 'italic', 'link', 'bulletedList', 'numberedList', '|', 'outdent', 'indent', '|', 'blockQuote', 'insertTable', '|', 'undo', 'redo'],
+        //   height: src.rows ? Math.max(120, Math.min(800, src.rows * 40)) : 200,
+        //   language: 'pt-br'
+        // };
         base.placeholder = src.placeholder || '';
         break;
       }
