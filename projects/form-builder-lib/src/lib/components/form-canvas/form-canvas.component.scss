@@ -79,7 +79,7 @@
       &.drag-over {
         opacity: 1;
         height: 32px;
-        border-color: #28a745;
+        border-color: red;
         background-color: rgba(40, 167, 69, 0.15);
         transform: scaleY(1.1);
         box-shadow: 0 2px 8px rgba(40, 167, 69, 0.3);
@@ -124,7 +124,7 @@
 
         &.drag-over {
           height: 40px;
-          border-color: #28a745;
+          border-color: red;
           background-color: rgba(40, 167, 69, 0.15);
           opacity: 1;
         }
