@@ -32,6 +32,8 @@ export class FormCanvasComponent implements OnInit, OnDestroy {
     dragInProgress: false
   };
 
+  isDragOver: boolean[] = [];
+
   dragOverIndex: number = -1;
   hoveredComponentId: string | null = null;
   currentStepValidationErrors: ValidationError[] = [];
@@ -45,6 +47,7 @@ export class FormCanvasComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
+    this.isDragOver = Array(this.getCurrentStepComponents().length).fill(false);
     this.formBuilderService.state$
       .pipe(takeUntil(this.destroy$))
       .subscribe(state => {
@@ -63,28 +66,32 @@ export class FormCanvasComponent implements OnInit, OnDestroy {
     return currentStep?.components || [];
   }
 
-  onDragOver(event: DragEvent, index?: number): void {
+  onDragOver(event: DragEvent, index: number): void {
+    console.log(event);
+    console.log(index);
     event.preventDefault();
     event.dataTransfer!.dropEffect = 'copy';
-    this.dragOverIndex = index ?? -1;
+    //this.dragOverIndex = index ?? -1;
+    this.isDragOver[index] = true;
   }
 
-  onDragLeave(event: DragEvent): void {
+  onDragLeave(event: DragEvent, index: number): void {
     const rect = (event.currentTarget as HTMLElement).getBoundingClientRect();
     const x = event.clientX;
     const y = event.clientY;
     
     // Only clear dragOverIndex if mouse is outside the drop zone
     if (x < rect.left || x > rect.right || y < rect.top || y > rect.bottom) {
-      this.dragOverIndex = -1;
+      //this.dragOverIndex = -1;
     }
+    this.isDragOver[index] = false;
   }
 
-  onDrop(event: DragEvent, targetIndex?: number): void {
+  onDrop(event: DragEvent, targetIndex: number): void {
     event.preventDefault();
     event.stopPropagation(); // Prevent event bubbling
-    this.dragOverIndex = -1;
-
+    //this.dragOverIndex = -1;
+this.isDragOver[targetIndex] = false;
     try {
       const data = JSON.parse(event.dataTransfer!.getData('application/json')) as DragDropData;
 
@@ -133,7 +140,7 @@ export class FormCanvasComponent implements OnInit, OnDestroy {
 
   onComponentDragEnd(): void {
     this.formBuilderService.updateState({ dragInProgress: false });
-    this.dragOverIndex = -1;
+   // this.dragOverIndex = -1;
   }
 
   isComponentSelected(componentId: string): boolean {
@@ -153,6 +160,10 @@ export class FormCanvasComponent implements OnInit, OnDestroy {
   }
 
   getDropZoneClass(index: number): string {
+    console.log('getDropZoneClass called for index:', index);
+    console.log('dragOverIndex:', this.dragOverIndex);
+    console.log('state.dragInProgress:', this.state.dragInProgress);
+
     let classes = 'drop-zone';
     if (this.dragOverIndex === index) {
       classes += ' drag-over';
