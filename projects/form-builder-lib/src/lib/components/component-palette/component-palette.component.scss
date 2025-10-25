@@ -323,3 +323,329 @@
   0% { transform: translate(-50%, -50%) rotate(0deg); }
   100% { transform: translate(-50%, -50%) rotate(360deg); }
 }
+
+.component-palette {
+  height: 100%;
+  overflow-y: auto;
+
+  .palette-header {
+    .search-box {
+      .input-group-text {
+        background: #f8f9fa;
+        border-color: #ced4da;
+        color: #6c757d;
+      }
+
+      .form-control {
+        border-color: #ced4da;
+        
+        &:focus {
+          border-color: #ced4da;
+          box-shadow: none;
+          outline: none;
+        }
+      }
+    }
+
+    .components-accordion {
+      .accordion {
+        .accordion-item {
+          border: 1px solid #e9ecef;
+          margin-bottom: 0.5rem;
+          border-radius: 0.375rem;
+          overflow: hidden;
+
+          &:last-child {
+            margin-bottom: 0;
+          }
+        }
+
+        .accordion-header {
+          .accordion-button {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #495057;
+            padding: 0.75rem 1rem;
+            background-color: #f8f9fa;
+
+            &:not(.collapsed) {
+              background-color: #007bff;
+              color: white;
+              box-shadow: none;
+            }
+
+            &:focus {
+              box-shadow: none;
+              outline: none;
+            }
+
+            .badge {
+              font-size: 0.7rem;
+              margin-left: auto;
+            }
+
+            i {
+              width: 16px;
+              text-align: center;
+            }
+          }
+        }
+
+        .accordion-body {
+          padding: 0.5rem;
+          background-color: #fff;
+        }
+      }
+    }
+  }
+
+  .components-grid {
+    .component-item {
+      display: flex;
+      align-items: center;
+      padding: 8px;
+      margin-bottom: 6px;
+      background: white;
+      border: 1px solid #e9ecef;
+      border-radius: 6px;
+      cursor: grab;
+      transition: all 0.2s ease;
+      user-select: none;
+
+      &:hover {
+        border-color: #007bff;
+        box-shadow: 0 2px 8px rgba(0, 123, 255, 0.15);
+        transform: translateY(-1px);
+
+        .drag-indicator {
+          opacity: 1;
+        }
+      }
+
+      &:active {
+        cursor: grabbing;
+        transform: scale(0.98);
+      }
+
+      .component-icon {
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+        color: white;
+        border-radius: 6px;
+        margin-right: 8px;
+        flex-shrink: 0;
+
+        i {
+          font-size: 1rem;
+        }
+      }
+
+      .component-info {
+        flex: 1;
+        min-width: 0;
+
+        .component-name {
+          font-weight: 600;
+          font-size: 0.8rem;
+          color: #2c3e50;
+          margin-bottom: 2px;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+
+        .component-description {
+          font-size: 0.7rem;
+          color: #6c757d;
+          line-height: 1.2;
+          display: -webkit-box;
+          -webkit-line-clamp: 1;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
+        }
+      }
+
+      .drag-indicator {
+        opacity: 0;
+        color: #6c757d;
+        transition: opacity 0.2s ease;
+        margin-left: 8px;
+
+        i {
+          font-size: 0.875rem;
+        }
+      }
+    }
+
+    .empty-state {
+      border: 2px dashed #dee2e6;
+      border-radius: 8px;
+      padding: 2rem 1rem;
+
+      i {
+        opacity: 0.5;
+      }
+    }
+  }
+
+  .palette-help {
+    background-color: #f8f9fa !important;
+    border: 1px solid #e9ecef;
+
+    h6 {
+      color: #495057;
+      margin-bottom: 8px;
+    }
+
+    ul {
+      padding-left: 1rem;
+      margin-bottom: 0;
+
+      li {
+        margin-bottom: 4px;
+
+        &:last-child {
+          margin-bottom: 0;
+        }
+
+        strong {
+          color: #495057;
+        }
+      }
+    }
+  }
+
+  .quick-actions {
+    .btn {
+      font-size: 0.875rem;
+      font-weight: 500;
+
+      i {
+        font-size: 0.875rem;
+      }
+    }
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .component-palette {
+    .component-item {
+      padding: 8px;
+
+      .component-icon {
+        width: 32px;
+        height: 32px;
+        margin-right: 8px;
+
+        i {
+          font-size: 1rem;
+        }
+      }
+
+      .component-info {
+        .component-name {
+          font-size: 0.8rem;
+        }
+
+        .component-description {
+          font-size: 0.7rem;
+        }
+      }
+    }
+
+    .palette-help {
+      padding: 0.75rem !important;
+      font-size: 0.875rem;
+    }
+  }
+}
+
+/* Animation for new items */
+.component-item {
+  animation: slideInLeft 0.3s ease-out;
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Focus states for accessibility */
+.component-item:focus {
+  outline: none;
+}
+
+.btn:focus {
+  box-shadow: none;
+  outline: none;
+}
+
+/* Dragging state */
+.component-item.dragging {
+  opacity: 0.5;
+  transform: rotate(3deg) scale(0.95);
+  z-index: 1000;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+/* Category-specific icon colors */
+.component-item[data-category="basic"] .component-icon {
+  background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+}
+
+.component-item[data-category="advanced"] .component-icon {
+  background: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%);
+}
+
+.component-item[data-category="layout"] .component-icon {
+  background: linear-gradient(135deg, #6f42c1 0%, #e83e8c 100%);
+}
+
+.component-item[data-category="data"] .component-icon {
+  background: linear-gradient(135deg, #17a2b8 0%, #6610f2 100%);
+}
+
+/* Hover effects for categories */
+.category-filter .btn i {
+  transition: transform 0.2s ease;
+}
+
+.category-filter .btn:hover i {
+  transform: scale(1.1);
+}
+
+/* Loading state */
+.component-palette.loading {
+  pointer-events: none;
+  opacity: 0.7;
+}
+
+.component-palette.loading::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 32px;
+  height: 32px;
+  border: 3px solid #f3f3f3;
+  border-top: 3px solid #007bff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: translate(-50%, -50%) rotate(0deg); }
+  100% { transform: translate(-50%, -50%) rotate(360deg); }
+}
