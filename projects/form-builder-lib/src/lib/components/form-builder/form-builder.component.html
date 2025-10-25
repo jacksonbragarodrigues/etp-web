@@ -85,7 +85,7 @@
           Components: {{ getCurrentStepComponentsCount() }}
         </span>
         <span *ngIf="state.selectedComponent">
-          Selected: {{ getSelectedComponentLabel() }}
+          Selected: {{ getSelectedComponentLabel() }} - {{ state.selectedComponent.type }}
         </span>
         <span>
           Steps: {{ getStepsCount() }}
