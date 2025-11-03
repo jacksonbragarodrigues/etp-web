@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ApplicationRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, ApplicationRef, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Subject, takeUntil } from 'rxjs';
@@ -40,6 +40,8 @@ export class StepsWizardComponent implements OnInit, OnDestroy {
 
   constructor(private formBuilderService: FormBuilderService, private cdr: ChangeDetectorRef, private appRef: ApplicationRef) {}
 
+    @ViewChild('stepsContainer') stepsContainer!: ElementRef<HTMLDivElement>;
+    
   ngOnInit(): void {
     this.formBuilderService.state$
       .pipe(takeUntil(this.destroy$))
@@ -57,6 +59,12 @@ export class StepsWizardComponent implements OnInit, OnDestroy {
   onAddStep(): void {
     const stepCount = this.state.formSchema.steps.length;
     this.formBuilderService.addStep(`Página ${stepCount + 1}`);
+
+    // Aguarda o Angular renderizar o novo elemento antes de rolar
+    setTimeout(() => {
+      this.scrollToEnd();
+    });
+
   }
 
   onStepPress(stepId: string, event: Event): void {
@@ -303,5 +311,12 @@ export class StepsWizardComponent implements OnInit, OnDestroy {
   shouldShowValidationIcon(step: FormStep): boolean {
     // Só mostra ícone no preview mode e se o step tem componentes
     return this.state.previewMode && step.components && step.components.length > 0;
+  }
+
+    private scrollToEnd(): void {
+    if (this.stepsContainer?.nativeElement) {
+      const el = this.stepsContainer.nativeElement;
+      el.scrollTo({ left: el.scrollWidth, behavior: 'smooth' });
+    }
   }
 }

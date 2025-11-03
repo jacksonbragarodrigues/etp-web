@@ -66,10 +66,11 @@
 
     .component-drop-zone {
       position: relative;
+      margin-bottom: 25px;
       height: 2px;
       margin: 2px 0;
       border-radius: 0.25rem;
-      border: 1px dashed transparent;
+      border: 1px dashed green;
       transition: all 0.2s ease;
       display: flex;
       align-items: center;
@@ -79,7 +80,7 @@
       &.drag-over {
         opacity: 1;
         height: 32px;
-        border-color: red;
+        border-color: green;
         background-color: rgba(40, 167, 69, 0.15);
         transform: scaleY(1.1);
         box-shadow: 0 2px 8px rgba(40, 167, 69, 0.3);
@@ -114,17 +115,18 @@
       }
 
       &.final-drop-zone {
-        border-color: #28a745;
+        // border-color: #28a745;
         background-color: rgba(40, 167, 69, 0.15);
-        margin-top: 8px;
+        margin-top: 5px;
+        margin-bottom: 5px;
         height: 24px;
-        border-style: solid;
-        border-color: #e9ecef;
+        border-style: dashed;
+        // border-color: #e9ecef;
         opacity: 0.7;
 
         &.drag-over {
           height: 40px;
-          border-color: red;
+          border-color: green;
           background-color: rgba(40, 167, 69, 0.15);
           opacity: 1;
         }
@@ -144,7 +146,7 @@
     .form-component-wrapper {
       position: relative;
       margin: 1px 0;
-      background: white;
+      background: transparent;
       // border: 2px solid transparent;
       border-radius: 0.5rem;
       transition: all 0.2s ease;

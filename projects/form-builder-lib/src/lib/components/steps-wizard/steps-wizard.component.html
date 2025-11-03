@@ -12,12 +12,13 @@
       Add Step
     </button>
   </div> -->
+  
 
   <div class="steps-container">
 
     <!-- Steps Scrollable Area -->
     <div class="steps-scroll-area">
-      <div class="steps-scroll-container" *ngIf="state.formSchema.steps.length > 0">
+      <div class="steps-scroll-container" *ngIf="state.formSchema.steps.length > 0"  #stepsContainer>
         <ng-container *ngFor="let step of state.formSchema.steps; trackBy: trackByStepId">
           <div
             *ngIf="shouldShowStep(step)"

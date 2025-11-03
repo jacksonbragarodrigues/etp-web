@@ -1039,9 +1039,9 @@
   justify-content: center;
   padding: 6px 8px;
   margin: 6px 0;
-  border: 2px dashed transparent;
+  border: 2px dashed green;
   border-radius: 6px;
-  background: transparent;
+  background-color: rgba(40, 167, 69, 0.15);
   transition: all 0.15s ease;
   min-height: 28px;
 }
@@ -1056,12 +1056,24 @@
 }
 
 .component-drop-zone.drag-over {
-  border-color: #28a745;
-  background-color: rgba(40,167,69,0.06);
+      opacity: 1;
+        height: 32px;
+        border-color: green;
+        background-color: rgba(40, 167, 69, 0.15);
+        transform: scaleY(1.1);
+        box-shadow: 0 2px 8px rgba(40, 167, 69, 0.3);
+        border-width: 2px;
 }
 
 .final-drop-zone {
-  margin-top: 8px;
+    // border-color: #28a745;
+        background-color: rgba(40, 167, 69, 0.15);
+        margin-top: 5px;
+        margin-bottom: 5px;
+        height: 24px;
+        border-style: dashed;
+        // border-color: #e9ecef;
+        opacity: 0.7;
 }
 
 /* Slightly different visual inside datagrid/columns */
