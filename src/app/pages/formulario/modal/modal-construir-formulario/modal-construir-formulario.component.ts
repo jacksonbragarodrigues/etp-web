@@ -582,34 +582,47 @@ export class ModalConstruirFormularioComponent implements OnInit, OnDestroy {
   }
 
   preSaveRender() {
-    this.callPreSave = true;
-
-    let msg = this.parametros.MSG_GRAVAR_FORMULARIO;
+    const formJson = this.formBuilderService.exportFormSchema();
+    const dataJson = this.formBuilderService.exportFormData();
+    console.log('XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX');
+    console.log(formJson);
+    
     let scriptFormulario = {
       id: this.formulario?.id,
-      jsonForm: this.formulario.jsonForm,
-      jsonDados: this.formulario.jsonDados,
+      jsonForm: formJson,
+      jsonDados: dataJson,
       versao: this.formulario?.versao,
     };
-    this.alertUtils.confirmDialog(msg).then((dataConfirme) => {
-      this.callPreSave = false;
-      if (dataConfirme) {
-        if (this.verificaMenuWizard()) {
-         // this.updateWizardJsonForm(this.form);
-          scriptFormulario = {
-            id: this.formulario?.id,
-            jsonForm: this.formulario.jsonForm,
-            jsonDados: this.formulario.jsonDados,
-            versao: this.formulario?.versao,
-          };
-        }
-        this.executarAposMinutos.emit(this.idFormulario);
-        this.gravarJsonFormulario.emit(scriptFormulario);
-        this.atualizaDadosRelatorioServiceService.updateJsonFormRelatorio(
-          this.formulario.jsonForm
-        );
-      }
-    });
+    this.gravarJsonFormulario.emit(scriptFormulario);
+    
+    // this.callPreSave = true;
+
+    // let msg = this.parametros.MSG_GRAVAR_FORMULARIO;
+    // let scriptFormulario = {
+    //   id: this.formulario?.id,
+    //   jsonForm: this.formulario.jsonForm,
+    //   jsonDados: this.formulario.jsonDados,
+    //   versao: this.formulario?.versao,
+    // };
+    // this.alertUtils.confirmDialog(msg).then((dataConfirme) => {
+    //   this.callPreSave = false;
+    //   if (dataConfirme) {
+    //     if (this.verificaMenuWizard()) {
+    //      // this.updateWizardJsonForm(this.form);
+    //       scriptFormulario = {
+    //         id: this.formulario?.id,
+    //         jsonForm: this.formulario.jsonForm,
+    //         jsonDados: this.formulario.jsonDados,
+    //         versao: this.formulario?.versao,
+    //       };
+    //     }
+    //     this.executarAposMinutos.emit(this.idFormulario);
+    //     this.gravarJsonFormulario.emit(scriptFormulario);
+    //     this.atualizaDadosRelatorioServiceService.updateJsonFormRelatorio(
+    //       this.formulario.jsonForm
+    //     );
+    //   }
+    // });
   }
 
   close() {

@@ -112,7 +112,7 @@
             <label class="form-label">Quando</label>
 
 
-            <ngx-select-dropdown [config]="config" [options]="availableComponentKeysValues"
+            <ngx-select-dropdown [disabled]="isComponentChave()" [config]="config" [options]="availableComponentKeysValues"
               (change)="onStepConditionalWhenChange()" [(ngModel)]="stepConditionalWhen"
               [multiple]="true"></ngx-select-dropdown>
 
@@ -186,7 +186,7 @@
                     <!-- Label -->
                     <div class="form-group mb-3">
                       <label class="form-label">Rótulo</label>
-                      <textarea class="form-control form-control-sm" [(ngModel)]="componentLabel"
+                      <textarea [disabled]="isComponentChave()" class="form-control form-control-sm" [(ngModel)]="componentLabel"
                         (input)="onLabelChange()" placeholder="Digite o rótulo">
             </textarea>
                     </div>
@@ -194,7 +194,7 @@
                     <!-- Placeholder -->
                     <div class="form-group mb-3" *ngIf="isInputType() || isTextareaType() || isSelectType()">
                       <label class="form-label">Texto quando vazio</label>
-                      <textarea class="form-control form-control-sm" [(ngModel)]="componentPlaceholder"
+                      <textarea  [disabled]="isComponentChave()" class="form-control form-control-sm" [(ngModel)]="componentPlaceholder"
                         (input)="onPlaceholderChange()" placeholder="Digite o texto">
               </textarea>
                     </div>
@@ -202,7 +202,7 @@
                     <!-- Tooltip -->
                     <div class="form-group mb-3">
                       <label class="form-label">Texto do Balão de Ajuda</label>
-                      <textarea class="form-control form-control-sm" [(ngModel)]="componentTooltip"
+                      <textarea  [disabled]="isComponentChave()" class="form-control form-control-sm" [(ngModel)]="componentTooltip"
                         (input)="onTooltipChange()" placeholder="Digite o texto">
               </textarea>
                     </div>
@@ -210,7 +210,7 @@
                     <!-- Help Text -->
                     <div class="form-group mb-3">
                       <label class="form-label">Texto de Ajuda</label>
-                      <textarea class="form-control form-control-sm" [(ngModel)]="componentHelpText"
+                      <textarea  [disabled]="isComponentChave()" class="form-control form-control-sm" [(ngModel)]="componentHelpText"
                         (input)="onHelpTextChange()" rows="2" placeholder="Digite o texto">
             </textarea>
                     </div>
@@ -218,7 +218,7 @@
                     <!-- Prefix (for input/textarea/number) -->
                     <div class="form-group mb-3" *ngIf="canHavePrefix()">
                       <label class="form-label">Prefixo</label>
-                      <input type="text" class="form-control form-control-sm" [(ngModel)]="componentPrefix"
+                      <input  [disabled]="isComponentChave()" type="text" class="form-control form-control-sm" [(ngModel)]="componentPrefix"
                         (input)="onPrefixChange()" placeholder="e.g., @, $, etc.">
                       <div class="form-text">
                         Texto que aparece antes do campo de entrada
@@ -228,7 +228,7 @@
                     <!-- Mask (for input/number) -->
                     <div class="form-group mb-3" *ngIf="canHaveMask()">
                       <label class="form-label">Máscara</label>
-                      <input type="text" class="form-control form-control-sm" [(ngModel)]="componentMask"
+                      <input  [disabled]="isComponentChave()" type="text" class="form-control form-control-sm" [(ngModel)]="componentMask"
                         (input)="onMaskChange()" placeholder="e.g., (999) 999-9999">
                       <div class="form-text">
                         <strong>Exemplos:</strong><br>
@@ -242,7 +242,7 @@
 
                     <!-- Disabled -->
                     <div class="form-check mb-3">
-                      <input class="form-check-input" type="checkbox" id="disabled" [(ngModel)]="componentDisabled"
+                      <input  [disabled]="isComponentChave()" class="form-check-input" type="checkbox" id="disabled" [(ngModel)]="componentDisabled"
                         (change)="onDisabledChange()">
                       <label class="form-check-label" for="disabled">
                         Desabilitado
@@ -251,7 +251,7 @@
 
                     <!-- Readonly -->
                     <div class="form-check mb-3" *ngIf="isInputType() || isTextareaType()">
-                      <input class="form-check-input" type="checkbox" id="readonly" [(ngModel)]="componentReadonly"
+                      <input  [disabled]="isComponentChave()" class="form-check-input" type="checkbox" id="readonly" [(ngModel)]="componentReadonly"
                         (change)="onReadonlyChange()">
                       <label class="form-check-label" for="readonly">
                         Apenas Leitura
@@ -260,7 +260,7 @@
 
                     <!-- Hidden -->
                     <div class="form-check mb-3">
-                      <input class="form-check-input" type="checkbox" id="hidden" [(ngModel)]="componentHidden"
+                      <input  [disabled]="isComponentChave()" class="form-check-input" type="checkbox" id="hidden" [(ngModel)]="componentHidden"
                         (change)="onHiddenChange()">
                       <label class="form-check-label" for="hidden">
                         Invisível
@@ -269,7 +269,7 @@
 
                     <!-- Hide Label -->
                     <div class="form-check mb-3">
-                      <input class="form-check-input" type="checkbox" id="hideLabel" [(ngModel)]="componentHideLabel"
+                      <input  [disabled]="isComponentChave()" class="form-check-input" type="checkbox" id="hideLabel" [(ngModel)]="componentHideLabel"
                         (change)="onHideLabelChange()">
                       <label class="form-check-label" for="hideLabel">
                         Ocultar rótulo
@@ -278,7 +278,7 @@
 
                     <!-- Allows Confidentiality -->
                     <div class="form-check mb-3" *ngIf="canHaveConfidentiality()">
-                      <input class="form-check-input" type="checkbox" id="allowsConfidentiality"
+                      <input  [disabled]="isComponentChave()" class="form-check-input" type="checkbox" id="allowsConfidentiality"
                         [(ngModel)]="allowsConfidentiality" (change)="onAllowsConfidentialityChange()">
                       <label class="form-check-label" for="allowsConfidentiality">
                         Permitir Sigilo
@@ -314,7 +314,7 @@
 
                     <!-- Required -->
                     <div class="form-check mb-3">
-                      <input class="form-check-input" type="checkbox" id="required" [(ngModel)]="componentRequired"
+                      <input  [disabled]="isComponentChave()" class="form-check-input" type="checkbox" id="required" [(ngModel)]="componentRequired"
                         (change)="onRequiredChange()">
                       <label class="form-check-label" for="required">
                         Preenchimento Obrigatório
@@ -326,14 +326,14 @@
                       <div class="col-6">
                         <div class="form-group mb-3">
                           <label class="form-label">Tamanho Mínimo</label>
-                          <input type="number" class="form-control form-control-sm" [(ngModel)]="minLength"
+                          <input  [disabled]="isComponentChave()" type="number" class="form-control form-control-sm" [(ngModel)]="minLength"
                             (input)="onMinLengthChange()" min="0">
                         </div>
                       </div>
                       <div class="col-6">
                         <div class="form-group mb-3">
                           <label class="form-label">Tamanho Máximo</label>
-                          <input type="number" class="form-control form-control-sm" [(ngModel)]="maxLength"
+                          <input  [disabled]="isComponentChave()" type="number" class="form-control form-control-sm" [(ngModel)]="maxLength"
                             (input)="onMaxLengthChange()" min="1">
                         </div>
                       </div>
@@ -344,14 +344,14 @@
                       <div class="col-6">
                         <div class="form-group mb-3">
                           <label class="form-label">Valor Mínimo</label>
-                          <input type="number" class="form-control form-control-sm" [(ngModel)]="minValue"
+                          <input  [disabled]="isComponentChave()" type="number" class="form-control form-control-sm" [(ngModel)]="minValue"
                             (input)="onMinValueChange()">
                         </div>
                       </div>
                       <div class="col-6">
                         <div class="form-group mb-3">
                           <label class="form-label">Valor Máximo</label>
-                          <input type="number" class="form-control form-control-sm" [(ngModel)]="maxValue"
+                          <input  [disabled]="isComponentChave()" type="number" class="form-control form-control-sm" [(ngModel)]="maxValue"
                             (input)="onMaxValueChange()">
                         </div>
                       </div>
@@ -540,106 +540,122 @@
                 CONFIGURAÇÃO DA API
               </h6> -->
 
-                    <!-- API URL -->
+                    <!-- Type of EndPoint -->
                     <div class="form-group mb-3">
-                      <label class="form-label">URL do Endpoint <span class="text-danger">*</span></label>
-                      <textarea class="form-control form-control-sm" [(ngModel)]="apiUrl" (input)="onApiUrlChange()"
-                        rows="2" placeholder="https://api.exemplo.com/items">
-            </textarea>
-                      <div class="form-text">
-                        URL completa do endpoint da API que retorna os dados
-                      </div>
-                    </div>
-
-                    <!-- HTTP Method -->
-                    <div class="form-group mb-3">
-                      <label class="form-label">Método HTTP</label>
-                      <select class="form-select form-control-sm" [(ngModel)]="apiMethod"
-                        (change)="onApiMethodChange()">
-                        <option value="GET">GET</option>
-                        <option value="POST">POST</option>
-                        <option value="PUT">PUT</option>
-                        <option value="DELETE">DELETE</option>
+                      <label class="form-label">Tipo de Pesquisa</label>
+                      <select class="form-select form-control-sm" [(ngModel)]="apiTypeEndPoint"
+                        (change)="onApiTypeEndPointChange()">
+                        <option value="">Selecione...</option>
+                        <option value="UNIDADE">Unidades</option>
+                        <option value="SERVIDOR">Servidores</option>
                       </select>
                     </div>
 
-                    <!-- JWT Token -->
-                    <div class="form-group mb-3">
-                      <label class="form-label">Token JWT</label>
-                      <textarea class="form-control form-control-sm" [(ngModel)]="apiToken" (input)="onApiTokenChange()"
-                        rows="2" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...">
-            </textarea>
-                      <div class="form-text">
-                        Token de autenticação JWT (será enviado como Bearer token)
-                      </div>
-                    </div>
+                    <div *ngIf="isTypeEndpointLiberado(apiTypeEndPoint)">
 
-                    <!-- Field Mappings -->
-                    <div class="row">
-                      <div class="col-6">
-                        <div class="form-group mb-3">
-                          <label class="form-label">Campo para Label</label>
-                          <input type="text" class="form-control form-control-sm" [(ngModel)]="apiLabelField"
-                            (input)="onApiLabelFieldChange()" placeholder="name">
-                          <div class="form-text">
-                            Campo do objeto que será exibido como texto
+
+                      <!-- API URL -->
+                      <div class="form-group mb-3">
+                        <label class="form-label">URL do Endpoint <span class="text-danger">*</span></label>
+                        <textarea class="form-control form-control-sm" [(ngModel)]="apiUrl" (input)="onApiUrlChange()"
+                          rows="2" placeholder="https://api.exemplo.com/items">
+            </textarea>
+                        <div class="form-text">
+                          URL completa do endpoint da API que retorna os dados
+                        </div>
+                      </div>
+
+
+
+                      <!-- HTTP Method -->
+                      <div class="form-group mb-3">
+                        <label class="form-label">Método HTTP</label>
+                        <select class="form-select form-control-sm" [(ngModel)]="apiMethod"
+                          (change)="onApiMethodChange()">
+                          <option value="GET">GET</option>
+                          <option value="POST">POST</option>
+                          <option value="PUT">PUT</option>
+                          <option value="DELETE">DELETE</option>
+                        </select>
+                      </div>
+
+                      <!-- JWT Token -->
+                      <div class="form-group mb-3">
+                        <label class="form-label">Token JWT</label>
+                        <textarea class="form-control form-control-sm" [(ngModel)]="apiToken"
+                          (input)="onApiTokenChange()" rows="2" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...">
+            </textarea>
+                        <div class="form-text">
+                          Token de autenticação JWT (será enviado como Bearer token)
+                        </div>
+                      </div>
+
+                      <!-- Field Mappings -->
+                      <div class="row">
+                        <div class="col-6">
+                          <div class="form-group mb-3">
+                            <label class="form-label">Campo para Label</label>
+                            <input type="text" class="form-control form-control-sm" [(ngModel)]="apiLabelField"
+                              (input)="onApiLabelFieldChange()" placeholder="name">
+                            <div class="form-text">
+                              Campo do objeto que será exibido como texto
+                            </div>
+                          </div>
+                        </div>
+                        <div class="col-6">
+                          <div class="form-group mb-3">
+                            <label class="form-label">Campo para Value</label>
+                            <input type="text" class="form-control form-control-sm" [(ngModel)]="apiValueField"
+                              (input)="onApiValueFieldChange()" placeholder="id">
+                            <div class="form-text">
+                              Campo do objeto que será usado como valor
+                            </div>
                           </div>
                         </div>
                       </div>
-                      <div class="col-6">
-                        <div class="form-group mb-3">
-                          <label class="form-label">Campo para Value</label>
-                          <input type="text" class="form-control form-control-sm" [(ngModel)]="apiValueField"
-                            (input)="onApiValueFieldChange()" placeholder="id">
-                          <div class="form-text">
-                            Campo do objeto que será usado como valor
-                          </div>
+
+                      <!-- Custom Headers -->
+                      <div class="form-group mb-3">
+                        <label class="form-label">Headers Personalizados</label>
+                        <textarea class="form-control form-control-sm" [(ngModel)]="apiHeaders"
+                          (input)="onApiHeadersChange()" rows="3"
+                          placeholder='{"Content-Type": "application/json", "X-Custom-Header": "valor"}'>
+            </textarea>
+                        <div class="form-text">
+                          Headers HTTP adicionais em formato JSON
                         </div>
                       </div>
-                    </div>
 
-                    <!-- Custom Headers -->
-                    <div class="form-group mb-3">
-                      <label class="form-label">Headers Personalizados</label>
-                      <textarea class="form-control form-control-sm" [(ngModel)]="apiHeaders"
-                        (input)="onApiHeadersChange()" rows="3"
-                        placeholder='{"Content-Type": "application/json", "X-Custom-Header": "valor"}'>
+                      <!-- Request Body (for POST/PUT) -->
+                      <div class="form-group mb-3" *ngIf="apiMethod === 'POST' || apiMethod === 'PUT'">
+                        <label class="form-label">Corpo da Requisição</label>
+                        <textarea class="form-control form-control-sm" [(ngModel)]="apiRequestBody"
+                          (input)="onApiRequestBodyChange()" rows="3" placeholder='{"filtro": "ativo", "limite": 100}'>
             </textarea>
-                      <div class="form-text">
-                        Headers HTTP adicionais em formato JSON
+                        <div class="form-text">
+                          Dados a serem enviados no corpo da requisição (JSON)
+                        </div>
                       </div>
-                    </div>
 
-                    <!-- Request Body (for POST/PUT) -->
-                    <div class="form-group mb-3" *ngIf="apiMethod === 'POST' || apiMethod === 'PUT'">
-                      <label class="form-label">Corpo da Requisição</label>
-                      <textarea class="form-control form-control-sm" [(ngModel)]="apiRequestBody"
-                        (input)="onApiRequestBodyChange()" rows="3" placeholder='{"filtro": "ativo", "limite": 100}'>
-            </textarea>
-                      <div class="form-text">
-                        Dados a serem enviados no corpo da requisição (JSON)
+                      <!-- Cache Settings -->
+                      <div class="form-check mb-3">
+                        <input class="form-check-input" type="checkbox" id="apiCache" [(ngModel)]="apiCache"
+                          (change)="onApiCacheChange()">
+                        <label class="form-check-label" for="apiCache">
+                          Habilitar Cache
+                        </label>
                       </div>
-                    </div>
 
-                    <!-- Cache Settings -->
-                    <div class="form-check mb-3">
-                      <input class="form-check-input" type="checkbox" id="apiCache" [(ngModel)]="apiCache"
-                        (change)="onApiCacheChange()">
-                      <label class="form-check-label" for="apiCache">
-                        Habilitar Cache
-                      </label>
-                    </div>
-
-                    <div class="form-group mb-3" *ngIf="apiCache">
-                      <label class="form-label">Tempo de Cache (minutos)</label>
-                      <input type="number" class="form-control form-control-sm" [(ngModel)]="apiCacheTimeout"
-                        (input)="onApiCacheTimeoutChange()" min="1" max="1440" step="1">
-                      <div class="form-text">
-                        Por quanto tempo os dados ficam em cache (1 a 1440 minutos)
+                      <div class="form-group mb-3" *ngIf="apiCache">
+                        <label class="form-label">Tempo de Cache (minutos)</label>
+                        <input type="number" class="form-control form-control-sm" [(ngModel)]="apiCacheTimeout"
+                          (input)="onApiCacheTimeoutChange()" min="1" max="1440" step="1">
+                        <div class="form-text">
+                          Por quanto tempo os dados ficam em cache (1 a 1440 minutos)
+                        </div>
                       </div>
                     </div>
                   </div>
-
                   <!-- API Select Options (Multiple Selection & Layout) -->
                   <div class="property-section mb-4" *ngIf="isSelectApiType()">
                     <h6 class="section-title" style="font-weight: bold;">
@@ -799,7 +815,7 @@
 
         </div> -->
 
-                    <div class="accordion-item" *ngIf="isTextHelpType()">
+            <div class="accordion-item" *ngIf="isTextHelpType()">
               <h2 class="accordion-header" id="headingApiSelect">
                 <button class="accordion-button" [class.collapsed]="!isAccordionOpen('apiSelect')" type="button"
                   (click)="toggleAccordion('apiSelect')" [attr.aria-expanded]="isAccordionOpen('apiSelect')">
@@ -811,52 +827,52 @@
                 [class.show]="isAccordionOpen('apiSelect')" aria-labelledby="headingApiSelect">
                 <div class="accordion-body p-2">
 
-            <!-- Text Help Properties -->
-            <div class="property-section mb-4" *ngIf="isTextHelpType()">
-              <!-- <h6 class="section-title" style="font-weight: bold;">
+                  <!-- Text Help Properties -->
+                  <div class="property-section mb-4" *ngIf="isTextHelpType()">
+                    <!-- <h6 class="section-title" style="font-weight: bold;">
                 <i class="bi bi-question-circle me-2"></i>
                 CONTEÚDO DA AJUDA
               </h6> -->
 
-              <!-- Help Text with CKEditor -->
-              <div class="form-group mb-3">
-                <label class="form-label mb-2">Texto de Ajuda</label>
-                <div class="d-grid">
-                  <button type="button" class="btn btn-outline-primary" (click)="openHelpTextModal()"
-                    title="Abrir editor de texto de ajuda">
-                    <i class="bi bi-pencil-square me-2"></i>
-                    {{ helpText ? 'Editar Texto de Ajuda' : 'Adicionar Texto de Ajuda' }}
-                  </button>
-                </div>
-                <div class="form-text mt-2">
-                  <small class="text-muted">
-                    <i class="bi bi-info-circle me-1"></i>
-                    Use o editor visual para criar texto formatado com formatação rica
-                  </small>
-                </div>
-                <!-- Preview do conteúdo quando existe -->
-                <div *ngIf="helpText" class="mt-2 p-2 border rounded bg-light">
-                  <small class="text-muted d-block mb-1">Preview:</small>
-                  <div class="help-text-preview" [innerHTML]="helpText"
-                    style="max-height: 100px; overflow-y: auto; font-size: 0.85em;"></div>
-                </div>
-              </div>
+                    <!-- Help Text with CKEditor -->
+                    <div class="form-group mb-3">
+                      <label class="form-label mb-2">Texto de Ajuda</label>
+                      <div class="d-grid">
+                        <button type="button" class="btn btn-outline-primary" (click)="openHelpTextModal()"
+                          title="Abrir editor de texto de ajuda">
+                          <i class="bi bi-pencil-square me-2"></i>
+                          {{ helpText ? 'Editar Texto de Ajuda' : 'Adicionar Texto de Ajuda' }}
+                        </button>
+                      </div>
+                      <div class="form-text mt-2">
+                        <small class="text-muted">
+                          <i class="bi bi-info-circle me-1"></i>
+                          Use o editor visual para criar texto formatado com formatação rica
+                        </small>
+                      </div>
+                      <!-- Preview do conteúdo quando existe -->
+                      <div *ngIf="helpText" class="mt-2 p-2 border rounded bg-light">
+                        <small class="text-muted d-block mb-1">Preview:</small>
+                        <div class="help-text-preview" [innerHTML]="helpText"
+                          style="max-height: 100px; overflow-y: auto; font-size: 0.85em;"></div>
+                      </div>
+                    </div>
 
-              <!-- Only Internal Flag -->
-              <div class="form-check mb-3">
-                <input class="form-check-input" type="checkbox" id="onlyInternal" [(ngModel)]="onlyInternal"
-                  (change)="onOnlyInternalChange()">
-                <label class="form-check-label" for="onlyInternal">
-                  Apenas Interno
-                </label>
-                <div class="form-text">
-                  Se marcado, o texto será amarelo (interno). Se desmarcado, será azul (público).
+                    <!-- Only Internal Flag -->
+                    <div class="form-check mb-3">
+                      <input class="form-check-input" type="checkbox" id="onlyInternal" [(ngModel)]="onlyInternal"
+                        (change)="onOnlyInternalChange()">
+                      <label class="form-check-label" for="onlyInternal">
+                        Apenas Interno
+                      </label>
+                      <div class="form-text">
+                        Se marcado, o texto será amarelo (interno). Se desmarcado, será azul (público).
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
-                </div>
-              </div>
-              </div>
 
 
             <div class="accordion-item">
@@ -886,11 +902,11 @@
                     <!-- Show/Hide -->
                     <div class="form-group mb-3">
                       <label class="form-label">Ação</label>
-                      <button style="float: right;" class="btn btn-outline-danger btn-sm m-1"
+                      <button  [disabled]="isComponentChave()" style="float: right;" class="btn btn-outline-danger btn-sm m-1"
                         (click)="clearConditionalLogic()" title="Clear conditional logic">
                         <i class="bi bi-trash"></i>
                       </button>
-                      <select class="form-select form-control-sm" [(ngModel)]="conditionalShow"
+                      <select  [disabled]="isComponentChave()" class="form-select form-control-sm" [(ngModel)]="conditionalShow"
                         (change)="onConditionalShowChange()">
                         <option value="true">Mostrar componente quando a condição for atendida</option>
                         <option value="false">Ocultar componente quando a condição for atendida</option>
@@ -901,7 +917,7 @@
                     <div class="form-group mb-3">
                       <label class="form-label">Quando campo</label>
 
-                      <ngx-select-dropdown [config]="config" [options]="availableComponentKeysValues"
+                      <ngx-select-dropdown [disabled]="isComponentChave()" [config]="config" [options]="availableComponentKeysValues"
                         (change)="onConditionalWhenChange()" [(ngModel)]="conditionalWhen"
                         [multiple]="false"></ngx-select-dropdown>
 
@@ -923,7 +939,7 @@
                       <label class="form-label">Valor igual</label>
 
                       <!-- Show select dropdown if the when component has options -->
-                      <select class="form-select form-control-sm" [(ngModel)]="conditionalEq"
+                      <select [disabled]="isComponentChave()"  class="form-select form-control-sm" [(ngModel)]="conditionalEq"
                         (change)="onConditionalEqChange()" *ngIf="hasConditionalWhenComponentOptions()">
                         <option value="">Selecione um valor...</option>
                         <option *ngFor="let option of conditionalWhenComponentOptions" [value]="option.value">
@@ -932,7 +948,7 @@
                       </select>
 
                       <!-- Show text input if the when component doesn't have options -->
-                      <input type="text" class="form-control form-control-sm" [(ngModel)]="conditionalEq"
+                      <input [disabled]="isComponentChave()"  type="text" class="form-control form-control-sm" [(ngModel)]="conditionalEq"
                         (input)="onConditionalEqChange()" placeholder="Digite o valor de comparação"
                         *ngIf="!hasConditionalWhenComponentOptions()">
 
@@ -985,8 +1001,8 @@
                     <!-- Component Key -->
                     <div class="form-group mb-3">
                       <label class="form-label">Identificador Chave</label>
-                      <input type="text" class="form-control form-control-sm" [(ngModel)]="componentKey"
-                        (input)="onKeyChange()" placeholder="Unique key for this component">
+                      <input [disabled]="isComponentChave()" type="text" class="form-control form-control-sm"
+                        [(ngModel)]="componentKey" (input)="onKeyChange()" placeholder="Unique key for this component">
                       <div class="form-text">
                         Identificador exclusivo usado para lógica condicional e vinculação de dados
                       </div>

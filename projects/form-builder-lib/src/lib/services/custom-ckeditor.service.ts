@@ -97,7 +97,7 @@ export class CustomCKEditorService {
       window.ClassicEditor
         .create(element, finalConfig)
         .then((editor: any) => {
-          console.log('Custom CKEditor initialized for element:', elementId);
+          // console.log('Custom CKEditor initialized for element:', elementId);
 
           // Store the instance
           const instance: CKEditorInstance = {
@@ -134,9 +134,9 @@ export class CustomCKEditorService {
         await Promise.resolve(instance.editor.destroy()).catch(() => {});
       } catch (error) {
         // Ignore internal CKEditor destroy errors to avoid breaking UX
-      } finally {
+        } finally {
         this.instances.delete(elementId);
-        console.log('CKEditor instance destroyed:', elementId);
+        // console.log('CKEditor instance destroyed:', elementId);
       }
     }
   }
@@ -151,8 +151,8 @@ export class CustomCKEditorService {
       destroyPromises.push(this.destroyEditor(elementId));
     }
 
-    await Promise.all(destroyPromises);
-    console.log('All CKEditor instances destroyed');
+  await Promise.all(destroyPromises);
+  // console.log('All CKEditor instances destroyed');
   }
 
   /**
@@ -243,7 +243,7 @@ export class CustomCKEditorService {
     });
 
     if (instancesToRemove.length > 0) {
-      console.log('Cleaned up unused CKEditor instances:', instancesToRemove);
+      // console.log('Cleaned up unused CKEditor instances:', instancesToRemove);
     }
   }
 }

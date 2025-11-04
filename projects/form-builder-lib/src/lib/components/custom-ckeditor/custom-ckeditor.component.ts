@@ -86,7 +86,7 @@ export class CustomCKEditorComponent implements OnInit, AfterViewInit, OnDestroy
       // Emit ready event
       this.ready.emit(this.editor);
 
-      console.log('Custom CKEditor component initialized with ID:', this.internalEditorId);
+      // console.log('Custom CKEditor component initialized with ID:', this.internalEditorId);
     } catch (error) {
       console.error('Failed to initialize CKEditor:', error);
     }

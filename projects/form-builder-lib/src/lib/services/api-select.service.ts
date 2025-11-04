@@ -14,6 +14,7 @@ export interface ApiSelectConfig {
   requestBody?: any;
   cache?: boolean;
   cacheTimeout?: number; // in minutes
+  typeEndPointAPI?: 'UNIDADE' | 'SERVIDOR'  | '';
 }
 
 export interface ApiSelectCache {

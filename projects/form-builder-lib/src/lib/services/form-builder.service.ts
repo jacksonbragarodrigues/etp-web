@@ -49,7 +49,27 @@ export class FormBuilderService {
       icon: 'bi-input-cursor-text',
       category: ComponentCategory.BASIC,
       description: 'Entrada de texto de linha única',
-      defaultProperties: { placeholder: 'Enter text...' }
+      placeholder: 'Enter text...',
+      defaultProperties: {  }
+    },
+    // Custom aliases that behave like INPUT
+    {
+      type: ComponentType.PROCESSO_SEI,
+      label: 'Processo SEI',
+      icon: 'bi-input-cursor-text',
+      category: ComponentCategory.CUSTOM,
+      description: 'Campo de texto para Processo SEI (comportamento igual a Campo de Texto)',
+      placeholder: 'Número do processo SEI...',
+      defaultProperties: {  }
+    },
+    {
+      type: ComponentType.NUMERO_ETP,
+      label: 'Número ETP',
+      icon: 'bi-input-cursor-text',
+      category: ComponentCategory.CUSTOM,
+      description: 'Campo de texto para número de ETP (comportamento igual a Campo de Texto)',
+      placeholder: 'Número do ETP...',
+      defaultProperties: {  }
     },
     {
       type: ComponentType.TEXTAREA,
@@ -57,7 +77,8 @@ export class FormBuilderService {
       icon: 'bi-textarea-resize',
       category: ComponentCategory.BASIC,
       description: 'Entrada de texto multilinha',
-      defaultProperties: { rows: 4, placeholder: 'Enter description...' }
+      placeholder: 'Enter description...',
+      defaultProperties: { rows: 4 }
     },
     {
       type: ComponentType.SELECT,
@@ -65,6 +86,7 @@ export class FormBuilderService {
       icon: 'bi-menu-button-wide',
       category: ComponentCategory.BASIC,
       description: 'Lista de Seleção',
+      placeholder: '...',
       defaultProperties: {
         options: [
           { value: 'opcao1', label: 'Opção 1' },
@@ -79,6 +101,7 @@ export class FormBuilderService {
       icon: 'bi-ui-checks',
       category: ComponentCategory.BASIC,
       description: 'Lista de caixas de seleção de seleção múltipla com seleção ��nica ou múltipla',
+      placeholder: '...',
       defaultProperties: {
         multiple: false,
         options: [
@@ -94,6 +117,7 @@ export class FormBuilderService {
       icon: 'bi-check-square',
       category: ComponentCategory.BASIC,
       description: 'Entrada de caixa de seleção',
+            placeholder: '...',
       defaultProperties: {}
     },
     {
@@ -102,6 +126,7 @@ export class FormBuilderService {
       icon: 'bi-record-circle',
       category: ComponentCategory.BASIC,
       description: 'Seleção única entre várias op��ões',
+            placeholder: '...',
       defaultProperties: {
         options: [
           { value: 'sim', label: 'Sim' },
@@ -115,6 +140,7 @@ export class FormBuilderService {
       icon: 'bi-calendar-date',
       category: ComponentCategory.BASIC,
       description: 'Entrada de seleção de data',
+            placeholder: '...',
       defaultProperties: {}
     },
     {
@@ -123,6 +149,7 @@ export class FormBuilderService {
       icon: 'bi-cloud-upload',
       category: ComponentCategory.BASIC,
       description: 'Entrada de upload de arquivo',
+            placeholder: '...',
       defaultProperties: { accept: '*/*' }
     },
     {
@@ -131,6 +158,7 @@ export class FormBuilderService {
       icon: 'bi-123',
       category: ComponentCategory.BASIC,
       description: 'Entrada numérica com valida��ão',
+            placeholder: '...',
       defaultProperties: { min: 0, max: 100, step: 1 }
     },
     {
@@ -139,7 +167,8 @@ export class FormBuilderService {
       icon: 'bi-envelope',
       category: ComponentCategory.BASIC,
       description: 'Entrada de endereço de e-mail com validação',
-      defaultProperties: { placeholder: 'email@example.com' }
+      placeholder: 'email@example.com',
+      defaultProperties: {  }
     },
     {
       type: ComponentType.RICH_TEXT,
@@ -147,8 +176,9 @@ export class FormBuilderService {
       icon: 'bi-text-paragraph',
       category: ComponentCategory.BASIC,
       description: 'Editor de rico com recursos de formatação',
+      placeholder: 'Digite o texto...',
       defaultProperties: {
-        placeholder: 'Digite o texto...',
+       
         ckEditorConfig: {
           toolbar: ["findAndReplace",
       "|",
@@ -194,6 +224,7 @@ export class FormBuilderService {
       icon: 'bi-layout-three-columns',
       category: ComponentCategory.LAYOUT,
       description: 'Painel para agrupar componentes',
+            placeholder: '...',
       defaultProperties: {
         classes: ['card'],
         collapsible: false,
@@ -206,6 +237,7 @@ export class FormBuilderService {
       icon: 'bi-columns-gap',
       category: ComponentCategory.LAYOUT,
       description: 'Layout de grade com múltiplas colunas',
+            placeholder: '...',
       defaultProperties: {
         hideLabel: false,
         clearOnHide: false,
@@ -231,6 +263,7 @@ export class FormBuilderService {
       icon: 'bi-table',
       category: ComponentCategory.DATA,
       description: 'Tabela editável com linhas dinâmicas',
+            placeholder: '...',
       defaultProperties: {
         tableView: true,
         rowDrafts: false,
@@ -248,6 +281,7 @@ export class FormBuilderService {
       icon: 'bi-cloud-download',
       category: ComponentCategory.CUSTOM,
       description: 'Selecione com opções do endpoint externo da API',
+            placeholder: '...',
       defaultProperties: {
         multiple: false,
         options: [],
@@ -259,7 +293,8 @@ export class FormBuilderService {
           labelField: 'name',
           valueField: 'id',
           cache: true,
-          cacheTimeout: 30
+          cacheTimeout: 30,
+          typeEndPoint: ''
         }
       }
     },
@@ -269,6 +304,7 @@ export class FormBuilderService {
       icon: 'bi-question-circle',
       category: ComponentCategory.BASIC,
       description: 'Texto de ajuda com formatação rica',
+            placeholder: '...',
       defaultProperties: {
         help: 'Digite aqui o texto de ajuda...',
         onlyInternal: false,
@@ -368,19 +404,21 @@ export class FormBuilderService {
     }
 
     // Deep copy properties to avoid shared references
-    let properties = {};
+    let defaultProperties = {};
     if (template?.defaultProperties) {
-      properties = this.deepCopyProperties(template.defaultProperties);
+      defaultProperties = this.deepCopyProperties(template.defaultProperties);
     }
-
+   console.log("SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS");
+   console.log(defaultProperties);
     const component: FormComponent = {
       id,
       key,
       type,
       label: '', // Start with empty label to show placeholder
       required: true,
-      properties,
+      properties: defaultProperties,
       children: this.isContainerType(type) ? [] : undefined,
+      placeholder: template?.placeholder,
       parentId
     };
 
@@ -390,14 +428,27 @@ export class FormBuilderService {
       // DataGrid starts empty - columns are added by dragging components
     }
 
+    if (type === ComponentType.PROCESSO_SEI) {
+       component.label = 'Processo SEI';
+       component.properties.mask = '999999/9999';
+       component.key = 'PAR_PROCESSO_SEI_PAR'
+    }
+
+    if (type === ComponentType.NUMERO_ETP) {
+       component.label = 'Número do ETP';
+       component.properties.mask = '999999/9999';
+       component.key = 'PAR_NUMERO_ETP_PAR'
+    }
+
     return component;
   }
 
   addComponent(component: FormComponent, stepId?: string, parentId?: string): void {
+      console.log("PASSSO 55 1111111111111111111");
+        console.log(component);
     const state = this.getCurrentState();
     const targetStepId = stepId || state.currentStep;
     const targetStep = state.formSchema.steps.find(s => s.id === targetStepId);
-
     if (!targetStep) return;
 
     if (parentId) {
@@ -803,8 +854,9 @@ export class FormBuilderService {
       tipocontratacaoselect: ComponentType.SELECT_API,
       unidadeselect: ComponentType.SELECT_API,
       servidorselect: ComponentType.SELECT_API,
-      processoseitextfield: ComponentType.INPUT,
-      numeroetptextfield: ComponentType.INPUT
+  processoseitextfield: ComponentType.PROCESSO_SEI,
+  numeroetptextfield: ComponentType.NUMERO_ETP
+      
     };
 
     const formioType = String(src.type || '').toLowerCase();
@@ -900,7 +952,8 @@ export class FormBuilderService {
             labelField: src.labelProperty || 'label',
             valueField: src.valueProperty || 'value',
             cache: true,
-            cacheTimeout: 30
+            cacheTimeout: 30,
+            typeEndPoint: ''
           };
         }
         break;
@@ -934,7 +987,8 @@ export class FormBuilderService {
           labelField: label,
           valueField: value,
           cache: true,
-          cacheTimeout: 30
+          cacheTimeout: 30,
+          typeEndPoint: ''
         };
         break;
       }
@@ -1594,6 +1648,8 @@ getAllComponentKeyValues(): { id: string, key: string , name: string }[] {
     // Verifica baseado no tipo de componente
     switch (component.type) {
       case ComponentType.INPUT:
+      case ComponentType.PROCESSO_SEI:
+      case ComponentType.NUMERO_ETP:
       case ComponentType.TEXTAREA:
       case ComponentType.EMAIL:
       case ComponentType.PASSWORD:
@@ -1652,6 +1708,8 @@ getAllComponentKeyValues(): { id: string, key: string , name: string }[] {
     // Verifica baseado no tipo de componente
     switch (componentType) {
       case ComponentType.INPUT:
+      case ComponentType.PROCESSO_SEI:
+      case ComponentType.NUMERO_ETP:
       case ComponentType.TEXTAREA:
       case ComponentType.EMAIL:
       case ComponentType.PASSWORD:
@@ -1778,18 +1836,18 @@ getAllComponentKeyValues(): { id: string, key: string , name: string }[] {
    * Debug method to test data export with detailed logging
    */
   debugExportFormData(): { data: any, json: string } {
-    console.log('=== Debug Export Form Data ===');
+  // console.log('=== Debug Export Form Data ===');
     const state = this.getCurrentState();
     const formData: { [key: string]: any } = {};
 
-    console.log('Form Schema Steps:', state.formSchema.steps.length);
+  // console.log('Form Schema Steps:', state.formSchema.steps.length);
 
     // Debug cada step
     state.formSchema.steps.forEach((step, stepIndex) => {
-      console.log(`Step ${stepIndex + 1} (${step.title}):`, {
-        componentsCount: step.components.length,
-        stepId: step.id
-      });
+      // console.log(`Step ${stepIndex + 1} (${step.title}):`, {
+      //   componentsCount: step.components.length,
+      //   stepId: step.id
+      // });
 
       // Debug cada componente no step
       this.debugComponentsForExport(step.components, 0);
@@ -1799,8 +1857,8 @@ getAllComponentKeyValues(): { id: string, key: string , name: string }[] {
 
     const jsonResult = JSON.stringify(formData, null, 2);
 
-    console.log('Final Exported Data:', formData);
-    console.log('=== End Debug Export ===');
+  // console.log('Final Exported Data:', formData);
+  // console.log('=== End Debug Export ===');
 
     return {
       data: formData,
@@ -1815,17 +1873,17 @@ getAllComponentKeyValues(): { id: string, key: string , name: string }[] {
     const indent = '  '.repeat(level);
 
     components.forEach(component => {
-      console.log(`${indent}Component:`, {
-        id: component.id,
-        key: component.key,
-        type: component.type,
-        label: component.label,
-        hasValue: component.value !== undefined && component.value !== null,
-        value: component.value,
-        hasRows: component.rows ? component.rows.length : 0,
-        rows: component.rows,
-        hasChildren: component.children ? component.children.length : 0
-      });
+      // console.log(`${indent}Component:`, {
+      //   id: component.id,
+      //   key: component.key,
+      //   type: component.type,
+      //   label: component.label,
+      //   hasValue: component.value !== undefined && component.value !== null,
+      //   value: component.value,
+      //   hasRows: component.rows ? component.rows.length : 0,
+      //   rows: component.rows,
+      //   hasChildren: component.children ? component.children.length : 0
+      // });
 
       if (component.children && component.children.length > 0) {
         this.debugComponentsForExport(component.children, level + 1);

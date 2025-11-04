@@ -17,6 +17,7 @@ export class ComponentPaletteComponent implements OnInit, OnDestroy {
   isDragging: boolean = false;
   clickTimeout: any = null;
 
+  
   // Accordion state management
   accordionState: { [key: string]: boolean } = {
     'basic': true,
@@ -25,7 +26,7 @@ export class ComponentPaletteComponent implements OnInit, OnDestroy {
     'custom': false
   };
 
-  constructor(private formBuilderService: FormBuilderService) {}
+  constructor(private formBuilderService: FormBuilderService) { }
 
   ngOnInit(): void {
     this.componentTemplates = this.formBuilderService.getComponentTemplates();
@@ -83,6 +84,8 @@ export class ComponentPaletteComponent implements OnInit, OnDestroy {
   getIconClass(template: ComponentTemplate): string {
     const iconMap: Partial<{ [key in ComponentType]: string }> = {
       [ComponentType.INPUT]: 'bi-input-cursor-text',
+      [ComponentType.PROCESSO_SEI]: 'bi-input-cursor-text',
+      [ComponentType.NUMERO_ETP]: 'bi-input-cursor-text',
       [ComponentType.TEXTAREA]: 'bi-textarea-resize',
       [ComponentType.SELECT]: 'bi-menu-button-wide',
       [ComponentType.SELECT_BOX]: 'bi-ui-checks',

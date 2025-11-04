@@ -15,7 +15,7 @@ export class ReportService {
 
   private readonly GLOBAL_ANALYSIS_ID = '__analysis__';
 
-  constructor(private formBuilderService: FormBuilderService, private validationService: ValidationService) {}
+  constructor(private formBuilderService: FormBuilderService, private validationService: ValidationService) { }
 
   generateHTMLReport(): string {
     const state = this.formBuilderService.getCurrentState();
@@ -84,7 +84,7 @@ ${summaryItems}
 
   private generateStepContent(step: FormStep, context: NumberingContext, mode: 'full' | 'summary' = 'full'): string {
     const stepNumber = context.stepIndex;
-    
+
     context.componentNumbers = [0];
 
     const stepHeader = `  <section class="capitulo outer-section" id="${stepNumber}">
@@ -245,7 +245,7 @@ ${summaryItems}
   private getComponentNumber(context: NumberingContext, depth: number): string {
     const stepNumber = context.stepIndex;
     const componentParts = context.componentNumbers.slice(0, depth + 1);
-    
+
     if (depth === 0) {
       return `${stepNumber}.${componentParts[0]}`;
     } else {
@@ -309,6 +309,8 @@ ${summaryItems}
   private getComponentTypeLabel(type: ComponentType): string {
     const typeLabels: { [key: string]: string } = {
       [ComponentType.INPUT]: 'Campo de Texto',
+      [ComponentType.PROCESSO_SEI]: 'Processo SEI',
+      [ComponentType.NUMERO_ETP]: 'Número ETP',
       [ComponentType.TEXTAREA]: 'Área de Texto',
       [ComponentType.SELECT]: 'Seleção',
       [ComponentType.SELECT_BOX]: 'Caixa de Seleção',

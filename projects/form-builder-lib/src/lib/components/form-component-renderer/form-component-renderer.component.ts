@@ -426,7 +426,7 @@ export class FormComponentRendererComponent implements OnInit, OnChanges, AfterV
     let value = target?.value || '';
 
     // Apply mask if defined
-    if (this.component.properties.mask && (this.component.type === ComponentType.INPUT || this.component.type === ComponentType.NUMBER)) {
+    if (this.component.properties.mask && (this.component.type === ComponentType.INPUT || this.component.type === ComponentType.PROCESSO_SEI || this.component.type === ComponentType.NUMERO_ETP || this.component.type === ComponentType.NUMBER)) {
       value = this.applyMask(value, this.component.properties.mask);
       target.value = value;
     }
@@ -711,6 +711,8 @@ export class FormComponentRendererComponent implements OnInit, OnChanges, AfterV
   isInputType(): boolean {
     return [
       ComponentType.INPUT,
+      ComponentType.PROCESSO_SEI,
+      ComponentType.NUMERO_ETP,
       ComponentType.EMAIL,
       ComponentType.PASSWORD,
       ComponentType.NUMBER,
@@ -1086,7 +1088,8 @@ export class FormComponentRendererComponent implements OnInit, OnChanges, AfterV
       valueField: rawConfig.valueField || 'id',
       requestBody: rawConfig.requestBody,
       cache: rawConfig.cache !== false,
-      cacheTimeout: rawConfig.cacheTimeout || 30
+      cacheTimeout: rawConfig.cacheTimeout || 30,
+      typeEndPoint: rawConfig.method || 'DEFAULT',
     };
 
     // Set loading state
@@ -1136,7 +1139,8 @@ export class FormComponentRendererComponent implements OnInit, OnChanges, AfterV
       valueField: rawConfig.valueField || 'id',
       requestBody: rawConfig.requestBody,
       cache: rawConfig.cache !== false,
-      cacheTimeout: rawConfig.cacheTimeout || 30
+      cacheTimeout: rawConfig.cacheTimeout || 30,
+      typeEndPoint: rawConfig.method || 'DEFAULT',
     };
 
     // Clear cache and reload
@@ -1493,7 +1497,7 @@ export class FormComponentRendererComponent implements OnInit, OnChanges, AfterV
 
   onCKEditorReady(editor: any): void {
     // Custom CKEditor is ready
-    console.log('Custom CKEditor ready for component:', this.component.id, 'with ID:', this.ckEditorId);
+    // console.log('Custom CKEditor ready for component:', this.component.id, 'with ID:', this.ckEditorId);
 
     // Store editor reference for potential future use
     this.ckEditorInstance = editor;
@@ -1534,6 +1538,9 @@ export class FormComponentRendererComponent implements OnInit, OnChanges, AfterV
         .replace(/[A]/g, 'A')
         .replace(/[a]/g, 'a');
     }
+    console.log("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
+    console.log(this.component);
+    console.log("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
     return this.component.placeholder || '';
   }
 
@@ -1978,6 +1985,8 @@ export class FormComponentRendererComponent implements OnInit, OnChanges, AfterV
   getSampleValue(component: FormComponent): string {
     switch (component.type) {
       case ComponentType.INPUT:
+      case ComponentType.PROCESSO_SEI:
+      case ComponentType.NUMERO_ETP:
       case ComponentType.EMAIL:
         return 'Sample text...';
       case ComponentType.NUMBER:
@@ -2080,6 +2089,8 @@ export class FormComponentRendererComponent implements OnInit, OnChanges, AfterV
 
     switch (component.type) {
       case ComponentType.INPUT:
+      case ComponentType.PROCESSO_SEI:
+      case ComponentType.NUMERO_ETP:
       case ComponentType.TEXTAREA:
       case ComponentType.EMAIL:
       case ComponentType.PASSWORD:
@@ -2271,6 +2282,8 @@ export class FormComponentRendererComponent implements OnInit, OnChanges, AfterV
     // Verifica baseado no tipo de componente
     switch (this.component.type) {
       case ComponentType.INPUT:
+      case ComponentType.PROCESSO_SEI:
+      case ComponentType.NUMERO_ETP:
       case ComponentType.TEXTAREA:
       case ComponentType.EMAIL:
       case ComponentType.PASSWORD:

@@ -92,6 +92,7 @@ export interface ComponentProperties {
     requestBody?: any;
     cache?: boolean;
     cacheTimeout?: number; // in minutes
+    typeEndPoint?: 'UNIDADE' | 'SERVIDOR' | '';
   };
   // Text Help specific properties
   help?: string; // HTML content for help text
@@ -175,6 +176,8 @@ export interface DragDropData {
 
 export enum ComponentType {
   INPUT = 'input',
+  PROCESSO_SEI = 'processo_sei',
+  NUMERO_ETP = 'numero_etp',
   TEXTAREA = 'textarea',
   SELECT = 'select',
   SELECT_BOX = 'selectbox',
@@ -217,6 +220,7 @@ export interface ComponentTemplate {
   icon: string;
   category: ComponentCategory;
   description: string;
+  placeholder: string;
   defaultProperties: Partial<ComponentProperties>;
 }
 

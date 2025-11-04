@@ -15,7 +15,7 @@ export interface ValidationError {
 })
 export class ValidationService {
 
-  constructor() {}
+  constructor() { }
 
   /**
    * Checks if a component type should not be validated
@@ -165,22 +165,22 @@ export class ValidationService {
 
       // Special handling for DataGrid - only validate individual cells, not the component itself
       if (component.type === ComponentType.DATAGRID) {
-        console.log('Validating DataGrid:', {
-          componentId: component.id,
-          label: component.label,
-          required: component.required,
-          rowsCount: component.rows?.length || 0,
-          childrenCount: component.children?.length || 0
-        });
+          // console.log('Validating DataGrid:', {
+          //   componentId: component.id,
+          //   label: component.label,
+          //   required: component.required,
+          //   rowsCount: component.rows?.length || 0,
+          //   childrenCount: component.children?.length || 0
+          // });
 
-        if (component.children && component.rows) {
-          const errorsBefore = errors.length;
-          this.validateDataGridRows(component, errors, stepId, stepTitle);
-          const errorsAdded = errors.length - errorsBefore;
-          console.log(`DataGrid validation added ${errorsAdded} cell-level errors`);
+          if (component.children && component.rows) {
+            const errorsBefore = errors.length;
+            this.validateDataGridRows(component, errors, stepId, stepTitle);
+            const errorsAdded = errors.length - errorsBefore;
+            // console.log(`DataGrid validation added ${errorsAdded} cell-level errors`);
+          }
+          return;
         }
-        return;
-      }
 
       // Validate current component only if it's required (for non-DataGrid components)
       if (component.required) {
@@ -212,9 +212,9 @@ export class ValidationService {
    * Validates DataGrid rows and their cells
    */
   private validateDataGridRows(
-    dataGridComponent: FormComponent, 
-    errors: ValidationError[], 
-    stepId: string, 
+    dataGridComponent: FormComponent,
+    errors: ValidationError[],
+    stepId: string,
     stepTitle: string
   ): void {
     if (!dataGridComponent.children || !dataGridComponent.rows) {
@@ -225,11 +225,11 @@ export class ValidationService {
       dataGridComponent.children!.forEach(childComponent => {
         if (childComponent.required) {
           const cellValue = row.data[childComponent.key];
-          
+
           if (this.isValueEmpty(cellValue, childComponent.type)) {
             const componentLabel = `${dataGridComponent.label || 'Tabela'} - Linha ${rowIndex + 1} - ${childComponent.label || childComponent.type}`;
             const message = `Campo obrigatório não preenchido em "${componentLabel}"`;
-            
+
             errors.push({
               componentId: `${dataGridComponent.id}_row_${row.id}_${childComponent.id}`,
               componentKey: `${dataGridComponent.key}.${row.index}.${childComponent.key}`,
@@ -249,11 +249,11 @@ export class ValidationService {
    */
   private getComponentDisplayLabel(component: FormComponent, parentLabel?: string): string {
     let label = component.label || this.getComponentTypeLabel(component.type);
-    
+
     if (parentLabel) {
       label = `${parentLabel} - ${label}`;
     }
-    
+
     return label;
   }
 
@@ -263,6 +263,8 @@ export class ValidationService {
   private getComponentTypeLabel(type: ComponentType): string {
     const typeLabels: { [key in ComponentType]: string } = {
       [ComponentType.INPUT]: 'Campo de Texto',
+      [ComponentType.PROCESSO_SEI]: 'Processo SEI',
+      [ComponentType.NUMERO_ETP]: 'Número ETP',
       [ComponentType.TEXTAREA]: 'Área de Texto',
       [ComponentType.SELECT]: 'Lista de Seleção',
       [ComponentType.SELECT_BOX]: 'Caixa de Seleção',
@@ -311,6 +313,8 @@ export class ValidationService {
     // Verifica baseado no tipo de componente
     switch (component.type) {
       case ComponentType.INPUT:
+      case ComponentType.PROCESSO_SEI:
+      case ComponentType.NUMERO_ETP:
       case ComponentType.TEXTAREA:
       case ComponentType.EMAIL:
       case ComponentType.PASSWORD:
@@ -381,6 +385,8 @@ export class ValidationService {
     // Verifica baseado no tipo de componente
     switch (componentType) {
       case ComponentType.INPUT:
+      case ComponentType.PROCESSO_SEI:
+      case ComponentType.NUMERO_ETP:
       case ComponentType.TEXTAREA:
       case ComponentType.EMAIL:
       case ComponentType.PASSWORD:
@@ -634,22 +640,22 @@ export class ValidationService {
    * Debug method to test validation for a specific step
    */
   debugValidationForStep(step: FormStep, formBuilderService?: any): void {
-    console.log('=== Debug Validation ===');
-    console.log('Step:', step.title, '(ID:', step.id, ')');
+  // console.log('=== Debug Validation ===');
+  // console.log('Step:', step.title, '(ID:', step.id, ')');
 
     const errors = this.validateStepWithErrors(step, formBuilderService);
 
-    console.log('Total validation errors found:', errors.length);
-    errors.forEach((error, index) => {
-      console.log(`Error ${index + 1}:`, {
-        component: error.componentLabel,
-        message: error.message,
-        componentId: error.componentId,
-        componentKey: error.componentKey
-      });
-    });
+    // console.log('Total validation errors found:', errors.length);
+    // errors.forEach((error, index) => {
+    //   console.log(`Error ${index + 1}:`, {
+    //     component: error.componentLabel,
+    //     message: error.message,
+    //     componentId: error.componentId,
+    //     componentKey: error.componentKey
+    //   });
+    // });
 
-    console.log('=== End Debug Validation ===');
+    // console.log('=== End Debug Validation ===');
     return;
   }
 }

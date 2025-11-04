@@ -120,10 +120,10 @@ export class FormBuilderComponent implements OnInit, OnDestroy, OnChanges {
     private cdr: ChangeDetectorRef,
     private appRef: ApplicationRef,
     private ngZone: NgZone
-  ) {}
+  ) { }
 
   ngOnInit(): void {
-    console.log(this.dataJson);
+  // console.log(this.dataJson);
     this.formBuilderService.state$
       .pipe(takeUntil(this.destroy$))
       .subscribe(state => {
@@ -171,7 +171,7 @@ export class FormBuilderComponent implements OnInit, OnDestroy, OnChanges {
               this.formBuilderService.importFormSchema(content);
               this.lastImportedFormJson = content;
             }
-          } catch {}
+          } catch { }
         }
       }
     }
@@ -184,7 +184,7 @@ export class FormBuilderComponent implements OnInit, OnDestroy, OnChanges {
         // Prevent feedback loop for data as well
         if (this.lastDataJsonEmitted === content) { return; }
         if (this.lastImportedDataJson === content) { /* no-op */ } else {
-          try { JSON.parse(content); this.formBuilderService.importFormData(content); this.lastImportedDataJson = content; } catch {}
+          try { JSON.parse(content); this.formBuilderService.importFormData(content); this.lastImportedDataJson = content; } catch { }
         }
       }
     }
@@ -202,7 +202,7 @@ export class FormBuilderComponent implements OnInit, OnDestroy, OnChanges {
               const payload = JSON.stringify({ annotations: obj });
               this.formBuilderService.importAnalysisData(payload);
             }
-          } catch {}
+          } catch { }
         }
       }
     }
@@ -241,7 +241,7 @@ export class FormBuilderComponent implements OnInit, OnDestroy, OnChanges {
             const payload = JSON.stringify({ annotations: obj });
             this.formBuilderService.importAnalysisData(payload);
           }
-        } catch {}
+        } catch { }
       }
     }
   }
@@ -265,7 +265,7 @@ export class FormBuilderComponent implements OnInit, OnDestroy, OnChanges {
         this.lastAnalysisJsonEmitted = analysis;
         this.analysisJsonChange.emit(analysis);
       }
-    } catch {}
+    } catch { }
   }
 
   ngOnDestroy(): void {
@@ -361,25 +361,25 @@ export class FormBuilderComponent implements OnInit, OnDestroy, OnChanges {
 
   onDebugExportData(): void {
     try {
-      console.log('=== Debug Export Data ===');
+      // console.log('=== Debug Export Data ===');
       const debugResult = this.formBuilderService.debugExportFormData();
 
       // Especificamente verificar DataGrids
       const dataGridComponents = this.findDataGridComponents();
-      console.log('DataGrid components found:', dataGridComponents.length);
+      // console.log('DataGrid components found:', dataGridComponents.length);
 
       dataGridComponents.forEach(comp => {
-        console.log(`DataGrid "${comp.label}" (${comp.key}):`, {
-          hasRows: comp.rows ? comp.rows.length : 0,
-          hasValue: comp.value ? comp.value.length : 0,
-          inExportedData: debugResult.data[comp.key] ? debugResult.data[comp.key].length : 'NOT FOUND',
-          rows: comp.rows,
-          value: comp.value,
-          exportedValue: debugResult.data[comp.key]
-        });
+        // console.log(`DataGrid "${comp.label}" (${comp.key}):`, {
+        //   hasRows: comp.rows ? comp.rows.length : 0,
+        //   hasValue: comp.value ? comp.value.length : 0,
+        //   inExportedData: debugResult.data[comp.key] ? debugResult.data[comp.key].length : 'NOT FOUND',
+        //   rows: comp.rows,
+        //   value: comp.value,
+        //   exportedValue: debugResult.data[comp.key]
+        // });
       });
 
-      console.log('Debug export completed. Check console for details.');
+      // console.log('Debug export completed. Check console for details.');
       alert('Debug export executado! Verifique o console para detalhes.');
     } catch (error) {
       console.error('Erro no debug export:', error);
@@ -933,6 +933,8 @@ export class FormBuilderComponent implements OnInit, OnDestroy, OnChanges {
   getComponentTypeLabel(type: ComponentType): string {
     const typeLabels: { [key: string]: string } = {
       [ComponentType.INPUT]: 'Campo de Texto',
+      [ComponentType.PROCESSO_SEI]: 'Processo SEI',
+      [ComponentType.NUMERO_ETP]: 'Número ETP',
       [ComponentType.TEXTAREA]: 'Área de Texto',
       [ComponentType.SELECT]: 'Seleção',
       [ComponentType.SELECT_BOX]: 'Caixa de Seleção',
