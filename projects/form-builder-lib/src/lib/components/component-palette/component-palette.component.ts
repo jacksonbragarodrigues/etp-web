@@ -17,7 +17,7 @@ export class ComponentPaletteComponent implements OnInit, OnDestroy {
   isDragging: boolean = false;
   clickTimeout: any = null;
 
-  
+
   // Accordion state management
   accordionState: { [key: string]: boolean } = {
     'basic': true,
@@ -89,7 +89,10 @@ export class ComponentPaletteComponent implements OnInit, OnDestroy {
       [ComponentType.TEXTAREA]: 'bi-textarea-resize',
       [ComponentType.SELECT]: 'bi-menu-button-wide',
       [ComponentType.SELECT_BOX]: 'bi-ui-checks',
-      [ComponentType.SELECT_API]: 'bi-cloud-download',
+  [ComponentType.SELECT_API]: 'bi-cloud-download',
+  [ComponentType.TIPO_CONTRATACAO]: 'bi-cloud-download',
+  [ComponentType.UNIDADE]: 'bi-cloud-download',
+  [ComponentType.SERVIDOR]: 'bi-cloud-download',
       [ComponentType.CHECKBOX]: 'bi-check-square',
       [ComponentType.RADIO]: 'bi-record-circle',
       [ComponentType.DATE]: 'bi-calendar-date',

@@ -92,7 +92,6 @@ export interface ComponentProperties {
     requestBody?: any;
     cache?: boolean;
     cacheTimeout?: number; // in minutes
-    typeEndPoint?: 'UNIDADE' | 'SERVIDOR' | '';
   };
   // Text Help specific properties
   help?: string; // HTML content for help text
@@ -182,6 +181,9 @@ export enum ComponentType {
   SELECT = 'select',
   SELECT_BOX = 'selectbox',
   SELECT_API = 'selectapi',
+  TIPO_CONTRATACAO = 'tipo_contratacao',
+  UNIDADE = 'unidade',
+  SERVIDOR = 'servidor',
   CHECKBOX = 'checkbox',
   RADIO = 'radio',
   DATE = 'date',

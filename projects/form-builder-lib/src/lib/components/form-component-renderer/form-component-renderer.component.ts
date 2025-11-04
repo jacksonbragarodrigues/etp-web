@@ -275,10 +275,13 @@ export class FormComponentRendererComponent implements OnInit, OnChanges, AfterV
 
   // Método para sincronizar valor do componente com opções selecionadas
   private syncValueWithOptions(): void {
-    if (this.component.type === ComponentType.SELECT ||
-        this.component.type === ComponentType.RADIO ||
-        this.component.type === ComponentType.SELECT_BOX ||
-        this.component.type === ComponentType.SELECT_API) {
+  if (this.component.type === ComponentType.SELECT ||
+    this.component.type === ComponentType.RADIO ||
+    this.component.type === ComponentType.SELECT_BOX ||
+    this.component.type === ComponentType.SELECT_API ||
+    this.component.type === ComponentType.TIPO_CONTRATACAO ||
+  this.component.type === ComponentType.UNIDADE ||
+this.component.type === ComponentType.SERVIDOR) {
 
       if (this.component.properties.options && this.value !== undefined && this.value !== null && this.value !== '') {
         // Para select e radio com valor único
@@ -300,8 +303,8 @@ export class FormComponentRendererComponent implements OnInit, OnChanges, AfterV
             option.selected = option.value == this.value;
           });
         }
-        // Para SELECT_API components
-        else if (this.component.type === ComponentType.SELECT_API) {
+  // Para SELECT_API components (inclui TIPO_CONTRATACAO)
+  else if (this.component.type === ComponentType.SELECT_API || this.component.type === ComponentType.TIPO_CONTRATACAO || this.component.type === ComponentType.UNIDADE || this.component.type === ComponentType.SERVIDOR) {
           if (this.component.properties.multiple) {
             const selectedValues = Array.isArray(this.value) ? this.value : [this.value];
             this.component.properties.options.forEach(option => {
@@ -315,8 +318,8 @@ export class FormComponentRendererComponent implements OnInit, OnChanges, AfterV
         }
       }
 
-      // Sync apiOptions as well for SELECT_API components
-      if (this.component.type === ComponentType.SELECT_API && this.apiOptions.length > 0) {
+  // Sync apiOptions as well for SELECT_API components (inclui TIPO_CONTRATACAO)
+  if (this.isSelectApiType() && this.apiOptions.length > 0) {
         if (this.value !== undefined && this.value !== null && this.value !== '') {
           if (this.component.properties.multiple) {
             const selectedValues = Array.isArray(this.value) ? this.value : [this.value];
@@ -387,7 +390,10 @@ export class FormComponentRendererComponent implements OnInit, OnChanges, AfterV
         return '';
       case ComponentType.SELECT_BOX:
         return this.component.properties.multiple ? [] : '';
-      case ComponentType.SELECT_API:
+  case ComponentType.SELECT_API:
+      case ComponentType.TIPO_CONTRATACAO:
+        case ComponentType.UNIDADE:
+          case ComponentType.SERVIDOR:
         return this.component.properties.multiple ? [] : '';
       default:
         return '';
@@ -744,7 +750,7 @@ export class FormComponentRendererComponent implements OnInit, OnChanges, AfterV
   }
 
   isSelectApiType(): boolean {
-    return this.component.type === ComponentType.SELECT_API;
+    return this.component.type === ComponentType.SELECT_API || this.component.type === ComponentType.TIPO_CONTRATACAO || this.component.type === ComponentType.UNIDADE || this.component.type === ComponentType.SERVIDOR;
   }
 
 
@@ -1088,8 +1094,7 @@ export class FormComponentRendererComponent implements OnInit, OnChanges, AfterV
       valueField: rawConfig.valueField || 'id',
       requestBody: rawConfig.requestBody,
       cache: rawConfig.cache !== false,
-      cacheTimeout: rawConfig.cacheTimeout || 30,
-      typeEndPoint: rawConfig.method || 'DEFAULT',
+      cacheTimeout: rawConfig.cacheTimeout || 30
     };
 
     // Set loading state
@@ -1139,8 +1144,7 @@ export class FormComponentRendererComponent implements OnInit, OnChanges, AfterV
       valueField: rawConfig.valueField || 'id',
       requestBody: rawConfig.requestBody,
       cache: rawConfig.cache !== false,
-      cacheTimeout: rawConfig.cacheTimeout || 30,
-      typeEndPoint: rawConfig.method || 'DEFAULT',
+      cacheTimeout: rawConfig.cacheTimeout || 30
     };
 
     // Clear cache and reload
@@ -2100,7 +2104,10 @@ export class FormComponentRendererComponent implements OnInit, OnChanges, AfterV
         return !component.value || String(component.value).trim() === '';
 
       case ComponentType.SELECT:
-      case ComponentType.SELECT_API:
+  case ComponentType.SELECT_API:
+  case ComponentType.TIPO_CONTRATACAO:
+  case ComponentType.UNIDADE:
+  case ComponentType.SERVIDOR:
         return !component.value || component.value === '';
 
       case ComponentType.SELECT_BOX:

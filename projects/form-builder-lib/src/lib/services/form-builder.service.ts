@@ -294,7 +294,72 @@ export class FormBuilderService {
           valueField: 'id',
           cache: true,
           cacheTimeout: 30,
-          typeEndPoint: ''
+        }
+      }
+    },
+    {
+      type: ComponentType.TIPO_CONTRATACAO,
+      label: 'Tipo de Contratação',
+      icon: 'bi-cloud-download',
+      category: ComponentCategory.CUSTOM,
+      description: 'Seleção API para Tipo de Contratação',
+      placeholder: '...',
+      defaultProperties: {
+        multiple: false,
+        options: [],
+        apiConfig: {
+          url: '',
+          method: 'GET',
+          headers: {},
+          token: '',
+          labelField: 'name',
+          valueField: 'id',
+          cache: true,
+          cacheTimeout: 30,
+        }
+      }
+    },
+    {
+      type: ComponentType.UNIDADE,
+      label: 'Unidade',
+      icon: 'bi-cloud-download',
+      category: ComponentCategory.CUSTOM,
+      description: 'Seleção API para Unidade',
+      placeholder: '...',
+      defaultProperties: {
+        multiple: false,
+        options: [],
+        apiConfig: {
+          url: '',
+          method: 'GET',
+          headers: {},
+          token: '',
+          labelField: 'name',
+          valueField: 'id',
+          cache: true,
+          cacheTimeout: 30,
+        }
+      }
+    },
+    {
+      type: ComponentType.SERVIDOR,
+      label: 'Servidor',
+      icon: 'bi-cloud-download',
+      category: ComponentCategory.CUSTOM,
+      description: 'Seleção API para Servidor',
+      placeholder: '...',
+      defaultProperties: {
+        multiple: false,
+        options: [],
+        apiConfig: {
+          url: '',
+          method: 'GET',
+          headers: {},
+          token: '',
+          labelField: 'name',
+          valueField: 'id',
+          cache: true,
+          cacheTimeout: 30,
         }
       }
     },
@@ -440,7 +505,56 @@ export class FormBuilderService {
        component.key = 'PAR_NUMERO_ETP_PAR'
     }
 
+    if (type === ComponentType.TIPO_CONTRATACAO) {
+       component.label = 'Tipo de Contratação';
+       component.key = 'PAR_TIPO_CONTRATACAO_PAR'
+       component.properties.apiConfig = {
+         url: 'https://my-json-server.typicode.com/jacksonbragarodrigues/dados/tipos-contratacao',
+         method: 'GET',
+         headers: {},
+         token: '',
+         labelField: 'nome',
+         valueField: 'codigo',
+         requestBody: '',
+         cache: true,
+         cacheTimeout: 30,
+       };
+    }
+
+    if (type === ComponentType.UNIDADE) {
+       component.label = 'Unidade';
+       component.key = 'PAR_UNIDADE_PAR'
+       component.properties.apiConfig = {
+         url: 'https://my-json-server.typicode.com/jacksonbragarodrigues/dados/unidades',
+         method: 'GET',
+         headers: {},
+         token: '',
+         labelField: 'descricao',
+         valueField: 'sigla',
+         requestBody: '',
+         cache: true,
+         cacheTimeout: 30,
+       };
+    }
+
+    if (type === ComponentType.SERVIDOR) {
+       component.label = 'Servidor';
+       component.key = 'PAR_SERVIDOR_PAR'
+       component.properties.apiConfig = {
+         url: 'https://my-json-server.typicode.com/jacksonbragarodrigues/dados/servidores',
+         method: 'GET',
+         headers: {},
+         token: '',
+         labelField: 'nome',
+         valueField: 'codigo',
+         requestBody: '',
+         cache: true,
+         cacheTimeout: 30,
+       };
+    }
+
     return component;
+
   }
 
   addComponent(component: FormComponent, stepId?: string, parentId?: string): void {
@@ -851,9 +965,7 @@ export class FormBuilderService {
       htmlelement: ComponentType.TEXT_HELP,
       notainterna: ComponentType.TEXT_HELP,
       botaoajuda: ComponentType.TEXT_HELP,
-      tipocontratacaoselect: ComponentType.SELECT_API,
-      unidadeselect: ComponentType.SELECT_API,
-      servidorselect: ComponentType.SELECT_API,
+      tipocontratacaoselect: ComponentType.TIPO_CONTRATACAO,
   processoseitextfield: ComponentType.PROCESSO_SEI,
   numeroetptextfield: ComponentType.NUMERO_ETP
       
@@ -953,33 +1065,20 @@ export class FormBuilderService {
             valueField: src.valueProperty || 'value',
             cache: true,
             cacheTimeout: 30,
-            typeEndPoint: ''
           };
         }
         break;
       }
-      case ComponentType.SELECT_API: {
+  case ComponentType.SELECT_API:
+  case ComponentType.TIPO_CONTRATACAO: 
+  case ComponentType.UNIDADE:
+  case ComponentType.SERVIDOR:
+  
+  {
         base.properties.multiple = !!src.multiple;
         base.properties.options = [];
         let url, label, value = '';
-        if(src.type == 'unidadeselect') {
-          url = 'https://my-json-server.typicode.com/jacksonbragarodrigues/dados/unidades'
-          label = 'descricao';
-          value = 'sigla';
-        }
-
-        if(src.type == 'servidorselect') {
-          url = 'https://my-json-server.typicode.com/jacksonbragarodrigues/dados/servidores'
-          label = 'nome';
-          value = 'matricula';
-        }
-
-        if(src.type == 'tipocontratacaoselect') {
-          url = 'https://my-json-server.typicode.com/jacksonbragarodrigues/dados/tipos-contratacao'
-          label = 'nome';
-          value = 'codigo';
-        }
-
+       
         base.properties.apiConfig = {
           url: url,
           method: 'GET',
@@ -988,7 +1087,6 @@ export class FormBuilderService {
           valueField: value,
           cache: true,
           cacheTimeout: 30,
-          typeEndPoint: ''
         };
         break;
       }
@@ -1135,7 +1233,10 @@ export class FormBuilderService {
     if (component.type === ComponentType.SELECT ||
         component.type === ComponentType.RADIO ||
         component.type === ComponentType.SELECT_BOX ||
-        component.type === ComponentType.SELECT_API) {
+        component.type === ComponentType.SELECT_API ||
+        component.type === ComponentType.TIPO_CONTRATACAO ||
+        component.type === ComponentType.UNIDADE ||
+        component.type === ComponentType.SERVIDOR) {
 
       if (component.properties.options && component.value !== undefined && component.value !== null) {
         // Para select e radio com valor ��nico
@@ -1165,8 +1266,8 @@ export class FormBuilderService {
             option.selected = option.value == component.value;
           });
         }
-        // Para SELECT_API components
-        else if (component.type === ComponentType.SELECT_API) {
+  // Para SELECT_API components (inclui TIPO_CONTRATACAO)
+  else if (component.type === ComponentType.SELECT_API || component.type === ComponentType.TIPO_CONTRATACAO || component.type === ComponentType.UNIDADE || component.type === ComponentType.SERVIDOR) {
           if (component.properties.multiple) {
             const selectedValues = Array.isArray(component.value) ? component.value : [component.value];
             component.properties.options.forEach(option => {
@@ -1468,7 +1569,12 @@ getAllComponentKeyValues(): { id: string, key: string , name: string }[] {
       case ComponentType.RADIO:
       case ComponentType.SELECT:
         return component.value || '';
-      case ComponentType.SELECT_API: {
+  case ComponentType.SELECT_API:
+  case ComponentType.TIPO_CONTRATACAO:
+   case ComponentType.UNIDADE:
+     case ComponentType.SERVIDOR:
+  
+  {
         const val = component.value;
         const valueField = component.properties.apiConfig?.valueField || 'id';
         if (component.properties.multiple) {
@@ -2048,6 +2154,9 @@ getAllComponentKeyValues(): { id: string, key: string , name: string }[] {
       case ComponentType.SELECT_BOX:
         return component.properties.multiple ? [] : '';
       case ComponentType.SELECT_API:
+      case ComponentType.TIPO_CONTRATACAO:
+        case ComponentType.UNIDADE:
+        case ComponentType.SERVIDOR:
         return component.properties.multiple ? [] : '';
       case ComponentType.NUMBER:
         return '';
@@ -2070,7 +2179,7 @@ getAllComponentKeyValues(): { id: string, key: string , name: string }[] {
    * Helper method to compare SELECT_API values (can be objects or simple values)
    */
   private compareSelectApiValues(value: any, option: any, component: FormComponent): boolean {
-    if (component.type !== ComponentType.SELECT_API) {
+    if (component.type !== ComponentType.SELECT_API && component.type !== ComponentType.TIPO_CONTRATACAO && component.type !== ComponentType.UNIDADE && component.type !== ComponentType.SERVIDOR ) {
       return value == option.value;
     }
 

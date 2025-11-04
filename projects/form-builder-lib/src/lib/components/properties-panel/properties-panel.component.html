@@ -540,18 +540,8 @@
                 CONFIGURAÇÃO DA API
               </h6> -->
 
-                    <!-- Type of EndPoint -->
-                    <div class="form-group mb-3">
-                      <label class="form-label">Tipo de Pesquisa</label>
-                      <select class="form-select form-control-sm" [(ngModel)]="apiTypeEndPoint"
-                        (change)="onApiTypeEndPointChange()">
-                        <option value="">Selecione...</option>
-                        <option value="UNIDADE">Unidades</option>
-                        <option value="SERVIDOR">Servidores</option>
-                      </select>
-                    </div>
-
-                    <div *ngIf="isTypeEndpointLiberado(apiTypeEndPoint)">
+     
+                    <div >
 
 
                       <!-- API URL -->

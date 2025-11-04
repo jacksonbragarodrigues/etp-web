@@ -7,6 +7,7 @@ import { FormComponent, FormBuilderState, ComponentType, SelectOption, Validatio
 import { HierarchyTreeComponent } from '../hierarchy-tree/hierarchy-tree.component';
 import { CkEditorModalComponent } from '../ck-editor-modal/ck-editor-modal.component';
 import { SelectDropDownModule } from 'ngx-select-dropdown';
+import { ApiSelectService } from '../../services/api-select.service';
 
 // Type for conditional when field that can handle different formats
 type ConditionalWhenValue = string | string[] | { id: string, name: string }[] | { id: string, name: string };
@@ -129,7 +130,6 @@ export class PropertiesPanelComponent implements OnInit, OnDestroy, AfterViewIni
   apiRequestBody: string = '';
   apiCache: boolean = true;
   apiCacheTimeout: number = 30;
-  apiTypeEndPoint: 'UNIDADE' | 'SERVIDOR' | '' = '';
 
   // Text Help specific properties
   helpText: string = '';
@@ -156,6 +156,7 @@ export class PropertiesPanelComponent implements OnInit, OnDestroy, AfterViewIni
   }
 
   constructor(
+     private apiSelectService: ApiSelectService,
     private formBuilderService: FormBuilderService,
     private cdr: ChangeDetectorRef
   ) { }
@@ -285,8 +286,7 @@ export class PropertiesPanelComponent implements OnInit, OnDestroy, AfterViewIni
     this.apiRequestBody = component.properties.apiConfig?.requestBody ? JSON.stringify(component.properties.apiConfig.requestBody, null, 2) : '';
     this.apiCache = component.properties.apiConfig?.cache !== false;
     this.apiCacheTimeout = component.properties.apiConfig?.cacheTimeout || 30;
-    this.apiTypeEndPoint = component.properties.apiConfig?.typeEndPoint || '';
-
+  
     // Confidentiality property
     this.allowsConfidentiality = component.properties.allowsConfidentiality || false;
 
@@ -345,7 +345,6 @@ export class PropertiesPanelComponent implements OnInit, OnDestroy, AfterViewIni
     this.apiRequestBody = '';
     this.apiCache = true;
     this.apiCacheTimeout = 30;
-    this.apiTypeEndPoint = '';
     this.allowsConfidentiality = false;
 
     // Reset step properties
@@ -750,35 +749,12 @@ export class PropertiesPanelComponent implements OnInit, OnDestroy, AfterViewIni
   }
 
   // API Select specific methods
-  onApiUrlChange(): void {
-    this.updateApiConfig();
+  onApiUrlChange(): any {
+    return this.updateApiConfig();
   }
 
   onApiMethodChange(): void {
     this.updateApiConfig();
-  }
-
-  onApiTypeEndPointChange(): void {
-    if (this.apiTypeEndPoint === 'UNIDADE') {
-      this.apiUrl = 'https://my-json-server.typicode.com/jacksonbragarodrigues/dados/unidades';
-      this.apiLabelField = 'nome'
-      this.apiValueField = 'codigo'
-    }
-    if (this.apiTypeEndPoint === 'SERVIDOR') {
-      this.apiUrl = 'https://my-json-server.typicode.com/jacksonbragarodrigues/dados/servidores';
-      this.apiLabelField = 'nome'
-      this.apiValueField = 'codigo'
-    }
-
-    this.apiMethod = 'GET';
-    this.apiToken = '';
-    this.apiHeaders = '';
-    this.apiRequestBody = '';
-    this.apiCache = true;
-    this.apiCacheTimeout = 30;
-
-    this.updateApiConfig();
-
   }
 
   onApiTokenChange(): void {
@@ -809,7 +785,7 @@ export class PropertiesPanelComponent implements OnInit, OnDestroy, AfterViewIni
     this.updateApiConfig();
   }
 
-  private updateApiConfig(): void {
+  private updateApiConfig(): any {
     let headers = {};
     let requestBody = {};
 
@@ -842,11 +818,13 @@ export class PropertiesPanelComponent implements OnInit, OnDestroy, AfterViewIni
       valueField: this.apiValueField.trim() || 'id',
       requestBody: Object.keys(requestBody).length > 0 ? requestBody : undefined,
       cache: this.apiCache,
-      cacheTimeout: this.apiCacheTimeout,
-      typeEndPoint: this.apiTypeEndPoint
+      cacheTimeout: this.apiCacheTimeout
     };
 
     this.updateProperty('properties.apiConfig', apiConfig);
+
+    return apiConfig;
+
   }
 
   isInputType(): boolean {
@@ -1128,7 +1106,10 @@ export class PropertiesPanelComponent implements OnInit, OnDestroy, AfterViewIni
     return component.type === ComponentType.SELECT ||
       component.type === ComponentType.RADIO ||
       component.type === ComponentType.SELECT_BOX ||
-      component.type === ComponentType.SELECT_API;
+      component.type === ComponentType.SELECT_API ||
+      component.type === ComponentType.TIPO_CONTRATACAO ||
+      component.type === ComponentType.UNIDADE ||
+      component.type === ComponentType.SERVIDOR;
   }
 
   // Method to check if the selected conditional when component has options
@@ -1209,17 +1190,10 @@ export class PropertiesPanelComponent implements OnInit, OnDestroy, AfterViewIni
     return this.accordionState[category] || false;
   }
 
-  isTypeEndpointLiberado(typeEndPoint: string): any {
-    // o usuário não seta endpoint (somente no código)
-    return false;
-
-  }
-
   isComponentChave():  boolean {
-    // console.log("ACHOUUUUUUUUUUUUUUUUUUUUUUUUUU");
-    // console.log(this.apiTypeEndPoint);
     if (this.state.selectedComponent?.type === ComponentType.PROCESSO_SEI ||
-      this.state.selectedComponent?.type === ComponentType.NUMERO_ETP )
+      this.state.selectedComponent?.type === ComponentType.NUMERO_ETP ||
+    this.state.selectedComponent?.type === ComponentType.TIPO_CONTRATACAO )
      {
       
       return true;
@@ -1229,4 +1203,6 @@ export class PropertiesPanelComponent implements OnInit, OnDestroy, AfterViewIni
     }
 
   }
+
+  
 }

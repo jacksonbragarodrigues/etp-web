@@ -948,7 +948,11 @@ export class FormBuilderComponent implements OnInit, OnDestroy, OnChanges {
       [ComponentType.PANEL]: 'Painel',
       [ComponentType.COLUMNS]: 'Colunas',
       [ComponentType.DATAGRID]: 'Grade de Dados',
-      [ComponentType.SELECT_API]: 'Seleção API'
+      [ComponentType.SELECT_API]: 'Seleção API',
+      [ComponentType.TIPO_CONTRATACAO]: 'Tipo de Contratação',
+      [ComponentType.UNIDADE]: 'Unidade',
+  [ComponentType.SERVIDOR]: 'Servidor',
+  
     } as any;
     return typeLabels[type] || String(type);
   }

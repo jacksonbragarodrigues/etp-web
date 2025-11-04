@@ -324,7 +324,10 @@ ${summaryItems}
       [ComponentType.PANEL]: 'Painel',
       [ComponentType.COLUMNS]: 'Colunas',
       [ComponentType.DATAGRID]: 'Grade de Dados',
-      [ComponentType.SELECT_API]: 'Seleção API'
+      [ComponentType.SELECT_API]: 'Seleção API',     
+       [ComponentType.UNIDADE]: 'Seleção Unidade API',
+        [ComponentType.SERVIDOR]: 'Seleção Servidor API', 
+      [ComponentType.TIPO_CONTRATACAO]: 'Tipo de Contratação'
     };
 
     return typeLabels[type] || type;
@@ -367,7 +370,12 @@ ${summaryItems}
         }
       }
 
-      case ComponentType.SELECT_API: {
+  case ComponentType.SELECT_API:
+  case ComponentType.TIPO_CONTRATACAO: 
+  case ComponentType.UNIDADE:
+    case ComponentType.SERVIDOR:
+  
+  {
         const labelFrom = (val: any): string => {
           const cfg = component.properties?.apiConfig || {};
           const labelKey = cfg.labelField || 'label';
