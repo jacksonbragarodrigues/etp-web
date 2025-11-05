@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import {  inject, Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import {
   FormComponent,
@@ -13,11 +13,14 @@ import {
 } from '../models/form-builder.models';
 import FunctionAux from '../function/functions.aux';
 import { ValidationService } from './validation.service';
+import { ENVIRONMENTER } from '../components/config.component';
 
 @Injectable({
   providedIn: 'root'
 })
 export class FormBuilderService {
+
+  environmenter: any = inject(ENVIRONMENTER);
 
   functionAux: FunctionAux = new FunctionAux();
   
@@ -279,7 +282,7 @@ export class FormBuilderService {
       type: ComponentType.SELECT_API,
       label: 'Select API',
       icon: 'bi-cloud-download',
-      category: ComponentCategory.CUSTOM,
+      category: ComponentCategory.NENHUMA,
       description: 'Selecione com opções do endpoint externo da API',
             placeholder: '...',
       defaultProperties: {
@@ -473,8 +476,8 @@ export class FormBuilderService {
     if (template?.defaultProperties) {
       defaultProperties = this.deepCopyProperties(template.defaultProperties);
     }
-   console.log("SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS");
-   console.log(defaultProperties);
+  //  console.log("SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS");
+  //  console.log(defaultProperties);
     const component: FormComponent = {
       id,
       key,
@@ -509,12 +512,13 @@ export class FormBuilderService {
        component.label = 'Tipo de Contratação';
        component.key = 'PAR_TIPO_CONTRATACAO_PAR'
        component.properties.apiConfig = {
-         url: 'https://my-json-server.typicode.com/jacksonbragarodrigues/dados/tipos-contratacao',
+         url: this.environmenter.apiFormulario + '/etp-tipo-licitacao/lista/?limit=' + this.environmenter.formioLimitReturnAPI,
          method: 'GET',
          headers: {},
          token: '',
-         labelField: 'nome',
-         valueField: 'codigo',
+         labelField: 'chave',
+         valueField: 'descricao',
+         labelTemplate: '{chave} - {descricao}',
          requestBody: '',
          cache: true,
          cacheTimeout: 30,
@@ -522,15 +526,17 @@ export class FormBuilderService {
     }
 
     if (type === ComponentType.UNIDADE) {
+
        component.label = 'Unidade';
        component.key = 'PAR_UNIDADE_PAR'
        component.properties.apiConfig = {
-         url: 'https://my-json-server.typicode.com/jacksonbragarodrigues/dados/unidades',
+         url: this.environmenter.apiFormulario + '/sarhclient/listaunidades?limit=' + this.environmenter.formioLimitReturnAPI,
          method: 'GET',
          headers: {},
          token: '',
          labelField: 'descricao',
          valueField: 'sigla',
+         labelTemplate: '{descricao} ({sigla})',
          requestBody: '',
          cache: true,
          cacheTimeout: 30,
@@ -539,18 +545,22 @@ export class FormBuilderService {
 
     if (type === ComponentType.SERVIDOR) {
        component.label = 'Servidor';
-       component.key = 'PAR_SERVIDOR_PAR'
+       component.key = 'PAR_SERVIDOR_PAR';
+       // Initialize empty options array first
+       component.properties.options = [];
        component.properties.apiConfig = {
-         url: 'https://my-json-server.typicode.com/jacksonbragarodrigues/dados/servidores',
+         url: this.environmenter.apiFormulario + '/sarhclient/listaservidores?limit=' + this.environmenter.formioLimitReturnAPI,
          method: 'GET',
          headers: {},
          token: '',
-         labelField: 'nome',
-         valueField: 'codigo',
+         labelField: "nome",
+         valueField: 'matricula',
+         labelTemplate: '{matricula} - {nome} - {siglaUnidade}',
          requestBody: '',
          cache: true,
          cacheTimeout: 30,
        };
+       console.log('Initialized SERVIDOR component:', component);
     }
 
     return component;
@@ -558,8 +568,8 @@ export class FormBuilderService {
   }
 
   addComponent(component: FormComponent, stepId?: string, parentId?: string): void {
-      console.log("PASSSO 55 1111111111111111111");
-        console.log(component);
+      // console.log("PASSSO 55 1111111111111111111");
+      //   console.log(component);
     const state = this.getCurrentState();
     const targetStepId = stepId || state.currentStep;
     const targetStep = state.formSchema.steps.find(s => s.id === targetStepId);
@@ -1073,20 +1083,29 @@ export class FormBuilderService {
   case ComponentType.TIPO_CONTRATACAO: 
   case ComponentType.UNIDADE:
   case ComponentType.SERVIDOR:
-  
   {
         base.properties.multiple = !!src.multiple;
         base.properties.options = [];
-        let url, label, value = '';
-       
+        
+        // Manter o labelTemplate existente ou configurar um padrão baseado no tipo
+        let labelTemplate = '';
+        if (base.type === ComponentType.SERVIDOR) {
+          labelTemplate = '{nome} ({matricula})';
+        } else if (base.type === ComponentType.UNIDADE) {
+          labelTemplate = '{descricao} ({sigla})';
+        } else if (base.type === ComponentType.TIPO_CONTRATACAO) {
+          labelTemplate = '{chave} - {descricao}';
+        }
+        
         base.properties.apiConfig = {
-          url: url,
+          url: '',  // URL será configurada na criação do componente
           method: 'GET',
-          headers: this.extractHeaders(src.data?.headers),
-          labelField: label,
-          valueField: value,
+          headers: {},
+          labelField: '',  // Será configurado na criação do componente
+          valueField: '',  // Será configurado na criação do componente
+          labelTemplate: labelTemplate,
           cache: true,
-          cacheTimeout: 30,
+          cacheTimeout: 30
         };
         break;
       }
@@ -1230,6 +1249,7 @@ export class FormBuilderService {
 
   // Método para sincronizar valor do componente com opções selecionadas
   private syncComponentValueWithOptions(component: FormComponent): void {
+    console.log("Syncing component:", component.type);
     if (component.type === ComponentType.SELECT ||
         component.type === ComponentType.RADIO ||
         component.type === ComponentType.SELECT_BOX ||
@@ -1238,6 +1258,11 @@ export class FormBuilderService {
         component.type === ComponentType.UNIDADE ||
         component.type === ComponentType.SERVIDOR) {
 
+      console.log("Component matched type check:", component.type);
+      console.log("Has options:", !!component.properties.options);
+      console.log("Options is array:", Array.isArray(component.properties.options));
+      console.log("API Config:", component.properties.apiConfig);
+      
       if (component.properties.options && component.value !== undefined && component.value !== null) {
         // Para select e radio com valor ��nico
         if (component.type === ComponentType.SELECT || component.type === ComponentType.RADIO) {
@@ -1266,8 +1291,47 @@ export class FormBuilderService {
             option.selected = option.value == component.value;
           });
         }
-  // Para SELECT_API components (inclui TIPO_CONTRATACAO)
+  // Para SELECT_API components (inclui TIPO_CONTRATACAO, UNIDADE, SERVIDOR)
   else if (component.type === ComponentType.SELECT_API || component.type === ComponentType.TIPO_CONTRATACAO || component.type === ComponentType.UNIDADE || component.type === ComponentType.SERVIDOR) {
+    console.log("Processing component type:", component.type);      
+    
+    // Certifica que temos um template apropriado
+    if (!component.properties.apiConfig?.labelTemplate) {
+      if (component.type === ComponentType.SERVIDOR) {
+        component.properties.apiConfig = { 
+          ...component.properties.apiConfig, 
+          labelTemplate: '{nome} ({matricula})'
+        };
+      } else if (component.type === ComponentType.UNIDADE) {
+        component.properties.apiConfig = {
+          ...component.properties.apiConfig,
+          labelTemplate: '{descricao} ({sigla})'
+        };
+      } else if (component.type === ComponentType.TIPO_CONTRATACAO) {
+        component.properties.apiConfig = {
+          ...component.properties.apiConfig,
+          labelTemplate: '{chave} - {descricao}'
+        };
+      }
+    }
+    
+    // Processa as opções para usar o labelTemplate se existir
+    if (component.properties.options && Array.isArray(component.properties.options)) {
+      const template = component.properties.apiConfig?.labelTemplate;
+      console.log("Using template:", template);
+
+            if (template) {
+               console.log("jjjjjjjjjjjjjjj >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+            console.log(template);
+              component.properties.options = component.properties.options.map(opt => {
+                let label = template;
+                Object.keys(opt).forEach(key => {
+                  label = label.replace(new RegExp(`{${key}}`, 'g'), opt[key as keyof typeof opt]);
+                });
+                return { ...opt, label };
+              });
+            }
+          }
           if (component.properties.multiple) {
             const selectedValues = Array.isArray(component.value) ? component.value : [component.value];
             component.properties.options.forEach(option => {
@@ -1479,6 +1543,7 @@ export class FormBuilderService {
     return keys;
   }
 
+  
   // Método para obter todos os pares key/value dos componentes
 getAllComponentKeyValues(): { id: string, key: string , name: string }[] {
   const state = this.getCurrentState();

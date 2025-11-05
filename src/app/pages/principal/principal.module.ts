@@ -28,7 +28,8 @@ import { TableSharedFormComponent } from '../formulario/shared/table-shared-form
 import { VersionarFormularioComponent } from '../formulario/modal/versionar-formulario/versionar-formulario.component';
 import { MenubarModule } from 'primeng/menubar';
 import { DelegarAcessoModule } from '../delegacao-acesso/gestao-delegacao-acesso/delegar-acesso.module';
-import { FormBuilderLibModule } from 'form-builder-lib';
+import { ENVIRONMENTER, FormBuilderLibModule } from 'form-builder-lib';
+import { environment } from '../../../environments/environment';
 
 @NgModule({
   declarations: [
@@ -88,6 +89,8 @@ import { FormBuilderLibModule } from 'form-builder-lib';
     MultiSelectModule,
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
-  providers: [],
+    providers: [
+    { provide: ENVIRONMENTER, useValue: environment }
+  ]
 })
 export class PrincipalModule {}

@@ -32,7 +32,8 @@ import { ChangeDetectionStrategy } from '@angular/core';
   ],
   templateUrl: './form-builder.component.html',
   styleUrls: ['./form-builder.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
+
 })
 export class FormBuilderComponent implements OnInit, OnDestroy, OnChanges {
   @ViewChild(FormCanvasComponent) formCanvasComponent!: FormCanvasComponent;

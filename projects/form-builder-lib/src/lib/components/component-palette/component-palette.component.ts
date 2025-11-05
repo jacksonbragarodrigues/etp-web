@@ -20,7 +20,7 @@ export class ComponentPaletteComponent implements OnInit, OnDestroy {
 
   // Accordion state management
   accordionState: { [key: string]: boolean } = {
-    'basic': true,
+    'basic': false,
     'layout': false,
     'data': false,
     'custom': false

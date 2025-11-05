@@ -34,3 +34,5 @@ export * from './lib/function/functions.aux';
 // Modules
 export * from './lib/module/form-builder-lib.module';
 
+export * from './lib/components/config.component';
+export { ENVIRONMENTER } from './lib/components/config.component';

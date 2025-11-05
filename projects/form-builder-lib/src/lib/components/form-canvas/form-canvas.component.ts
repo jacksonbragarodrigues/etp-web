@@ -68,8 +68,8 @@ export class FormCanvasComponent implements OnInit, OnDestroy {
   }
 
   onDragOver(event: DragEvent, index: number): void {
-    console.log(event);
-    console.log(index);
+    // console.log(event);
+    // console.log(index);
     event.preventDefault();
     event.dataTransfer!.dropEffect = 'copy';
     //this.dragOverIndex = index ?? -1;
@@ -98,11 +98,11 @@ this.isDragOver[targetIndex] = false;
       if (data.componentType) {
         // Dropping from component palette
         const component = this.formBuilderService.createComponent(data.componentType);
-        console.log("PASSSO 22 1111111111111111111");
-        console.log(component);
+        // console.log("PASSSO 22 1111111111111111111");
+        // console.log(component);
         this.insertComponentAtIndex(component, targetIndex);
       } else if (data.component) {
-          console.log("PASSSO 33 1111111111111111111");
+          // console.log("PASSSO 33 1111111111111111111");
         
         // Moving existing component
         this.moveComponent(data.component, data.sourceIndex, targetIndex);
@@ -261,8 +261,8 @@ this.isDragOver[targetIndex] = false;
     
     const componentType = type as ComponentType;
     const component = this.formBuilderService.createComponent(componentType);
-      console.log("PASSSO 44 1111111111111111111");
-        console.log(component);
+      // console.log("PASSSO 44 1111111111111111111");
+      //   console.log(component);
     this.formBuilderService.addComponent(component);
   }
 

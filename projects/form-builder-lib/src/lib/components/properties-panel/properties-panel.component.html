@@ -112,9 +112,9 @@
             <label class="form-label">Quando</label>
 
 
-            <ngx-select-dropdown [disabled]="isComponentChave()" [config]="config" [options]="availableComponentKeysValues"
-              (change)="onStepConditionalWhenChange()" [(ngModel)]="stepConditionalWhen"
-              [multiple]="true"></ngx-select-dropdown>
+            <ngx-select-dropdown [disabled]="isComponentChave()" [config]="config"
+              [options]="availableComponentKeysValues" (change)="onStepConditionalWhenChange()"
+              [(ngModel)]="stepConditionalWhen" [multiple]="true"></ngx-select-dropdown>
 
             <!-- <select class="form-select form-select-sm" [(ngModel)]="stepConditionalWhen"
               (change)="onStepConditionalWhenChange()">
@@ -149,15 +149,15 @@
       <div class="component-properties p-3" *ngIf="state.selectedComponent">
 
         <!-- Component Info Header -->
-        <!-- <div class="component-info mb-3 p-3 bg-light rounded">
+        <div class="component-info mb-1 p-1 bg-light rounded">
           <div class="d-flex justify-content-between align-items-center">
-            <div>
+            <!-- <div>
               <h6 class="mb-1 fw-semibold">{{ state.selectedComponent.type | titlecase }}</h6>
-              <small class="text-muted">ID: {{ componentId }}</small> 
-            </div>
-            <span class="badge bg-primary">{{ state.selectedComponent.type }}</span>
+              <small class="text-muted">ID: {{ componentId }}</small>  
+            </div> -->
+            <div [title]="getTitle(state.selectedComponent.label, state.selectedComponent.type)" class="badge bg-primary text-overflow" >{{ state.selectedComponent.label }} ({{ state.selectedComponent.type }})</div>
           </div>
-        </div> -->
+        </div>
 
         <div class="components-accordion">
           <div class="accordion" id="componentsAccordion">
@@ -186,40 +186,41 @@
                     <!-- Label -->
                     <div class="form-group mb-3">
                       <label class="form-label">Rótulo</label>
-                      <textarea [disabled]="isComponentChave()" class="form-control form-control-sm" [(ngModel)]="componentLabel"
-                        (input)="onLabelChange()" placeholder="Digite o rótulo">
+                      <textarea [disabled]="isComponentChave()" class="form-control form-control-sm"
+                        [(ngModel)]="componentLabel" (input)="onLabelChange()" placeholder="Digite o rótulo">
             </textarea>
                     </div>
 
                     <!-- Placeholder -->
                     <div class="form-group mb-3" *ngIf="isInputType() || isTextareaType() || isSelectType()">
                       <label class="form-label">Texto quando vazio</label>
-                      <textarea  [disabled]="isComponentChave()" class="form-control form-control-sm" [(ngModel)]="componentPlaceholder"
-                        (input)="onPlaceholderChange()" placeholder="Digite o texto">
+                      <textarea [disabled]="isComponentChave()" class="form-control form-control-sm"
+                        [(ngModel)]="componentPlaceholder" (input)="onPlaceholderChange()" placeholder="Digite o texto">
               </textarea>
                     </div>
 
                     <!-- Tooltip -->
                     <div class="form-group mb-3">
                       <label class="form-label">Texto do Balão de Ajuda</label>
-                      <textarea  [disabled]="isComponentChave()" class="form-control form-control-sm" [(ngModel)]="componentTooltip"
-                        (input)="onTooltipChange()" placeholder="Digite o texto">
+                      <textarea [disabled]="isComponentChave()" class="form-control form-control-sm"
+                        [(ngModel)]="componentTooltip" (input)="onTooltipChange()" placeholder="Digite o texto">
               </textarea>
                     </div>
 
                     <!-- Help Text -->
                     <div class="form-group mb-3">
                       <label class="form-label">Texto de Ajuda</label>
-                      <textarea  [disabled]="isComponentChave()" class="form-control form-control-sm" [(ngModel)]="componentHelpText"
-                        (input)="onHelpTextChange()" rows="2" placeholder="Digite o texto">
+                      <textarea [disabled]="isComponentChave()" class="form-control form-control-sm"
+                        [(ngModel)]="componentHelpText" (input)="onHelpTextChange()" rows="2"
+                        placeholder="Digite o texto">
             </textarea>
                     </div>
 
                     <!-- Prefix (for input/textarea/number) -->
                     <div class="form-group mb-3" *ngIf="canHavePrefix()">
                       <label class="form-label">Prefixo</label>
-                      <input  [disabled]="isComponentChave()" type="text" class="form-control form-control-sm" [(ngModel)]="componentPrefix"
-                        (input)="onPrefixChange()" placeholder="e.g., @, $, etc.">
+                      <input [disabled]="isComponentChave()" type="text" class="form-control form-control-sm"
+                        [(ngModel)]="componentPrefix" (input)="onPrefixChange()" placeholder="e.g., @, $, etc.">
                       <div class="form-text">
                         Texto que aparece antes do campo de entrada
                       </div>
@@ -228,8 +229,8 @@
                     <!-- Mask (for input/number) -->
                     <div class="form-group mb-3" *ngIf="canHaveMask()">
                       <label class="form-label">Máscara</label>
-                      <input  [disabled]="isComponentChave()" type="text" class="form-control form-control-sm" [(ngModel)]="componentMask"
-                        (input)="onMaskChange()" placeholder="e.g., (999) 999-9999">
+                      <input [disabled]="isComponentChave()" type="text" class="form-control form-control-sm"
+                        [(ngModel)]="componentMask" (input)="onMaskChange()" placeholder="e.g., (999) 999-9999">
                       <div class="form-text">
                         <strong>Exemplos:</strong><br>
                         • <code>000-000</code> - Número com Híphen (123-456)<br>
@@ -242,8 +243,8 @@
 
                     <!-- Disabled -->
                     <div class="form-check mb-3">
-                      <input  [disabled]="isComponentChave()" class="form-check-input" type="checkbox" id="disabled" [(ngModel)]="componentDisabled"
-                        (change)="onDisabledChange()">
+                      <input [disabled]="isComponentChave()" class="form-check-input" type="checkbox" id="disabled"
+                        [(ngModel)]="componentDisabled" (change)="onDisabledChange()">
                       <label class="form-check-label" for="disabled">
                         Desabilitado
                       </label>
@@ -251,8 +252,8 @@
 
                     <!-- Readonly -->
                     <div class="form-check mb-3" *ngIf="isInputType() || isTextareaType()">
-                      <input  [disabled]="isComponentChave()" class="form-check-input" type="checkbox" id="readonly" [(ngModel)]="componentReadonly"
-                        (change)="onReadonlyChange()">
+                      <input [disabled]="isComponentChave()" class="form-check-input" type="checkbox" id="readonly"
+                        [(ngModel)]="componentReadonly" (change)="onReadonlyChange()">
                       <label class="form-check-label" for="readonly">
                         Apenas Leitura
                       </label>
@@ -260,8 +261,8 @@
 
                     <!-- Hidden -->
                     <div class="form-check mb-3">
-                      <input  [disabled]="isComponentChave()" class="form-check-input" type="checkbox" id="hidden" [(ngModel)]="componentHidden"
-                        (change)="onHiddenChange()">
+                      <input [disabled]="isComponentChave()" class="form-check-input" type="checkbox" id="hidden"
+                        [(ngModel)]="componentHidden" (change)="onHiddenChange()">
                       <label class="form-check-label" for="hidden">
                         Invisível
                       </label>
@@ -269,8 +270,8 @@
 
                     <!-- Hide Label -->
                     <div class="form-check mb-3">
-                      <input  [disabled]="isComponentChave()" class="form-check-input" type="checkbox" id="hideLabel" [(ngModel)]="componentHideLabel"
-                        (change)="onHideLabelChange()">
+                      <input [disabled]="isComponentChave()" class="form-check-input" type="checkbox" id="hideLabel"
+                        [(ngModel)]="componentHideLabel" (change)="onHideLabelChange()">
                       <label class="form-check-label" for="hideLabel">
                         Ocultar rótulo
                       </label>
@@ -278,8 +279,9 @@
 
                     <!-- Allows Confidentiality -->
                     <div class="form-check mb-3" *ngIf="canHaveConfidentiality()">
-                      <input  [disabled]="isComponentChave()" class="form-check-input" type="checkbox" id="allowsConfidentiality"
-                        [(ngModel)]="allowsConfidentiality" (change)="onAllowsConfidentialityChange()">
+                      <input [disabled]="isComponentChave()" class="form-check-input" type="checkbox"
+                        id="allowsConfidentiality" [(ngModel)]="allowsConfidentiality"
+                        (change)="onAllowsConfidentialityChange()">
                       <label class="form-check-label" for="allowsConfidentiality">
                         Permitir Sigilo
                       </label>
@@ -314,8 +316,8 @@
 
                     <!-- Required -->
                     <div class="form-check mb-3">
-                      <input  [disabled]="isComponentChave()" class="form-check-input" type="checkbox" id="required" [(ngModel)]="componentRequired"
-                        (change)="onRequiredChange()">
+                      <input [disabled]="isComponentChave()" class="form-check-input" type="checkbox" id="required"
+                        [(ngModel)]="componentRequired" (change)="onRequiredChange()">
                       <label class="form-check-label" for="required">
                         Preenchimento Obrigatório
                       </label>
@@ -326,15 +328,15 @@
                       <div class="col-6">
                         <div class="form-group mb-3">
                           <label class="form-label">Tamanho Mínimo</label>
-                          <input  [disabled]="isComponentChave()" type="number" class="form-control form-control-sm" [(ngModel)]="minLength"
-                            (input)="onMinLengthChange()" min="0">
+                          <input [disabled]="isComponentChave()" type="number" class="form-control form-control-sm"
+                            [(ngModel)]="minLength" (input)="onMinLengthChange()" min="0">
                         </div>
                       </div>
                       <div class="col-6">
                         <div class="form-group mb-3">
                           <label class="form-label">Tamanho Máximo</label>
-                          <input  [disabled]="isComponentChave()" type="number" class="form-control form-control-sm" [(ngModel)]="maxLength"
-                            (input)="onMaxLengthChange()" min="1">
+                          <input [disabled]="isComponentChave()" type="number" class="form-control form-control-sm"
+                            [(ngModel)]="maxLength" (input)="onMaxLengthChange()" min="1">
                         </div>
                       </div>
                     </div>
@@ -344,15 +346,15 @@
                       <div class="col-6">
                         <div class="form-group mb-3">
                           <label class="form-label">Valor Mínimo</label>
-                          <input  [disabled]="isComponentChave()" type="number" class="form-control form-control-sm" [(ngModel)]="minValue"
-                            (input)="onMinValueChange()">
+                          <input [disabled]="isComponentChave()" type="number" class="form-control form-control-sm"
+                            [(ngModel)]="minValue" (input)="onMinValueChange()">
                         </div>
                       </div>
                       <div class="col-6">
                         <div class="form-group mb-3">
                           <label class="form-label">Valor Máximo</label>
-                          <input  [disabled]="isComponentChave()" type="number" class="form-control form-control-sm" [(ngModel)]="maxValue"
-                            (input)="onMaxValueChange()">
+                          <input [disabled]="isComponentChave()" type="number" class="form-control form-control-sm"
+                            [(ngModel)]="maxValue" (input)="onMaxValueChange()">
                         </div>
                       </div>
                     </div>
@@ -375,151 +377,7 @@
                 </div>
               </div>
             </div>
-
-
-
-            <div class="accordion-item"
-              *ngIf="isPanelComponent() || isTextareaType() || isFileType() || isNumberType() || isRichTextType()">
-              <h2 class="accordion-header" id="headingOther">
-                <button class="accordion-button" [class.collapsed]="!isAccordionOpen('other')" type="button"
-                  (click)="toggleAccordion('other')" [attr.aria-expanded]="isAccordionOpen('other')">
-                  <i class="bi bi-sliders me-2"></i>
-                  OUTRAS
-                  <!-- <span class="badge bg-primary ms-2">{{ getComponentsByCategory('basic').length }}</span> -->
-                </button>
-              </h2>
-              <div id="collapseOther" class="accordion-collapse collapse" [class.show]="isAccordionOpen('other')"
-                aria-labelledby="headingOther">
-                <div class="accordion-body p-2">
-
-                  <!-- Component Specific Properties -->
-                  <div class="property-section mb-4">
-                    <!-- <h6 class="section-title" style="font-weight: bold;">
-                <i class="bi bi-sliders me-2"></i>
-                OUTRAS
-              </h6> -->
-
-                    <!-- Textarea Rows/Cols -->
-                    <div class="row" *ngIf="isTextareaType()">
-                      <div class="col-6">
-                        <div class="form-group mb-3">
-                          <label class="form-label">Número de Linhas</label>
-                          <input type="number" class="form-control form-control-sm" [(ngModel)]="textareaRows"
-                            (input)="onRowsChange()" min="1" max="20">
-                        </div>
-                      </div>
-                      <div class="col-6">
-                        <div class="form-group mb-3">
-                          <label class="form-label">Número de Colunas</label>
-                          <input type="number" class="form-control form-control-sm" [(ngModel)]="textareaCols"
-                            (input)="onColsChange()" min="1" max="100">
-                        </div>
-                      </div>
-                    </div>
-
-                    <!-- File Accept -->
-                    <div class="form-group mb-3" *ngIf="isFileType()">
-                      <label class="form-label">Accepted File Types</label>
-                      <input type="text" class="form-control form-control-sm" [(ngModel)]="fileAccept"
-                        (input)="onAcceptChange()" placeholder="e.g., .jpg,.png,.pdf or image/*">
-                      <div class="form-text">
-                        Specify file types (MIME types or extensions)
-                      </div>
-                    </div>
-
-
-
-                    <!-- Number Step -->
-                    <div class="form-group mb-3" *ngIf="isNumberType()">
-                      <label class="form-label">Step</label>
-                      <input type="number" class="form-control form-control-sm" [(ngModel)]="numberStep"
-                        (input)="onStepChange()" min="0.01" step="0.01">
-                      <div class="form-text">
-                        Step interval for number input
-                      </div>
-                    </div>
-
-
-                    <!-- Collapsible Panel Options -->
-                    <div *ngIf="isPanelComponent()">
-                      <!-- Collapsible -->
-                      <div class="form-check mb-3">
-                        <input class="form-check-input" type="checkbox" id="collapsible"
-                          [(ngModel)]="componentCollapsible" (change)="onCollapsibleChange()">
-                        <label class="form-check-label" for="collapsible">
-                          Colapsável
-                        </label>
-                        <div class="form-text">
-                          Permitir que o painel seja recolhido/expandido
-                        </div>
-                      </div>
-
-                      <!-- Initially Collapsed -->
-                      <div class="form-check mb-3" *ngIf="componentCollapsible">
-                        <input class="form-check-input" type="checkbox" id="initCollapsed"
-                          [(ngModel)]="componentInitCollapsed" (change)="onInitCollapsedChange()">
-                        <label class="form-check-label" for="initCollapsed">
-                          Inicialmente recolhido
-                        </label>
-                        <div class="form-text">
-                          Inicie o painel no estado recolhido
-                        </div>
-                      </div>
-                    </div>
-
-                    <!-- CKEditor Configuration -->
-                    <div *ngIf="isRichTextType()">
-                      <!-- Editor Height -->
-                      <div class="form-group mb-3">
-                        <label class="form-label">Altura do Editor (px)</label>
-                        <input type="number" class="form-control form-control-sm" [(ngModel)]="ckEditorHeight"
-                          (input)="onCkEditorHeightChange()" min="100" max="800" step="10">
-                        <div class="form-text">
-                          Altura em pixels do editor CKEditor
-                        </div>
-                      </div>
-
-                      <!-- Language -->
-                      <div class="form-group mb-3">
-                        <label class="form-label">Idioma</label>
-                        <select class="form-select form-control-sm" [(ngModel)]="ckEditorLanguage"
-                          (change)="onCkEditorLanguageChange()">
-                          <option value="pt-br">Português (Brasil)</option>
-                          <option value="en">English</option>
-                          <option value="es">Español</option>
-                          <option value="fr">Français</option>
-                        </select>
-                      </div>
-
-                      <!-- Toolbar Configuration -->
-                      <div class="form-group mb-3">
-                        <label class="form-label">Configuração da Barra de Ferramentas</label>
-                        <textarea class="form-control form-control-sm" [(ngModel)]="ckEditorToolbarString"
-                          (input)="onCkEditorToolbarChange()" rows="3"
-                          placeholder="heading,|,bold,italic,link,bulletedList,numberedList">
-              </textarea>
-                        <div class="form-text">
-                          <small>
-                            <strong>Elementos disponíveis:</strong><br>
-                            • <code>heading</code> - Títulos<br>
-                            • <code>bold, italic, underline</code> - Formatação<br>
-                            • <code>link</code> - Links<br>
-                            • <code>bulletedList, numberedList</code> - Listas<br>
-                            • <code>outdent, indent</code> - Indentação<br>
-                            • <code>blockQuote</code> - Citação<br>
-                            • <code>insertTable</code> - Tabelas<br>
-                            • <code>undo, redo</code> - Desfazer/Refazer<br>
-                            • <code>|</code> - Separador
-                          </small>
-                        </div>
-                      </div>
-                    </div>
-
-                  </div>
-                </div>
-              </div>
-            </div>
-
+            
             <div class="accordion-item" *ngIf="isSelectApiType()">
               <h2 class="accordion-header" id="headingApiSelect">
                 <button class="accordion-button" [class.collapsed]="!isAccordionOpen('apiSelect')" type="button"
@@ -540,8 +398,8 @@
                 CONFIGURAÇÃO DA API
               </h6> -->
 
-     
-                    <div >
+
+                    <div>
 
 
                       <!-- API URL -->
@@ -892,12 +750,13 @@
                     <!-- Show/Hide -->
                     <div class="form-group mb-3">
                       <label class="form-label">Ação</label>
-                      <button  [disabled]="isComponentChave()" style="float: right;" class="btn btn-outline-danger btn-sm m-1"
-                        (click)="clearConditionalLogic()" title="Clear conditional logic">
+                      <button [disabled]="isComponentChave()" style="float: right;"
+                        class="btn btn-outline-danger btn-sm m-1" (click)="clearConditionalLogic()"
+                        title="Clear conditional logic">
                         <i class="bi bi-trash"></i>
                       </button>
-                      <select  [disabled]="isComponentChave()" class="form-select form-control-sm" [(ngModel)]="conditionalShow"
-                        (change)="onConditionalShowChange()">
+                      <select [disabled]="isComponentChave()" class="form-select form-control-sm"
+                        [(ngModel)]="conditionalShow" (change)="onConditionalShowChange()">
                         <option value="true">Mostrar componente quando a condição for atendida</option>
                         <option value="false">Ocultar componente quando a condição for atendida</option>
                       </select>
@@ -907,9 +766,9 @@
                     <div class="form-group mb-3">
                       <label class="form-label">Quando campo</label>
 
-                      <ngx-select-dropdown [disabled]="isComponentChave()" [config]="config" [options]="availableComponentKeysValues"
-                        (change)="onConditionalWhenChange()" [(ngModel)]="conditionalWhen"
-                        [multiple]="false"></ngx-select-dropdown>
+                      <ngx-select-dropdown [disabled]="isComponentChave()" [config]="config"
+                        [options]="availableComponentKeysValues" (change)="onConditionalWhenChange()"
+                        [(ngModel)]="conditionalWhen" [multiple]="false"></ngx-select-dropdown>
 
                       <!-- <select class="form-select form-control-sm" [(ngModel)]="conditionalWhen"
               (change)="onConditionalWhenChange()">
@@ -929,8 +788,9 @@
                       <label class="form-label">Valor igual</label>
 
                       <!-- Show select dropdown if the when component has options -->
-                      <select [disabled]="isComponentChave()"  class="form-select form-control-sm" [(ngModel)]="conditionalEq"
-                        (change)="onConditionalEqChange()" *ngIf="hasConditionalWhenComponentOptions()">
+                      <select [disabled]="isComponentChave()" class="form-select form-control-sm"
+                        [(ngModel)]="conditionalEq" (change)="onConditionalEqChange()"
+                        *ngIf="hasConditionalWhenComponentOptions()">
                         <option value="">Selecione um valor...</option>
                         <option *ngFor="let option of conditionalWhenComponentOptions" [value]="option.value">
                           {{ option.label }}
@@ -938,9 +798,9 @@
                       </select>
 
                       <!-- Show text input if the when component doesn't have options -->
-                      <input [disabled]="isComponentChave()"  type="text" class="form-control form-control-sm" [(ngModel)]="conditionalEq"
-                        (input)="onConditionalEqChange()" placeholder="Digite o valor de comparação"
-                        *ngIf="!hasConditionalWhenComponentOptions()">
+                      <input [disabled]="isComponentChave()" type="text" class="form-control form-control-sm"
+                        [(ngModel)]="conditionalEq" (input)="onConditionalEqChange()"
+                        placeholder="Digite o valor de comparação" *ngIf="!hasConditionalWhenComponentOptions()">
 
                       <div class="form-text">
                         O componente será mostrado/ocultado quando o campo monitorado for igual a este valor
@@ -964,6 +824,148 @@
               Select a field to watch and specify the target value.
             </small>
           </div> -->
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="accordion-item"
+              *ngIf="isPanelComponent() || isTextareaType() || isFileType() || isNumberType() || isRichTextType()">
+              <h2 class="accordion-header" id="headingOther">
+                <button class="accordion-button" [class.collapsed]="!isAccordionOpen('other')" type="button"
+                  (click)="toggleAccordion('other')" [attr.aria-expanded]="isAccordionOpen('other')">
+                  <i class="bi bi-sliders me-2"></i>
+                  OUTRAS
+                  <!-- <span class="badge bg-primary ms-2">{{ getComponentsByCategory('basic').length }}</span> -->
+                </button>
+              </h2>
+              <div id="collapseOther" class="accordion-collapse collapse" [class.show]="isAccordionOpen('other')"
+                aria-labelledby="headingOther">
+                <div class="accordion-body p-2">
+
+                  <!-- Component Specific Properties -->
+                  <div class="property-section mb-4">
+                    <!-- <h6 class="section-title" style="font-weight: bold;">
+                <i class="bi bi-sliders me-2"></i>
+                OUTRAS
+              </h6> -->
+
+                    <!-- Textarea Rows/Cols -->
+                    <div class="row" *ngIf="isTextareaType()">
+                      <div class="col-6">
+                        <div class="form-group mb-3">
+                          <label class="form-label">Número de Linhas</label>
+                          <input type="number" class="form-control form-control-sm" [(ngModel)]="textareaRows"
+                            (input)="onRowsChange()" min="1" max="20">
+                        </div>
+                      </div>
+                      <div class="col-6">
+                        <div class="form-group mb-3">
+                          <label class="form-label">Número de Colunas</label>
+                          <input type="number" class="form-control form-control-sm" [(ngModel)]="textareaCols"
+                            (input)="onColsChange()" min="1" max="100">
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- File Accept -->
+                    <div class="form-group mb-3" *ngIf="isFileType()">
+                      <label class="form-label">Accepted File Types</label>
+                      <input type="text" class="form-control form-control-sm" [(ngModel)]="fileAccept"
+                        (input)="onAcceptChange()" placeholder="e.g., .jpg,.png,.pdf or image/*">
+                      <div class="form-text">
+                        Specify file types (MIME types or extensions)
+                      </div>
+                    </div>
+
+
+
+                    <!-- Number Step -->
+                    <div class="form-group mb-3" *ngIf="isNumberType()">
+                      <label class="form-label">Step</label>
+                      <input type="number" class="form-control form-control-sm" [(ngModel)]="numberStep"
+                        (input)="onStepChange()" min="0.01" step="0.01">
+                      <div class="form-text">
+                        Step interval for number input
+                      </div>
+                    </div>
+
+
+                    <!-- Collapsible Panel Options -->
+                    <div *ngIf="isPanelComponent()">
+                      <!-- Collapsible -->
+                      <div class="form-check mb-3">
+                        <input class="form-check-input" type="checkbox" id="collapsible"
+                          [(ngModel)]="componentCollapsible" (change)="onCollapsibleChange()">
+                        <label class="form-check-label" for="collapsible">
+                          Colapsável
+                        </label>
+                        <div class="form-text">
+                          Permitir que o painel seja recolhido/expandido
+                        </div>
+                      </div>
+
+                      <!-- Initially Collapsed -->
+                      <div class="form-check mb-3" *ngIf="componentCollapsible">
+                        <input class="form-check-input" type="checkbox" id="initCollapsed"
+                          [(ngModel)]="componentInitCollapsed" (change)="onInitCollapsedChange()">
+                        <label class="form-check-label" for="initCollapsed">
+                          Inicialmente recolhido
+                        </label>
+                        <div class="form-text">
+                          Inicie o painel no estado recolhido
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- CKEditor Configuration -->
+                    <div *ngIf="isRichTextType()">
+                      <!-- Editor Height -->
+                      <div class="form-group mb-3">
+                        <label class="form-label">Altura do Editor (px)</label>
+                        <input type="number" class="form-control form-control-sm" [(ngModel)]="ckEditorHeight"
+                          (input)="onCkEditorHeightChange()" min="100" max="800" step="10">
+                        <div class="form-text">
+                          Altura em pixels do editor CKEditor
+                        </div>
+                      </div>
+
+                      <!-- Language -->
+                      <div class="form-group mb-3">
+                        <label class="form-label">Idioma</label>
+                        <select class="form-select form-control-sm" [(ngModel)]="ckEditorLanguage"
+                          (change)="onCkEditorLanguageChange()">
+                          <option value="pt-br">Português (Brasil)</option>
+                          <option value="en">English</option>
+                          <option value="es">Español</option>
+                          <option value="fr">Français</option>
+                        </select>
+                      </div>
+
+                      <!-- Toolbar Configuration -->
+                      <div class="form-group mb-3">
+                        <label class="form-label">Configuração da Barra de Ferramentas</label>
+                        <textarea class="form-control form-control-sm" [(ngModel)]="ckEditorToolbarString"
+                          (input)="onCkEditorToolbarChange()" rows="3"
+                          placeholder="heading,|,bold,italic,link,bulletedList,numberedList">
+              </textarea>
+                        <div class="form-text">
+                          <small>
+                            <strong>Elementos disponíveis:</strong><br>
+                            • <code>heading</code> - Títulos<br>
+                            • <code>bold, italic, underline</code> - Formatação<br>
+                            • <code>link</code> - Links<br>
+                            • <code>bulletedList, numberedList</code> - Listas<br>
+                            • <code>outdent, indent</code> - Indentação<br>
+                            • <code>blockQuote</code> - Citação<br>
+                            • <code>insertTable</code> - Tabelas<br>
+                            • <code>undo, redo</code> - Desfazer/Refazer<br>
+                            • <code>|</code> - Separador
+                          </small>
+                        </div>
+                      </div>
+                    </div>
+
                   </div>
                 </div>
               </div>

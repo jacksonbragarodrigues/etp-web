@@ -20,14 +20,11 @@
         <span class="text-danger" *ngIf="component.required"></span>
         <i class="bi bi-code-slash text-info ms-1"
            *ngIf="!previewMode && hasConditionalLogic()"
-           title="Este componente tem lógica condicional configurada"
-           data-bs-toggle="tooltip"
-           data-bs-placement="top"></i>
+           [title]="getConditional(component)"></i>
         <i class="fa fa-question-circle text-muted ms-1"
            *ngIf="component.properties.tooltip"
            [title]="component.properties.tooltip"
-           data-bs-toggle="tooltip"
-           data-bs-placement="top"></i>
+         ></i>
       </label>
 
       <!-- Sigilo checkbox when allowsConfidentiality is true -->
@@ -97,14 +94,12 @@
         <span class="text-danger" *ngIf="component.required"></span>
         <i class="bi bi-code-slash text-info ms-1"
            *ngIf="!previewMode && hasConditionalLogic()"
-           title="Este componente tem lógica condicional configurada"
-           data-bs-toggle="tooltip"
-           data-bs-placement="top"></i>
+                     [title]="getConditional(component)" >
+          </i>
         <i class="fa fa-question-circle text-muted ms-1"
            *ngIf="component.properties.tooltip"
            [title]="component.properties.tooltip"
-           data-bs-toggle="tooltip"
-           data-bs-placement="top"></i>
+       ></i>
       </label>
 
       <!-- Sigilo checkbox when allowsConfidentiality is true -->
@@ -178,14 +173,11 @@
         <span class="text-danger" *ngIf="component.required"></span>
         <i class="bi bi-code-slash text-info ms-1"
            *ngIf="!previewMode && hasConditionalLogic()"
-           title="Este componente tem lógica condicional configurada"
-           data-bs-toggle="tooltip"
-           data-bs-placement="top"></i>
+                     [title]="getConditional(component)"></i>
         <i class="fa fa-question-circle text-muted ms-1"
            *ngIf="component.properties.tooltip"
            [title]="component.properties.tooltip"
-           data-bs-toggle="tooltip"
-           data-bs-placement="top"></i>
+       ></i>
       </label>
 
       <!-- Sigilo checkbox when allowsConfidentiality is true -->
@@ -284,14 +276,13 @@
       <span class="text-danger" *ngIf="component.required"></span>
       <i class="bi bi-code-slash text-info ms-1"
          *ngIf="!previewMode && hasConditionalLogic()"
-         title="Este componente tem lógica condicional configurada"
-         data-bs-toggle="tooltip"
-         data-bs-placement="top"></i>
+[title]="getConditional(component)"
+         
+         ></i>
       <i class="fa fa-question-circle text-muted ms-1"
          *ngIf="component.properties.tooltip"
          [title]="component.properties.tooltip"
-         data-bs-toggle="tooltip"
-         data-bs-placement="top"></i>
+></i>
     </label>
 
     <!-- Multiple Selection with Chips -->
@@ -423,14 +414,13 @@
           <span class="text-danger" *ngIf="component.required"></span>
           <i class="bi bi-code-slash text-info ms-1"
              *ngIf="!previewMode && hasConditionalLogic()"
-             title="Este componente tem lógica condicional configurada"
-             data-bs-toggle="tooltip"
-             data-bs-placement="top"></i>
+    [title]="getConditional(component)"
+             
+             ></i>
           <i class="fa fa-question-circle text-muted ms-1"
              *ngIf="component.properties.tooltip"
              [title]="component.properties.tooltip"
-             data-bs-toggle="tooltip"
-             data-bs-placement="top"></i>
+       ></i>
         </label>
       </div>
 
@@ -478,14 +468,13 @@
       <span class="text-danger" *ngIf="component.required"></span>
       <i class="bi bi-code-slash text-info ms-1"
          *ngIf="!previewMode && hasConditionalLogic()"
-         title="Este componente tem lógica condicional configurada"
-         data-bs-toggle="tooltip"
-         data-bs-placement="top"></i>
+      [title]="getConditional(component)"
+         
+         ></i>
       <i class="fa fa-question-circle text-muted ms-1"
          *ngIf="component.properties.tooltip"
          [title]="component.properties.tooltip"
-         data-bs-toggle="tooltip"
-         data-bs-placement="top"></i>
+        ></i>
     </label>
 
     <!-- Horizontal layout -->
@@ -551,14 +540,12 @@
       <span class="text-danger" *ngIf="component.required"></span>
       <i class="bi bi-code-slash text-info ms-1"
          *ngIf="!previewMode && hasConditionalLogic()"
-         title="Este componente tem lógica condicional configurada"
-         data-bs-toggle="tooltip"
-         data-bs-placement="top"></i>
+     [title]="getConditional(component)"
+         ></i>
       <i class="fa fa-question-circle text-muted ms-1"
          *ngIf="component.properties.tooltip"
          [title]="component.properties.tooltip"
-         data-bs-toggle="tooltip"
-         data-bs-placement="top"></i>
+        ></i>
     </label>
 
     <!-- Placeholder text when no options -->
@@ -637,14 +624,13 @@
       <span class="text-danger" *ngIf="component.required"></span>
       <i class="bi bi-code-slash text-info ms-1"
          *ngIf="!previewMode && hasConditionalLogic()"
-         title="Este componente tem lógica condicional configurada"
-         data-bs-toggle="tooltip"
-         data-bs-placement="top"></i>
+     [title]="getConditional(component)"
+         
+         ></i>
       <i class="fa fa-question-circle text-muted ms-1"
          *ngIf="component.properties.tooltip"
          [title]="component.properties.tooltip"
-         data-bs-toggle="tooltip"
-         data-bs-placement="top"></i>
+       ></i>
     </label>
 
     <!-- Loading state -->
@@ -1162,10 +1148,10 @@
       <span class="badge bg-info" *ngIf="component.validation?.length" title="Has validation rules">
         <i class="bi bi-shield-check"></i>
       </span>
-      <span class="badge bg-secondary" *ngIf="component.properties.conditional"
+      <!-- <span class="badge bg-secondary" *ngIf="component.properties.conditional"
             [title]="'Conditional: ' + (component.properties.conditional.show === 'true' ? 'Show' : 'Hide') + ' when ' + component.properties.conditional.when + ' = ' + component.properties.conditional.eq">
         <i class="bi bi-code-slash"></i>
-      </span>
+      </span> -->
       <span class="badge bg-danger" *ngIf="!isVisible && !previewMode" title="Hidden by conditional logic">
         <i class="bi bi-eye-slash"></i>
       </span>

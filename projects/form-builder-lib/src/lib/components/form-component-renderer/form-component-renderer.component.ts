@@ -63,7 +63,7 @@ export class FormComponentRendererComponent implements OnInit, OnChanges, AfterV
     private validationService: ValidationService,
     private elementRef: ElementRef,
     private customCKEditorService: CustomCKEditorService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.value = this.component.value || this.getDefaultValue();
@@ -133,58 +133,58 @@ export class FormComponentRendererComponent implements OnInit, OnChanges, AfterV
       this.component.value = [];
     }
 
-    console.log('DataGrid initialized:', {
-      componentId: this.component.id,
-      key: this.component.key,
-      rowsCount: this.component.rows.length,
-      valueLength: this.component.value?.length || 0,
-      previewMode: this.previewMode
-    });
+    // console.log('DataGrid initialized:', {
+    //   componentId: this.component.id,
+    //     key: this.component.key,
+    //       rowsCount: this.component.rows.length,
+    //         valueLength: this.component.value?.length || 0,
+    //           previewMode: this.previewMode
+    // });
   }
 
   // Debug method to test data export
   debugDataGridExport(): void {
     if (!this.isDataGridType()) return;
 
-    console.log('=== DataGrid Debug Export ===');
-    console.log('Component ID:', this.component.id);
-    console.log('Component Key:', this.component.key);
-    console.log('Preview Mode:', this.previewMode);
-    console.log('Rows Count:', this.component.rows?.length || 0);
-    console.log('Rows Data:', this.component.rows);
-    console.log('Component Value:', this.component.value);
+    // console.log('=== DataGrid Debug Export ===');
+    // console.log('Component ID:', this.component.id);
+    // console.log('Component Key:', this.component.key);
+    // console.log('Preview Mode:', this.previewMode);
+    // console.log('Rows Count:', this.component.rows?.length || 0);
+    // console.log('Rows Data:', this.component.rows);
+    // console.log('Component Value:', this.component.value);
 
     // Test export functionality with debug
     try {
-      console.log('=== Testing Export Functionality ===');
+      // console.log('=== Testing Export Functionality ===');
       const debugResult = this.formBuilderService.debugExportFormData();
-      console.log('DataGrid in exported data:', debugResult.data[this.component.key]);
+      // console.log('DataGrid in exported data:', debugResult.data[this.component.key]);
 
       // Also test regular export
       const normalExport = this.formBuilderService.exportFormData();
       const normalParsed = JSON.parse(normalExport);
-      console.log('Normal export DataGrid data:', normalParsed[this.component.key]);
+      // console.log('Normal export DataGrid data:', normalParsed[this.component.key]);
 
       // Compare results
-      console.log('Results match:', JSON.stringify(debugResult.data[this.component.key]) === JSON.stringify(normalParsed[this.component.key]));
+      // console.log('Results match:', JSON.stringify(debugResult.data[this.component.key]) === JSON.stringify(normalParsed[this.component.key]));
     } catch (error) {
       console.error('Error exporting data:', error);
     }
-    console.log('=== End DataGrid Debug ===');
+    // console.log('=== End DataGrid Debug ===');
   }
 
   // Debug method to test validation
   debugDataGridValidation(): void {
     if (!this.isDataGridType()) return;
 
-    console.log('=== DataGrid Debug Validation ===');
-    console.log('Component ID:', this.component.id);
-    console.log('Component Key:', this.component.key);
-    console.log('Component Label:', this.component.label);
-    console.log('Component Required:', this.component.required);
-    console.log('Preview Mode:', this.previewMode);
-    console.log('Rows Count:', this.component.rows?.length || 0);
-    console.log('Children Count:', this.component.children?.length || 0);
+    // console.log('=== DataGrid Debug Validation ===');
+    // console.log('Component ID:', this.component.id);
+    // console.log('Component Key:', this.component.key);
+    // console.log('Component Label:', this.component.label);
+    // console.log('Component Required:', this.component.required);
+    // console.log('Preview Mode:', this.previewMode);
+    // console.log('Rows Count:', this.component.rows?.length || 0);
+    // console.log('Children Count:', this.component.children?.length || 0);
 
     if (this.component.children) {
       console.log('Child Components:');
@@ -200,7 +200,7 @@ export class FormComponentRendererComponent implements OnInit, OnChanges, AfterV
     }
 
     if (this.component.rows) {
-      console.log('Rows Data:');
+      // console.log('Rows Data:');
       this.component.rows.forEach((row, index) => {
         console.log(`  Row ${index + 1}:`, {
           id: row.id,
@@ -275,13 +275,13 @@ export class FormComponentRendererComponent implements OnInit, OnChanges, AfterV
 
   // Método para sincronizar valor do componente com opções selecionadas
   private syncValueWithOptions(): void {
-  if (this.component.type === ComponentType.SELECT ||
-    this.component.type === ComponentType.RADIO ||
-    this.component.type === ComponentType.SELECT_BOX ||
-    this.component.type === ComponentType.SELECT_API ||
-    this.component.type === ComponentType.TIPO_CONTRATACAO ||
-  this.component.type === ComponentType.UNIDADE ||
-this.component.type === ComponentType.SERVIDOR) {
+    if (this.component.type === ComponentType.SELECT ||
+      this.component.type === ComponentType.RADIO ||
+      this.component.type === ComponentType.SELECT_BOX ||
+      this.component.type === ComponentType.SELECT_API ||
+      this.component.type === ComponentType.TIPO_CONTRATACAO ||
+      this.component.type === ComponentType.UNIDADE ||
+      this.component.type === ComponentType.SERVIDOR) {
 
       if (this.component.properties.options && this.value !== undefined && this.value !== null && this.value !== '') {
         // Para select e radio com valor único
@@ -303,8 +303,8 @@ this.component.type === ComponentType.SERVIDOR) {
             option.selected = option.value == this.value;
           });
         }
-  // Para SELECT_API components (inclui TIPO_CONTRATACAO)
-  else if (this.component.type === ComponentType.SELECT_API || this.component.type === ComponentType.TIPO_CONTRATACAO || this.component.type === ComponentType.UNIDADE || this.component.type === ComponentType.SERVIDOR) {
+        // Para SELECT_API components (inclui TIPO_CONTRATACAO)
+        else if (this.component.type === ComponentType.SELECT_API || this.component.type === ComponentType.TIPO_CONTRATACAO || this.component.type === ComponentType.UNIDADE || this.component.type === ComponentType.SERVIDOR) {
           if (this.component.properties.multiple) {
             const selectedValues = Array.isArray(this.value) ? this.value : [this.value];
             this.component.properties.options.forEach(option => {
@@ -318,8 +318,8 @@ this.component.type === ComponentType.SERVIDOR) {
         }
       }
 
-  // Sync apiOptions as well for SELECT_API components (inclui TIPO_CONTRATACAO)
-  if (this.isSelectApiType() && this.apiOptions.length > 0) {
+      // Sync apiOptions as well for SELECT_API components (inclui TIPO_CONTRATACAO)
+      if (this.isSelectApiType() && this.apiOptions.length > 0) {
         if (this.value !== undefined && this.value !== null && this.value !== '') {
           if (this.component.properties.multiple) {
             const selectedValues = Array.isArray(this.value) ? this.value : [this.value];
@@ -390,10 +390,10 @@ this.component.type === ComponentType.SERVIDOR) {
         return '';
       case ComponentType.SELECT_BOX:
         return this.component.properties.multiple ? [] : '';
-  case ComponentType.SELECT_API:
+      case ComponentType.SELECT_API:
       case ComponentType.TIPO_CONTRATACAO:
-        case ComponentType.UNIDADE:
-          case ComponentType.SERVIDOR:
+      case ComponentType.UNIDADE:
+      case ComponentType.SERVIDOR:
         return this.component.properties.multiple ? [] : '';
       default:
         return '';
@@ -670,7 +670,7 @@ this.component.type === ComponentType.SERVIDOR) {
 
   getFormControlClasses(): string {
     let classes = 'form-control';
-    
+
     if (this.component.type === ComponentType.TEXTAREA) {
       classes = 'form-control';
     } else if (this.component.type === ComponentType.SELECT) {
@@ -680,29 +680,29 @@ this.component.type === ComponentType.SERVIDOR) {
     } else if (this.component.type === ComponentType.FILE) {
       classes = 'form-control';
     }
-    
+
     return classes;
   }
 
   getLabelClasses(): string {
     let classes = '';
-    
+
     if (this.component.type === ComponentType.CHECKBOX || this.component.type === ComponentType.RADIO) {
       classes = 'form-label';
     } else {
       classes = 'form-label';
     }
-    
+
     if (this.component.required) {
       classes += ' required';
     }
-    
+
     return classes;
   }
 
   getContainerClasses(): string {
     let classes = '';
-    
+
     if (this.component.type === ComponentType.CHECKBOX || this.component.type === ComponentType.RADIO) {
       classes = 'form-check';
     } else if (this.component.type === ComponentType.PANEL) {
@@ -710,7 +710,7 @@ this.component.type === ComponentType.SERVIDOR) {
     } else {
       classes = 'mb-3';
     }
-    
+
     return classes;
   }
 
@@ -887,8 +887,8 @@ this.component.type === ComponentType.SERVIDOR) {
       attributes.accept = this.component.properties.accept;
     }
 
-    if (this.component.properties.multiple && 
-        (this.component.type === ComponentType.SELECT || this.component.type === ComponentType.FILE)) {
+    if (this.component.properties.multiple &&
+      (this.component.type === ComponentType.SELECT || this.component.type === ComponentType.FILE)) {
       attributes.multiple = true;
     }
 
@@ -1154,7 +1154,29 @@ this.component.type === ComponentType.SERVIDOR) {
 
   getApiOptions(): SelectOption[] {
     if (this.isSelectApiType()) {
-      return this.apiOptions;
+      const options = [...this.apiOptions];
+      
+      // If this is a SERVIDOR component and we have a labelTemplate, format the labels
+      if (this.component.type === ComponentType.SERVIDOR && this.component.properties.apiConfig?.labelTemplate) {
+        return options.map(option => {
+          if (option.originalData) {
+            let formattedLabel = this.component.properties.apiConfig!.labelTemplate!;
+            
+            // Replace template variables with actual values from originalData
+            Object.keys(option.originalData).forEach(key => {
+              formattedLabel = formattedLabel.replace(`{${key}}`, option.originalData[key] || '');
+            });
+            
+            return {
+              ...option,
+              label: formattedLabel
+            };
+          }
+          return option;
+        });
+      }
+      
+      return options;
     }
     return this.getOptions();
   }
@@ -1542,9 +1564,6 @@ this.component.type === ComponentType.SERVIDOR) {
         .replace(/[A]/g, 'A')
         .replace(/[a]/g, 'a');
     }
-    console.log("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
-    console.log(this.component);
-    console.log("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
     return this.component.placeholder || '';
   }
 
@@ -2104,10 +2123,10 @@ this.component.type === ComponentType.SERVIDOR) {
         return !component.value || String(component.value).trim() === '';
 
       case ComponentType.SELECT:
-  case ComponentType.SELECT_API:
-  case ComponentType.TIPO_CONTRATACAO:
-  case ComponentType.UNIDADE:
-  case ComponentType.SERVIDOR:
+      case ComponentType.SELECT_API:
+      case ComponentType.TIPO_CONTRATACAO:
+      case ComponentType.UNIDADE:
+      case ComponentType.SERVIDOR:
         return !component.value || component.value === '';
 
       case ComponentType.SELECT_BOX:
@@ -2204,6 +2223,18 @@ this.component.type === ComponentType.SERVIDOR) {
     const valueField = config?.valueField || 'id';
 
     if (typeof this.value === 'object' && this.value !== null) {
+      // If there's a labelTemplate defined and this is a SERVIDOR component
+      if (this.component.type === ComponentType.SERVIDOR && config?.labelTemplate) {
+        let formattedLabel = config.labelTemplate;
+        
+        // Replace template variables with actual values
+        Object.keys(this.value).forEach(key => {
+          formattedLabel = formattedLabel.replace(`{${key}}`, this.value[key] || '');
+        });
+        
+        return formattedLabel;
+      }
+
       return this.value[valueField] || this.value.value || this.value.id || '';
     }
 
@@ -2327,4 +2358,91 @@ this.component.type === ComponentType.SERVIDOR) {
         return !value;
     }
   }
+
+  getLabelWhen(key: string | string[] | undefined): string {
+    // console.log("1111 HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH");
+    //    console.log(key);
+
+    if (key instanceof Array) {
+      const chave = key[0] as string;
+      // console.log("1111 OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO");
+      //  console.log(chave);
+      const component = this.formBuilderService.getComponentById(chave);
+      if (component) {
+        //      console.log("RRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR");
+        //  console.log(component);
+        return component.label;
+      }
+    }
+    else {
+      const chave = key as string;
+      //           console.log("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF");
+      //  console.log(chave);
+      const component = this.formBuilderService.getComponentById(chave.trim());
+      if (component) {
+        return component.label;
+      }
+    }
+
+    return 'indefinido';
+
+  }
+
+  getLabelEq(when: any, eq: any): string {
+    let component = this.formBuilderService.getComponentById(when);
+    if (!component) {
+      if (when instanceof Array) {
+        component = this.formBuilderService.getComponentById(when[0])
+      }
+    }
+  let valor = eq;
+    
+    // console.log("MMMMMMMMMMMMMMMMMMMMMMMMMM");
+    // console.log(component);
+    if (component && this.componentHasOptions(component) && component.properties.options) {
+      const conditionalWhenComponentOptions = component.properties.options;
+    
+      if (conditionalWhenComponentOptions.length > 0) {
+        // console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+        // console.log(conditionalWhenComponentOptions);
+
+        conditionalWhenComponentOptions.forEach((option: any) => {
+          // console.log(" value [" + option.value + "]");
+          // console.log(" label [" + option.label + "]");
+          // console.log(" eq [" + eq + "]");
+
+          const teste = option.value as string;
+          const teste2 = eq as string;
+          if (option.value === eq) {
+             valor =  option.label;
+          }
+        });
+      }
+
+    }
+    return valor;
+  }
+
+  private componentHasOptions(component: FormComponent): boolean {
+    return component.type === ComponentType.SELECT ||
+      component.type === ComponentType.RADIO ||
+      component.type === ComponentType.SELECT_BOX ||
+      component.type === ComponentType.SELECT_API ||
+      component.type === ComponentType.TIPO_CONTRATACAO ||
+      component.type === ComponentType.UNIDADE ||
+      component.type === ComponentType.SERVIDOR;
+  }
+
+  getConditional(component: FormComponent): string {
+    //String texto 1/ (component.properties.conditional?.show === 'true' ? 'Show' : 'Hide') + ' when ' + getLabelWhen(component.properties.conditional?.when) + ' = ' + "
+
+    const quando = this.getLabelWhen(component.properties.conditional?.when);
+    const valor = this.getLabelEq(component.properties.conditional?.when, component.properties.conditional?.eq)
+    const acao = component.properties.conditional?.show === 'true' ? 'Mostrar' : 'Ocultar';
+    const condicao = acao + ' quando ' + quando + ' = ' + valor;
+
+    return condicao;
+  }
+
+
 }

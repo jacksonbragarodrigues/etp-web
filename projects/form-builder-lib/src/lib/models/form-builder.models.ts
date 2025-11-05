@@ -83,15 +83,17 @@ export interface ComponentProperties {
   };
   // API Select specific properties
   apiConfig?: {
-    url?: string;
-    method?: 'GET' | 'POST' | 'PUT' | 'DELETE';
-    headers?: { [key: string]: string };
-    token?: string;
-    labelField?: string;
-    valueField?: string;
-    requestBody?: any;
-    cache?: boolean;
-    cacheTimeout?: number; // in minutes
+  url?: string;
+  method?: 'GET' | 'POST' | 'PUT' | 'DELETE';
+  headers?: { [key: string]: string };
+  token?: string;
+  labelField?: string;
+  valueField?: string;
+  templateField?: string[];
+  labelTemplate?: string;
+  requestBody?: any;
+  cache?: boolean;
+  cacheTimeout?: number; // in minutes
   };
   // Text Help specific properties
   help?: string; // HTML content for help text
@@ -231,7 +233,8 @@ export enum ComponentCategory {
   ADVANCED = 'advanced',
   LAYOUT = 'layout',
   DATA = 'data',
-  CUSTOM = 'custom'
+  CUSTOM = 'custom',
+  NENHUMA = 'nenhuma'
 }
 
 export interface TreeNode {

@@ -654,3 +654,9 @@
     background-color: #dc3545 !important;
   }
 }
+
+.text-overflow {
+     white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+}

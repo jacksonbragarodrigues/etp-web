@@ -1,7 +1,6 @@
 import { NgModule, type Type } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-
 import { AnnotationsModalComponent } from '../components/annotations-modal/annotations-modal.component';
 import { CkEditorModalComponent } from '../components/ck-editor-modal/ck-editor-modal.component';
 import { ComponentPaletteComponent } from '../components/component-palette/component-palette.component';
@@ -21,8 +20,11 @@ import { HelpContentService } from '../services/help-content.service';
 import { ReportService } from '../services/report.service';
 import { CustomCKEditorService } from '../services/custom-ckeditor.service';
 import { ApiSelectService } from '../services/api-select.service';
+import { ConfigComponent } from '../components/config.component';
+import { ENVIRONMENTER } from '../components/config.component';
 
 const FORM_BUILDER_DECLARATIONS: ReadonlyArray<Type<unknown>> = [
+  ConfigComponent,
   FormBuilderComponent,
   FormCanvasComponent,
   FormComponentRendererComponent,
@@ -55,7 +57,7 @@ const FORM_BUILDER_LIB_PROVIDER_LIST = [
     ...FORM_BUILDER_DECLARATIONS
   ],
   exports: [...FORM_BUILDER_DECLARATIONS],
-  providers: FORM_BUILDER_LIB_PROVIDER_LIST
+  providers: [...FORM_BUILDER_LIB_PROVIDER_LIST]
 })
 export class FormBuilderLibModule {}
 
