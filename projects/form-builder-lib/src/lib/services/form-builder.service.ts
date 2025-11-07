@@ -1,4 +1,4 @@
-import {  inject, Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import {
   FormComponent,
@@ -23,7 +23,7 @@ export class FormBuilderService {
   environmenter: any = inject(ENVIRONMENTER);
 
   functionAux: FunctionAux = new FunctionAux();
-  
+
   private stateSubject = new BehaviorSubject<FormBuilderState>({
     currentStep: '',
     selectedComponent: null,
@@ -53,7 +53,7 @@ export class FormBuilderService {
       category: ComponentCategory.BASIC,
       description: 'Entrada de texto de linha única',
       placeholder: 'Enter text...',
-      defaultProperties: {  }
+      defaultProperties: {}
     },
     // Custom aliases that behave like INPUT
     {
@@ -63,7 +63,7 @@ export class FormBuilderService {
       category: ComponentCategory.CUSTOM,
       description: 'Campo de texto para Processo SEI (comportamento igual a Campo de Texto)',
       placeholder: 'Número do processo SEI...',
-      defaultProperties: {  }
+      defaultProperties: {}
     },
     {
       type: ComponentType.NUMERO_ETP,
@@ -72,7 +72,7 @@ export class FormBuilderService {
       category: ComponentCategory.CUSTOM,
       description: 'Campo de texto para número de ETP (comportamento igual a Campo de Texto)',
       placeholder: 'Número do ETP...',
-      defaultProperties: {  }
+      defaultProperties: {}
     },
     {
       type: ComponentType.TEXTAREA,
@@ -120,7 +120,7 @@ export class FormBuilderService {
       icon: 'bi-check-square',
       category: ComponentCategory.BASIC,
       description: 'Entrada de caixa de seleção',
-            placeholder: '...',
+      placeholder: '...',
       defaultProperties: {}
     },
     {
@@ -129,7 +129,7 @@ export class FormBuilderService {
       icon: 'bi-record-circle',
       category: ComponentCategory.BASIC,
       description: 'Seleção única entre várias op��ões',
-            placeholder: '...',
+      placeholder: '...',
       defaultProperties: {
         options: [
           { value: 'sim', label: 'Sim' },
@@ -143,7 +143,7 @@ export class FormBuilderService {
       icon: 'bi-calendar-date',
       category: ComponentCategory.BASIC,
       description: 'Entrada de seleção de data',
-            placeholder: '...',
+      placeholder: '...',
       defaultProperties: {}
     },
     {
@@ -152,7 +152,7 @@ export class FormBuilderService {
       icon: 'bi-cloud-upload',
       category: ComponentCategory.BASIC,
       description: 'Entrada de upload de arquivo',
-            placeholder: '...',
+      placeholder: '...',
       defaultProperties: { accept: '*/*' }
     },
     {
@@ -161,7 +161,7 @@ export class FormBuilderService {
       icon: 'bi-123',
       category: ComponentCategory.BASIC,
       description: 'Entrada numérica com valida��ão',
-            placeholder: '...',
+      placeholder: '...',
       defaultProperties: { min: 0, max: 100, step: 1 }
     },
     {
@@ -171,7 +171,7 @@ export class FormBuilderService {
       category: ComponentCategory.BASIC,
       description: 'Entrada de endereço de e-mail com validação',
       placeholder: 'email@example.com',
-      defaultProperties: {  }
+      defaultProperties: {}
     },
     {
       type: ComponentType.RICH_TEXT,
@@ -181,41 +181,41 @@ export class FormBuilderService {
       description: 'Editor de rico com recursos de formatação',
       placeholder: 'Digite o texto...',
       defaultProperties: {
-       
+
         ckEditorConfig: {
           toolbar: ["findAndReplace",
-      "|",
-      "heading",
-      "|",
-      "fontSize",
-      "fontFamily",
-      "fontColor",
-      "fontBackgroundColor",
-      "|",
-      "insereLinkSei",
-      "insereLinkCustom",
-      "|",
-      "bold",
-      "italic",
-      "underline",
-      "strikethrough",
-      "subscript",
-      "superscript",
-      "removeFormat",
-      "|",
-      "specialCharacters",
-      "uploadImage",
-      "imageStyle",
-      "resizeImage",
-      "insertTable",
-      "blockQuote",
-      "|",
-      "alignment",
-      "|",
-      "bulletedList",
-      "numberedList",
-      "outdent",
-      "indent",],
+            "|",
+            "heading",
+            "|",
+            "fontSize",
+            "fontFamily",
+            "fontColor",
+            "fontBackgroundColor",
+            "|",
+            "insereLinkSei",
+            "insereLinkCustom",
+            "|",
+            "bold",
+            "italic",
+            "underline",
+            "strikethrough",
+            "subscript",
+            "superscript",
+            "removeFormat",
+            "|",
+            "specialCharacters",
+            "uploadImage",
+            "imageStyle",
+            "resizeImage",
+            "insertTable",
+            "blockQuote",
+            "|",
+            "alignment",
+            "|",
+            "bulletedList",
+            "numberedList",
+            "outdent",
+            "indent",],
           height: 200,
           language: 'pt-br'
         }
@@ -227,7 +227,7 @@ export class FormBuilderService {
       icon: 'bi-layout-three-columns',
       category: ComponentCategory.LAYOUT,
       description: 'Painel para agrupar componentes',
-            placeholder: '...',
+      placeholder: '...',
       defaultProperties: {
         classes: ['card'],
         collapsible: false,
@@ -240,7 +240,7 @@ export class FormBuilderService {
       icon: 'bi-columns-gap',
       category: ComponentCategory.LAYOUT,
       description: 'Layout de grade com múltiplas colunas',
-            placeholder: '...',
+      placeholder: '...',
       defaultProperties: {
         hideLabel: false,
         clearOnHide: false,
@@ -266,7 +266,7 @@ export class FormBuilderService {
       icon: 'bi-table',
       category: ComponentCategory.DATA,
       description: 'Tabela editável com linhas dinâmicas',
-            placeholder: '...',
+      placeholder: '...',
       defaultProperties: {
         tableView: true,
         rowDrafts: false,
@@ -284,7 +284,7 @@ export class FormBuilderService {
       icon: 'bi-cloud-download',
       category: ComponentCategory.NENHUMA,
       description: 'Selecione com opções do endpoint externo da API',
-            placeholder: '...',
+      placeholder: '...',
       defaultProperties: {
         multiple: false,
         options: [],
@@ -311,12 +311,14 @@ export class FormBuilderService {
         multiple: false,
         options: [],
         apiConfig: {
-          url: '',
+          url: this.environmenter.apiFormulario + '/etp-tipo-licitacao/lista?limit=' + this.environmenter.formioLimitReturnAPI,
           method: 'GET',
           headers: {},
           token: '',
-          labelField: 'name',
-          valueField: 'id',
+          labelField: 'descricao',
+          valueField: 'chave',
+          labelTemplate: '{chave} - {descricao}',
+          requestBody: '',
           cache: true,
           cacheTimeout: 30,
         }
@@ -372,7 +374,7 @@ export class FormBuilderService {
       icon: 'bi-question-circle',
       category: ComponentCategory.BASIC,
       description: 'Texto de ajuda com formatação rica',
-            placeholder: '...',
+      placeholder: '...',
       defaultProperties: {
         help: 'Digite aqui o texto de ajuda...',
         onlyInternal: false,
@@ -468,7 +470,7 @@ export class FormBuilderService {
     const id = this.generateIdPAR();
     let key = this.generateUniqueKey(type, template);
     if (template) {
-       key = this.generateUniqueKeyPAR(template.label, id );
+      key = this.generateUniqueKeyPAR(template.label, id);
     }
 
     // Deep copy properties to avoid shared references
@@ -476,8 +478,8 @@ export class FormBuilderService {
     if (template?.defaultProperties) {
       defaultProperties = this.deepCopyProperties(template.defaultProperties);
     }
-  //  console.log("SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS");
-  //  console.log(defaultProperties);
+    //  console.log("SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS");
+    //  console.log(defaultProperties);
     const component: FormComponent = {
       id,
       key,
@@ -497,70 +499,70 @@ export class FormBuilderService {
     }
 
     if (type === ComponentType.PROCESSO_SEI) {
-       component.label = 'Processo SEI';
-       component.properties.mask = '999999/9999';
-       component.key = 'PAR_PROCESSO_SEI_PAR'
+      component.label = 'Processo SEI';
+      component.properties.mask = '999999/9999';
+      component.key = 'PAR_PROCESSO_SEI_PAR'
     }
 
     if (type === ComponentType.NUMERO_ETP) {
-       component.label = 'Número do ETP';
-       component.properties.mask = '999999/9999';
-       component.key = 'PAR_NUMERO_ETP_PAR'
+      component.label = 'Número do ETP';
+      component.properties.mask = '999999/9999';
+      component.key = 'PAR_NUMERO_ETP_PAR'
     }
 
     if (type === ComponentType.TIPO_CONTRATACAO) {
-       component.label = 'Tipo de Contratação';
-       component.key = 'PAR_TIPO_CONTRATACAO_PAR'
-       component.properties.apiConfig = {
-         url: this.environmenter.apiFormulario + '/etp-tipo-licitacao/lista/?limit=' + this.environmenter.formioLimitReturnAPI,
-         method: 'GET',
-         headers: {},
-         token: '',
-         labelField: 'chave',
-         valueField: 'descricao',
-         labelTemplate: '{chave} - {descricao}',
-         requestBody: '',
-         cache: true,
-         cacheTimeout: 30,
-       };
+      component.label = 'Tipo de Contratação';
+      component.key = 'PAR_TIPO_CONTRATACAO_PAR'
+      component.properties.apiConfig = {
+        url: this.environmenter.apiFormulario + '/etp-tipo-licitacao/lista/?limit=' + this.environmenter.formioLimitReturnAPI,
+        method: 'GET',
+        headers: {},
+        token: '',
+        labelField: 'descricao',
+        valueField: 'chave',
+        labelTemplate: '{chave} - {descricao}',
+        requestBody: '',
+        cache: true,
+        cacheTimeout: 30,
+      };
     }
 
     if (type === ComponentType.UNIDADE) {
 
-       component.label = 'Unidade';
-       component.key = 'PAR_UNIDADE_PAR'
-       component.properties.apiConfig = {
-         url: this.environmenter.apiFormulario + '/sarhclient/listaunidades?limit=' + this.environmenter.formioLimitReturnAPI,
-         method: 'GET',
-         headers: {},
-         token: '',
-         labelField: 'descricao',
-         valueField: 'sigla',
-         labelTemplate: '{descricao} ({sigla})',
-         requestBody: '',
-         cache: true,
-         cacheTimeout: 30,
-       };
+      component.label = 'Unidade';
+      component.key = 'PAR_UNIDADE_PAR'
+      component.properties.apiConfig = {
+        url: this.environmenter.apiFormulario + '/sarhclient/listaunidades?limit=' + this.environmenter.formioLimitReturnAPI,
+        method: 'GET',
+        headers: {},
+        token: '',
+        labelField: 'descricao',
+        valueField: 'sigla',
+        labelTemplate: '{descricao} ({sigla})',
+        requestBody: '',
+        cache: true,
+        cacheTimeout: 30,
+      };
     }
 
     if (type === ComponentType.SERVIDOR) {
-       component.label = 'Servidor';
-       component.key = 'PAR_SERVIDOR_PAR';
-       // Initialize empty options array first
-       component.properties.options = [];
-       component.properties.apiConfig = {
-         url: this.environmenter.apiFormulario + '/sarhclient/listaservidores?limit=' + this.environmenter.formioLimitReturnAPI,
-         method: 'GET',
-         headers: {},
-         token: '',
-         labelField: "nome",
-         valueField: 'matricula',
-         labelTemplate: '{matricula} - {nome} - {siglaUnidade}',
-         requestBody: '',
-         cache: true,
-         cacheTimeout: 30,
-       };
-       console.log('Initialized SERVIDOR component:', component);
+      component.label = 'Servidor';
+      component.key = 'PAR_SERVIDOR_PAR';
+      // Initialize empty options array first
+      component.properties.options = [];
+      component.properties.apiConfig = {
+        url: this.environmenter.apiFormulario + '/sarhclient/listaservidores?limit=' + this.environmenter.formioLimitReturnAPI,
+        method: 'GET',
+        headers: {},
+        token: '',
+        labelField: "nome",
+        valueField: 'matricula',
+        labelTemplate: '{matricula} - {nome} - {siglaUnidade}',
+        requestBody: '',
+        cache: true,
+        cacheTimeout: 30,
+      };
+      console.log('Initialized SERVIDOR component:', component);
     }
 
     return component;
@@ -568,8 +570,8 @@ export class FormBuilderService {
   }
 
   addComponent(component: FormComponent, stepId?: string, parentId?: string): void {
-      // console.log("PASSSO 55 1111111111111111111");
-      //   console.log(component);
+    // console.log("PASSSO 55 1111111111111111111");
+    //   console.log(component);
     const state = this.getCurrentState();
     const targetStepId = stepId || state.currentStep;
     const targetStep = state.formSchema.steps.find(s => s.id === targetStepId);
@@ -630,12 +632,12 @@ export class FormBuilderService {
   removeComponent(componentId: string): void {
     const state = this.getCurrentState();
     const step = state.formSchema.steps.find(s => s.id === state.currentStep);
-    
+
     if (!step) return;
 
     this.removeComponentFromArray(step.components, componentId);
-    
-    this.updateState({ 
+
+    this.updateState({
       formSchema: { ...state.formSchema },
       selectedComponent: null
     });
@@ -693,7 +695,7 @@ export class FormBuilderService {
     };
 
     state.formSchema.steps.push(newStep);
-    this.updateState({ 
+    this.updateState({
       formSchema: { ...state.formSchema },
       currentStep: newStep.id
     });
@@ -730,16 +732,16 @@ export class FormBuilderService {
   moveStep(stepId: string, direction: 'left' | 'right'): void {
     const state = this.getCurrentState();
     const stepIndex = state.formSchema.steps.findIndex(s => s.id === stepId);
-    
+
     if (stepIndex === -1) return;
 
     const newIndex = direction === 'left' ? stepIndex - 1 : stepIndex + 1;
-    
+
     if (newIndex < 0 || newIndex >= state.formSchema.steps.length) return;
 
     // Swap steps
-    [state.formSchema.steps[stepIndex], state.formSchema.steps[newIndex]] = 
-    [state.formSchema.steps[newIndex], state.formSchema.steps[stepIndex]];
+    [state.formSchema.steps[stepIndex], state.formSchema.steps[newIndex]] =
+      [state.formSchema.steps[newIndex], state.formSchema.steps[stepIndex]];
 
     // Update order
     state.formSchema.steps.forEach((step, index) => {
@@ -976,9 +978,9 @@ export class FormBuilderService {
       notainterna: ComponentType.TEXT_HELP,
       botaoajuda: ComponentType.TEXT_HELP,
       tipocontratacaoselect: ComponentType.TIPO_CONTRATACAO,
-  processoseitextfield: ComponentType.PROCESSO_SEI,
-  numeroetptextfield: ComponentType.NUMERO_ETP
-      
+      processoseitextfield: ComponentType.PROCESSO_SEI,
+      numeroetptextfield: ComponentType.NUMERO_ETP
+
     };
 
     const formioType = String(src.type || '').toLowerCase();
@@ -987,12 +989,12 @@ export class FormBuilderService {
     // ID deve vir do 'key' do Form.io quando existir
     const registry = usedIds || new Set<string>();
     let desiredId = this.sanitizeId(String(src.key || ''));
-    if (!desiredId) desiredId = this.generateIdPAR();
+    //if (!desiredId) desiredId = this.generateIdPAR();
     let finalId = desiredId;
     let counter = 1;
-    while (registry.has(finalId)) {
-      finalId = `${desiredId}_${counter++}`;
-    }
+    // while (registry.has(finalId)) {
+    //   finalId = `${desiredId}_${counter++}`;
+    // }
     registry.add(finalId);
 
     // Para painéis, o "label" deve vir do campo "title" do Form.io
@@ -1001,7 +1003,7 @@ export class FormBuilderService {
       : (src.label || src.title || formioType || 'Campo');
 
     // A chave segue o key do Form.io quando existir; caso contrário, gerar
-    const key = src.key ? String(src.key) : this.generateUniqueKeyPAR(computedLabel, finalId, '');
+    const key = src.key ? String(src.key) : this.generateUniqueKeyPAR(computedLabel, finalId);
 
     const base: FormComponent = {
       id: finalId,
@@ -1039,6 +1041,10 @@ export class FormBuilderService {
         eq: src.conditional.eq != null ? String(src.conditional.eq) : ''
       } as any;
     }
+       // Máscara
+    if (src.inputMask || src.displayMask) {
+        base.properties.mask = src.inputMask || src.displayMask;
+    }
 
     // Mapeamentos específicos por tipo
     switch (mappedType) {
@@ -1056,6 +1062,11 @@ export class FormBuilderService {
         //   language: 'pt-br'
         // };
         base.placeholder = src.placeholder || '';
+        break;
+      }
+      case ComponentType.PROCESSO_SEI:
+      case ComponentType.NUMERO_ETP: {
+        base.properties.mask = '999999/9999';
         break;
       }
       case ComponentType.SELECT: {
@@ -1079,36 +1090,51 @@ export class FormBuilderService {
         }
         break;
       }
-  case ComponentType.SELECT_API:
-  case ComponentType.TIPO_CONTRATACAO: 
-  case ComponentType.UNIDADE:
-  case ComponentType.SERVIDOR:
-  {
-        base.properties.multiple = !!src.multiple;
-        base.properties.options = [];
-        
-        // Manter o labelTemplate existente ou configurar um padrão baseado no tipo
-        let labelTemplate = '';
-        if (base.type === ComponentType.SERVIDOR) {
-          labelTemplate = '{nome} ({matricula})';
-        } else if (base.type === ComponentType.UNIDADE) {
-          labelTemplate = '{descricao} ({sigla})';
-        } else if (base.type === ComponentType.TIPO_CONTRATACAO) {
-          labelTemplate = '{chave} - {descricao}';
-        }
-        
+      case ComponentType.TIPO_CONTRATACAO: {
+        base.type = ComponentType.TIPO_CONTRATACAO;
         base.properties.apiConfig = {
-          url: '',  // URL será configurada na criação do componente
+          url: this.environmenter.apiFormulario + '/etp-tipo-licitacao/lista?limit=' + this.environmenter.formioLimitReturnAPI,
           method: 'GET',
           headers: {},
-          labelField: '',  // Será configurado na criação do componente
-          valueField: '',  // Será configurado na criação do componente
-          labelTemplate: labelTemplate,
+          token: '',
+          labelField: 'descricao',
+          valueField: 'chave',
+          labelTemplate: '{chave} - {descricao}',
+          requestBody: '',
           cache: true,
-          cacheTimeout: 30
+          cacheTimeout: 30,
         };
         break;
       }
+      case ComponentType.SELECT_API:
+      case ComponentType.UNIDADE:
+      case ComponentType.SERVIDOR:
+        {
+          base.properties.multiple = !!src.multiple;
+          base.properties.options = [];
+
+          // Manter o labelTemplate existente ou configurar um padrão baseado no tipo
+          let labelTemplate = '';
+          if (base.type === ComponentType.SERVIDOR) {
+            labelTemplate = '{nome} ({matricula})';
+          } else if (base.type === ComponentType.UNIDADE) {
+            labelTemplate = '{descricao} ({sigla})';
+          } else if (base.type === ComponentType.TIPO_CONTRATACAO) {
+            labelTemplate = '{chave} - {descricao}';
+          }
+
+          base.properties.apiConfig = {
+            url: '',  // URL será configurada na criação do componente
+            method: 'GET',
+            headers: {},
+            labelField: '',  // Será configurado na criação do componente
+            valueField: '',  // Será configurado na criação do componente
+            labelTemplate: labelTemplate,
+            cache: true,
+            cacheTimeout: 30
+          };
+          break;
+        }
       case ComponentType.SELECT_BOX: {
         base.properties.multiple = true;
         base.properties.options = Array.isArray(src.values)
@@ -1200,10 +1226,7 @@ export class FormBuilderService {
         break;
     }
 
-    // Máscara
-    if (src.inputMask || src.displayMask) {
-      base.properties.mask = src.inputMask || src.displayMask;
-    }
+ 
 
     return base;
   }
@@ -1225,7 +1248,7 @@ export class FormBuilderService {
     if (typeof headers === 'object') return { ...headers } as any;
     return undefined;
   }
-  
+
 
   // Método para normalizar o schema importado
   private normalizeImportedSchema(schema: FormSchema): void {
@@ -1251,18 +1274,18 @@ export class FormBuilderService {
   private syncComponentValueWithOptions(component: FormComponent): void {
     console.log("Syncing component:", component.type);
     if (component.type === ComponentType.SELECT ||
-        component.type === ComponentType.RADIO ||
-        component.type === ComponentType.SELECT_BOX ||
-        component.type === ComponentType.SELECT_API ||
-        component.type === ComponentType.TIPO_CONTRATACAO ||
-        component.type === ComponentType.UNIDADE ||
-        component.type === ComponentType.SERVIDOR) {
+      component.type === ComponentType.RADIO ||
+      component.type === ComponentType.SELECT_BOX ||
+      component.type === ComponentType.SELECT_API ||
+      component.type === ComponentType.TIPO_CONTRATACAO ||
+      component.type === ComponentType.UNIDADE ||
+      component.type === ComponentType.SERVIDOR) {
 
       console.log("Component matched type check:", component.type);
       console.log("Has options:", !!component.properties.options);
       console.log("Options is array:", Array.isArray(component.properties.options));
       console.log("API Config:", component.properties.apiConfig);
-      
+
       if (component.properties.options && component.value !== undefined && component.value !== null) {
         // Para select e radio com valor ��nico
         if (component.type === ComponentType.SELECT || component.type === ComponentType.RADIO) {
@@ -1291,38 +1314,38 @@ export class FormBuilderService {
             option.selected = option.value == component.value;
           });
         }
-  // Para SELECT_API components (inclui TIPO_CONTRATACAO, UNIDADE, SERVIDOR)
-  else if (component.type === ComponentType.SELECT_API || component.type === ComponentType.TIPO_CONTRATACAO || component.type === ComponentType.UNIDADE || component.type === ComponentType.SERVIDOR) {
-    console.log("Processing component type:", component.type);      
-    
-    // Certifica que temos um template apropriado
-    if (!component.properties.apiConfig?.labelTemplate) {
-      if (component.type === ComponentType.SERVIDOR) {
-        component.properties.apiConfig = { 
-          ...component.properties.apiConfig, 
-          labelTemplate: '{nome} ({matricula})'
-        };
-      } else if (component.type === ComponentType.UNIDADE) {
-        component.properties.apiConfig = {
-          ...component.properties.apiConfig,
-          labelTemplate: '{descricao} ({sigla})'
-        };
-      } else if (component.type === ComponentType.TIPO_CONTRATACAO) {
-        component.properties.apiConfig = {
-          ...component.properties.apiConfig,
-          labelTemplate: '{chave} - {descricao}'
-        };
-      }
-    }
-    
-    // Processa as opções para usar o labelTemplate se existir
-    if (component.properties.options && Array.isArray(component.properties.options)) {
-      const template = component.properties.apiConfig?.labelTemplate;
-      console.log("Using template:", template);
+        // Para SELECT_API components (inclui TIPO_CONTRATACAO, UNIDADE, SERVIDOR)
+        else if (component.type === ComponentType.SELECT_API || component.type === ComponentType.TIPO_CONTRATACAO || component.type === ComponentType.UNIDADE || component.type === ComponentType.SERVIDOR) {
+          console.log("Processing component type:", component.type);
+
+          // Certifica que temos um template apropriado
+          if (!component.properties.apiConfig?.labelTemplate) {
+            if (component.type === ComponentType.SERVIDOR) {
+              component.properties.apiConfig = {
+                ...component.properties.apiConfig,
+                labelTemplate: '{nome} ({matricula})'
+              };
+            } else if (component.type === ComponentType.UNIDADE) {
+              component.properties.apiConfig = {
+                ...component.properties.apiConfig,
+                labelTemplate: '{descricao} ({sigla})'
+              };
+            } else if (component.type === ComponentType.TIPO_CONTRATACAO) {
+              component.properties.apiConfig = {
+                ...component.properties.apiConfig,
+                labelTemplate: '{chave} - {descricao}'
+              };
+            }
+          }
+
+          // Processa as opções para usar o labelTemplate se existir
+          if (component.properties.options && Array.isArray(component.properties.options)) {
+            const template = component.properties.apiConfig?.labelTemplate;
+            console.log("Using template:", template);
 
             if (template) {
-               console.log("jjjjjjjjjjjjjjj >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
-            console.log(template);
+              console.log("jjjjjjjjjjjjjjj >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+              console.log(template);
               component.properties.options = component.properties.options.map(opt => {
                 let label = template;
                 Object.keys(opt).forEach(key => {
@@ -1509,9 +1532,10 @@ export class FormBuilderService {
     return `${typePrefix}_${timestamp}_${random}`;
   }
 
-  public generateUniqueKeyPAR(label: string, id:string, key: string = ""): string {
+  public generateUniqueKeyPAR(label: string, key: string = ""): string {
     // Generate a unique key based on component type
-    return this.functionAux.createKeyApi(label, id, key);
+    const id = this.getMaxExistingId();
+    return this.functionAux.createKeyApi(label, id);
   }
 
   public generateUniqueKeyVALUE_PAR(label: string): string {
@@ -1543,33 +1567,33 @@ export class FormBuilderService {
     return keys;
   }
 
-  
+
   // Método para obter todos os pares key/value dos componentes
-getAllComponentKeyValues(): { id: string, key: string , name: string }[] {
-  const state = this.getCurrentState();
-  const keyValues: { id: string, key: string, name: string }[] = [];
+  getAllComponentKeyValues(): { id: string, key: string, name: string }[] {
+    const state = this.getCurrentState();
+    const keyValues: { id: string, key: string, name: string }[] = [];
 
-  const extractKeyValues = (components: FormComponent[]) => {
-    components.forEach(component => {
-      if (component.key) {
-        keyValues.push({
-          id: component.id,
-          key: component.key,
-          name: component.label || String(component.type) || ''
-        });
-      }
-      if (component.children) {
-        extractKeyValues(component.children);
-      }
+    const extractKeyValues = (components: FormComponent[]) => {
+      components.forEach(component => {
+        if (component.key) {
+          keyValues.push({
+            id: component.id,
+            key: component.key,
+            name: component.label || String(component.type) || ''
+          });
+        }
+        if (component.children) {
+          extractKeyValues(component.children);
+        }
+      });
+    };
+
+    state.formSchema.steps.forEach(step => {
+      extractKeyValues(step.components);
     });
-  };
 
-  state.formSchema.steps.forEach(step => {
-    extractKeyValues(step.components);
-  });
-
-  return keyValues;
-}
+    return keyValues;
+  }
 
   // Method to get component by key
   getComponentByKey(key: string): FormComponent | null {
@@ -1634,30 +1658,30 @@ getAllComponentKeyValues(): { id: string, key: string , name: string }[] {
       case ComponentType.RADIO:
       case ComponentType.SELECT:
         return component.value || '';
-  case ComponentType.SELECT_API:
-  case ComponentType.TIPO_CONTRATACAO:
-   case ComponentType.UNIDADE:
-     case ComponentType.SERVIDOR:
-  
-  {
-        const val = component.value;
-        const valueField = component.properties.apiConfig?.valueField || 'id';
-        if (component.properties.multiple) {
-          const arr = Array.isArray(val) ? val : (val != null ? [val] : []);
-          const normalized = arr.map(v => {
-            if (typeof v === 'object' && v !== null) {
-              return v[valueField] || v.value || v.id || v;
+      case ComponentType.SELECT_API:
+      case ComponentType.TIPO_CONTRATACAO:
+      case ComponentType.UNIDADE:
+      case ComponentType.SERVIDOR:
+
+        {
+          const val = component.value;
+          const valueField = component.properties.apiConfig?.valueField || 'id';
+          if (component.properties.multiple) {
+            const arr = Array.isArray(val) ? val : (val != null ? [val] : []);
+            const normalized = arr.map(v => {
+              if (typeof v === 'object' && v !== null) {
+                return v[valueField] || v.value || v.id || v;
+              }
+              return v;
+            });
+            return normalized.join(',');
+          } else {
+            if (typeof val === 'object' && val !== null) {
+              return val[valueField] || val.value || val.id || '';
             }
-            return v;
-          });
-          return normalized.join(',');
-        } else {
-          if (typeof val === 'object' && val !== null) {
-            return val[valueField] || val.value || val.id || '';
+            return val || '';
           }
-          return val || '';
         }
-      }
       default:
         return component.value || '';
     }
@@ -2007,11 +2031,11 @@ getAllComponentKeyValues(): { id: string, key: string , name: string }[] {
    * Debug method to test data export with detailed logging
    */
   debugExportFormData(): { data: any, json: string } {
-  // console.log('=== Debug Export Form Data ===');
+    // console.log('=== Debug Export Form Data ===');
     const state = this.getCurrentState();
     const formData: { [key: string]: any } = {};
 
-  // console.log('Form Schema Steps:', state.formSchema.steps.length);
+    // console.log('Form Schema Steps:', state.formSchema.steps.length);
 
     // Debug cada step
     state.formSchema.steps.forEach((step, stepIndex) => {
@@ -2028,8 +2052,8 @@ getAllComponentKeyValues(): { id: string, key: string , name: string }[] {
 
     const jsonResult = JSON.stringify(formData, null, 2);
 
-  // console.log('Final Exported Data:', formData);
-  // console.log('=== End Debug Export ===');
+    // console.log('Final Exported Data:', formData);
+    // console.log('=== End Debug Export ===');
 
     return {
       data: formData,
@@ -2220,8 +2244,8 @@ getAllComponentKeyValues(): { id: string, key: string , name: string }[] {
         return component.properties.multiple ? [] : '';
       case ComponentType.SELECT_API:
       case ComponentType.TIPO_CONTRATACAO:
-        case ComponentType.UNIDADE:
-        case ComponentType.SERVIDOR:
+      case ComponentType.UNIDADE:
+      case ComponentType.SERVIDOR:
         return component.properties.multiple ? [] : '';
       case ComponentType.NUMBER:
         return '';
@@ -2244,7 +2268,7 @@ getAllComponentKeyValues(): { id: string, key: string , name: string }[] {
    * Helper method to compare SELECT_API values (can be objects or simple values)
    */
   private compareSelectApiValues(value: any, option: any, component: FormComponent): boolean {
-    if (component.type !== ComponentType.SELECT_API && component.type !== ComponentType.TIPO_CONTRATACAO && component.type !== ComponentType.UNIDADE && component.type !== ComponentType.SERVIDOR ) {
+    if (component.type !== ComponentType.SELECT_API && component.type !== ComponentType.TIPO_CONTRATACAO && component.type !== ComponentType.UNIDADE && component.type !== ComponentType.SERVIDOR) {
       return value == option.value;
     }
 

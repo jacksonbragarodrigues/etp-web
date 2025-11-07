@@ -1,5 +1,6 @@
+
 .form-builder-container {
-  height: 90vh;
+  // height: 90vh;
   background-color: #f8f9fa;
 }
 
@@ -35,7 +36,7 @@
 }
 
 .status-bar {
-  min-height: 40px;
+  max-height: 10px;
   border-top: 1px solid #dee2e6;
   font-size: 0.875rem;
 }

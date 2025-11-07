@@ -60,27 +60,14 @@ export default class FunctionAux {
     component.label = `<b>${component.label}</b>`;
   }
 
-  createKeyApi(label: string, id:string, key:string ):string {
-    // if (event.type === 'updateComponent') {
-    //   if (event.component.type === 'processoSeiTextField') {
-    //     event.component.key = 'PAR_PROCESSO_SEI_PAR';
-    //   } else if (event.component.type === 'numeroEtpTextField') {
-    //     event.component.key = 'PAR_NUMERO_ETP_PAR';
-    //   } else if (event.component.type === 'tipocontratacaoselect') {
-    //     event.component.key = 'PAR_TIPO_CONTRATACAO_PAR';
-    //   } else if (event.component.type === 'partesetpselect') {
-    //     event.component.key = 'PAR_PARTES_ETP_PAR';
-    //   } else {
+  createKeyApi(label: string, id:number):string {
+
         label = this.trimReplaceWhiteSpaceByUnderscore(label);
-        label = 'par_' + label + '_' + id + '_par';
+        label = 'par_' + label + "_" + id + '_par';
         label = this.removeStopWordsAndSplitUnderscore(label);
-       // const regex = /^PAR_.*_PAR$/;
-        //if (!regex.test(key)) {
-           return label.toUpperCase();
-        //} 
-         // return key;
-    //  }
-  //  }
+        label = label.toUpperCase();
+        return label;
+
   }
 
   removeStopWordsAndSplitUnderscore(texto: string) {

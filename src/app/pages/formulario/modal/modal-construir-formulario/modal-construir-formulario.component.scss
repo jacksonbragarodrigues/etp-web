@@ -66,3 +66,12 @@
  padding: 0 !important;
  margin: 0 !important;
 }
+
+::ng-deep .p-menubar-root-list {
+    margin: 0px;
+    max-height: 45px;
+}
+// ::ng-deep .p-menuitem {
+//    align-self: stretch;
+// }
+   

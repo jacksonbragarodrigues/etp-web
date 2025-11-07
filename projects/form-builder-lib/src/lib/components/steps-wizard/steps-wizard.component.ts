@@ -136,6 +136,13 @@ export class StepsWizardComponent implements OnInit, OnDestroy {
     this.editingTitle = step.title;
   }
 
+  // Open the properties panel for the given step (selects the step and opens properties)
+  onOpenProperties(step: FormStep, event: Event): void {
+    event.stopPropagation();
+    // Use formBuilderService to select the step and open the properties panel
+    this.formBuilderService.selectStep(step.id);
+  }
+
   onSaveEdit(): void {
     if (this.editingStepId && this.editingTitle.trim()) {
       const step = this.state.formSchema.steps.find(s => s.id === this.editingStepId);

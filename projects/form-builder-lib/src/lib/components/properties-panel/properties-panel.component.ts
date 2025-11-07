@@ -360,7 +360,7 @@ export class PropertiesPanelComponent implements OnInit, OnDestroy, AfterViewIni
       case 'label':
         updates.label = value;
         // console.log(this.componentKey);
-        const key = this.formBuilderService.generateUniqueKeyPAR(value, this.componentId, this.componentKey)
+        const key = this.formBuilderService.generateUniqueKeyPAR(value, this.componentId)
         updates.key = key;
         break;
       case 'placeholder':

@@ -9,7 +9,6 @@ import {
   Output,
   TemplateRef,
   ViewChild,
-  inject
 } from '@angular/core';
 
 import { EtpEnvioSeiService } from 'src/app/services/etp-envio-sei.service';
@@ -17,14 +16,6 @@ import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { getEnvironment } from 'src/app/app.component';
 import { AlertUtils } from '../../../../../utils/alerts.util';
 import { AtualizaDadosRelatorioService } from '../../../../services/atualiza-dados-relatorio.service';
-import BotaoAjuda from '../../componentes-customizados-formio/botao-ajuda';
-import NotaInterna from '../../componentes-customizados-formio/nota-interna';
-import NumeroEtpTextField from '../../componentes-customizados-formio/numeroetp-textfield';
-import ProcessoSeiTextField from '../../componentes-customizados-formio/processosei-textfield';
-import ServidorSelect from '../../componentes-customizados-formio/servidores-select';
-import TextoAjuda from '../../componentes-customizados-formio/texto-ajuda';
-import TipoContratacaoSelect from '../../componentes-customizados-formio/tipocontratacao-select';
-import UnidadeSelect from '../../componentes-customizados-formio/unidades-select';
 import FunctionAux from './functions.aux';
 import UndoManager from '../../../shared/undo/UndoManager';
 import { AcoesEnum } from '../../../../shared/models/acoes.enum';
@@ -36,39 +27,18 @@ import { VersionarFormularioComponent } from '../versionar-formulario/versionar-
 import { CompararHtmlEtpNovaVersaoComponent } from '../../../etp/gestao-etp/modal/comparar-html-etp-nova-versao/comparar-html-etp-nova-versao.component';
 import { DelegarAcessoComponent } from '../../../delegacao-acesso/gestao-delegacao-acesso/delegar-acesso.component';
 import { optionsPtBrConstrutor } from './options/options-construtor';
-import PartesEtpSelect from '../../componentes-customizados-formio/partes-etp-select';
 import { AuthLoginGuard } from 'src/app/auth/auth-login.guard';
 import { FormBuilderService, ReportService } from 'form-builder-lib';
 
-// const editForm = Components.components.select.editForm;
-// UnidadeSelect.editForm = editForm;
-// Components.setComponent('unidadeselect', UnidadeSelect);
-// ServidorSelect.editForm = editForm;
-// Components.setComponent('servidorselect', ServidorSelect);
-// PartesEtpSelect.editForm = editForm;
-// Components.setComponent('partesetpselect', PartesEtpSelect);
-// ProcessoSeiTextField.editForm = editForm;
-// Components.setComponent('processoSeiTextField', ProcessoSeiTextField);
-// NumeroEtpTextField.editForm = editForm;
-// Components.setComponent('numeroEtpTextField', NumeroEtpTextField);
-// TipoContratacaoSelect.editForm = editForm;
-// Components.setComponent('tipocontratacaoselect', TipoContratacaoSelect);
-
-// BotaoAjuda.editForm = Components.components.content.editForm;
-// Components.setComponent('botaoajuda', BotaoAjuda);
-
-// TextoAjuda.editForm = Components.components.content.editForm;
-// Components.setComponent('textoajuda', TextoAjuda);
-
-// NotaInterna.editForm = Components.components.content.editForm;
-// Components.setComponent('notainterna', NotaInterna);
 
 @Component({
   selector: 'modal-construir-formulario',
   templateUrl: './modal-construir-formulario.component.html',
   styleUrl: './modal-construir-formulario.component.scss',
 })
+
 export class ModalConstruirFormularioComponent implements OnInit, OnDestroy {
+
   @ViewChild('modalConstruirFormularioComponent') private modalContent:
     | TemplateRef<ModalConstruirFormularioComponent>
     | undefined;
@@ -107,11 +77,6 @@ export class ModalConstruirFormularioComponent implements OnInit, OnDestroy {
 
   @ViewChild('json') jsonElement?: ElementRef;
 
-  // public form: FormioForm = { components: [] };
-  // public formAnterior: FormioForm = { components: [] };
-
-  private callPreSave = false;
-
     // Report management
   isReportPanelOpen: boolean = false;
   currentReportContent: string = '';
@@ -119,15 +84,15 @@ export class ModalConstruirFormularioComponent implements OnInit, OnDestroy {
   @ViewChild('versionar_formulario', { static: true })
   VERSIONAR_FORMULARIO!: VersionarFormularioComponent;
 
-  // @ViewChild('formio') formio: FormioComponent | undefined;
-
   @ViewChild('htmlNovaVersao', { static: true })
   COMPARAR_FORMULARIO_HTML!: CompararHtmlEtpNovaVersaoComponent;
+
   @ViewChild('delegar_acesso', { static: true })
   DELEGAR_ACESSO!: DelegarAcessoComponent;
 
   @Output() submissionLoad = new EventEmitter<any>();
   @ViewChild('json') jsonElementRender?: ElementRef;
+
   public formRender: any
   functionAux: FunctionAux = new FunctionAux();
 
@@ -144,27 +109,7 @@ export class ModalConstruirFormularioComponent implements OnInit, OnDestroy {
   clickRetornar: boolean = false;
   dados: any;
   pageRender: any = undefined;
-  labelInit: string[] = [
-    'Text Area',
-    'Text Field',
-    'Data Grid',
-    'Number',
-    'Checkbox',
-    'Select',
-    'Select Boxes',
-    'Radio',
-    'Servidores',
-    'Unidades',
-    'Columns',
-    'Panel',
-    'Table',
-    'Tabs',
-    'Email',
-    'Url',
-    'Phone Number',
-    'Currency',
-  ];
-
+  
   tabsModel!: ITabsModel[];
   menuIndex = 0;
 
@@ -186,6 +131,11 @@ export class ModalConstruirFormularioComponent implements OnInit, OnDestroy {
   items: MenuItem[] | undefined;
   hasPermissionConsulta: any;
 
+  mensagens = {
+    MSG_JSON_PADRAO_SALVO: 'Formulário padrão salvo com sucesso',
+    MSG_SUCESSO_ALTERAR: 'Alterado com sucesso',
+  };
+  
   constructor(
     private etpEnvioSeiService: EtpEnvioSeiService,
     public modalService: NgbModal,
@@ -198,21 +148,9 @@ export class ModalConstruirFormularioComponent implements OnInit, OnDestroy {
     private formBuilderService: FormBuilderService,
     private reportService: ReportService
   ) {
-   // const requireLibrary = Formio.requireLibrary;
-    // Formio.requireLibrary = function (name, property, src, polling) {
-    //   return requireLibrary(
-    //     name,
-    //     property,
-    //     src.replace(
-    //       'https://cdn.form.io/ckeditor/19.0.0/ckeditor.js',
-    //       `${getEnvironment().pathFormularioWeb}/assets/ckeditor.js`
-    //     ),
-    //     polling
-    //   );
-    // };
     this.undoManager = new UndoManager();
 
-      window.removeEventListener('open-sei-dialog', () => {});
+    window.removeEventListener('open-sei-dialog', () => {});
     window.removeEventListener('link-custom-dialog', () => {});
 
     window.addEventListener('open-sei-dialog', () => {
@@ -427,10 +365,6 @@ export class ModalConstruirFormularioComponent implements OnInit, OnDestroy {
     ];
   }
 
-  mensagens = {
-    MSG_JSON_PADRAO_SALVO: 'Formulário padrão salvo com sucesso',
-    MSG_SUCESSO_ALTERAR: 'Alterado com sucesso',
-  };
   salvarAssuntoJsonPadrao() {
     this.assuntoFormularioServiceService
       .putAssuntoJsonPadrao(this.formulario?.assuntoId, {
@@ -479,7 +413,7 @@ export class ModalConstruirFormularioComponent implements OnInit, OnDestroy {
   }
 
   public open(formulario: any): Promise<boolean> {
-    getEnvironment().etpPartesId = formulario?.id;
+
     this.clickRetornar = false;
     this.initObjectForm();
     this.setDadosFormulario(formulario);
@@ -584,8 +518,6 @@ export class ModalConstruirFormularioComponent implements OnInit, OnDestroy {
   preSaveRender() {
     const formJson = this.formBuilderService.exportFormSchema();
     const dataJson = this.formBuilderService.exportFormData();
-    console.log('XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX');
-    console.log(formJson);
     
     let scriptFormulario = {
       id: this.formulario?.id,
@@ -593,6 +525,7 @@ export class ModalConstruirFormularioComponent implements OnInit, OnDestroy {
       jsonDados: dataJson,
       versao: this.formulario?.versao,
     };
+    
     this.gravarJsonFormulario.emit(scriptFormulario);
     
     // this.callPreSave = true;
@@ -689,7 +622,7 @@ export class ModalConstruirFormularioComponent implements OnInit, OnDestroy {
   onChangeBuilder(event: any) {
     if (!event || !event.form) return;
     this.handleComponentActions(event);
-    this.updateComponentLabels(event);
+    // this.updateComponentLabels(event);
     if (event.type == 'saveComponent') {
       event.form = this.verificaConditional(
         event.component,
@@ -747,23 +680,23 @@ export class ModalConstruirFormularioComponent implements OnInit, OnDestroy {
     }
   }
 
-  updateComponentLabels(event: any): void {
-    const { component } = event;
-    if (!component) return;
+  // updateComponentLabels(event: any): void {
+  //   const { component } = event;
+  //   if (!component) return;
 
-    if (this.labelInit.includes(component.label)) {
-      component.label = 'Digite o rótulo';
-    }
-    if (this.labelInit.includes(component.title)) {
-      component.title = 'Digite o rótulo';
-    }
-    if (component.title === 'Content') {
-      component.title = '&nbsp;';
-    }
-    if (component.label === 'Content') {
-      component.label = '&nbsp;';
-    }
-  }
+  //   if (this.labelInit.includes(component.label)) {
+  //     component.label = 'Digite o rótulo';
+  //   }
+  //   if (this.labelInit.includes(component.title)) {
+  //     component.title = 'Digite o rótulo';
+  //   }
+  //   if (component.title === 'Content') {
+  //     component.title = '&nbsp;';
+  //   }
+  //   if (component.label === 'Content') {
+  //     component.label = '&nbsp;';
+  //   }
+  // }
 
   private updateJsonForm(event: any): void {
     this.formulario.jsonForm = JSON.stringify(event.form);
@@ -1010,29 +943,29 @@ export class ModalConstruirFormularioComponent implements OnInit, OnDestroy {
     }
   }
 
-  private addExtraButtonFormulario(
-    classNameUnique: string,
-    uniqueNameFormulario: string
-  ): void {
-    const existingButton = document.querySelector(`.${uniqueNameFormulario}`);
-    if (existingButton) {
-      existingButton.remove();
-    }
-    const nextButtonformulario = document.querySelector(classNameUnique);
-    if (nextButtonformulario) {
-      const extraButtonFormulario = document.createElement('button');
-      extraButtonFormulario.innerHTML =
-        '<em class="fa fa-lg fa-minus-circle float-center pt-1"></em> Fechar';
-      extraButtonFormulario.className = `w-40 btn btn-danger ml-2 ${uniqueNameFormulario}`;
-      extraButtonFormulario.onclick = () => {
-        this.close();
-      };
-      nextButtonformulario?.parentElement?.insertBefore(
-        extraButtonFormulario,
-        nextButtonformulario.nextSibling
-      );
-    }
-  }
+  // private addExtraButtonFormulario(
+  //   classNameUnique: string,
+  //   uniqueNameFormulario: string
+  // ): void {
+  //   const existingButton = document.querySelector(`.${uniqueNameFormulario}`);
+  //   if (existingButton) {
+  //     existingButton.remove();
+  //   }
+  //   const nextButtonformulario = document.querySelector(classNameUnique);
+  //   if (nextButtonformulario) {
+  //     const extraButtonFormulario = document.createElement('button');
+  //     extraButtonFormulario.innerHTML =
+  //       '<em class="fa fa-lg fa-minus-circle float-center pt-1"></em> Fechar';
+  //     extraButtonFormulario.className = `w-40 btn btn-danger ml-2 ${uniqueNameFormulario}`;
+  //     extraButtonFormulario.onclick = () => {
+  //       this.close();
+  //     };
+  //     nextButtonformulario?.parentElement?.insertBefore(
+  //       extraButtonFormulario,
+  //       nextButtonformulario.nextSibling
+  //     );
+  //   }
+  // }
 
   toggleFullScreenFormulario(element: any) {
     if (!document.fullscreenElement) {

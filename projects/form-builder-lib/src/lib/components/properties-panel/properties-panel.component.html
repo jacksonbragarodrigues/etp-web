@@ -33,22 +33,22 @@
       <div class="step-properties p-3" *ngIf="state.selectedStep && !state.selectedComponent">
 
         <!-- Step Info Header -->
-        <div class="step-info mb-3 p-3 bg-light rounded">
+        <div class="step-info mb-1 p-1 bg-light rounded">
           <div class="d-flex justify-content-between align-items-center">
-            <div>
+            <!-- <div>
               <h6 class="mb-1 fw-semibold">Propriedades do Step</h6>
               <small class="text-muted">{{ state.selectedStep.title }}</small>
-            </div>
-            <span class="badge bg-success">Step</span>
+            </div> -->
+            <div [title]="getTitle(state.selectedStep.title, 'step')" class="badge bg-primary text-overflow" >{{ state.selectedStep.title }} ({{ "step" }})</div>
           </div>
         </div>
 
         <!-- Step Basic Properties -->
         <div class="property-section mb-4">
-          <h6 class="section-title" style="font-weight: bold;">
+          <!-- <h6 class="section-title" style="font-weight: bold;">
             <i class="bi bi-tag me-2"></i>
             PROPRIEDADES DO STEP
-          </h6>
+          </h6> -->
 
           <!-- Title -->
           <div class="form-group mb-3">
@@ -992,17 +992,17 @@
 
                     <!-- Component Key -->
                     <div class="form-group mb-3">
-                      <label class="form-label">Identificador Chave</label>
-                      <input [disabled]="isComponentChave()" type="text" class="form-control form-control-sm"
-                        [(ngModel)]="componentKey" (input)="onKeyChange()" placeholder="Unique key for this component">
+                      <label class="form-label">Identificadores Chaves</label>
+                      <pre class="form-label">KEY: {{ componentKey }}</pre>
+                      <!-- <input [disabled]="isComponentChave()" type="text" class="form-control form-control-sm"
+                        [(ngModel)]="componentKey" (input)="onKeyChange()" placeholder="Unique key for this component"> -->
                       <div class="form-text">
-                        Identificador exclusivo usado para lógica condicional e vinculação de dados
+                        Identificador exclusivo usado para vinculação de dados
                       </div>
-                    </div>
-
-                    <!-- Component Id -->
-                    <div class="form-group mb-3">
-                      <label class="form-label">ID: {{ componentId }}</label>
+                      <pre class="form-label">ID: {{ componentId }}</pre>
+                      <div class="form-text">
+                        Identificador exclusivo usado para lógica condicional
+                      </div>
                     </div>
 
                   </div>
