@@ -1043,7 +1043,7 @@
   border-radius: 6px;
   background-color: rgba(40, 167, 69, 0.15);
   transition: all 0.15s ease;
-  min-height: 28px;
+  // min-height: 28px;
 }
 
 .component-drop-zone .drop-indicator {
@@ -1055,18 +1055,58 @@
   opacity: 0.7;
 }
 
-.component-drop-zone.drag-over {
-      opacity: 1;
+    .component-drop-zone {
+      position: relative;
+      margin-bottom: 25px;
+      height: 2px;
+      margin: 2px 0;
+      border-radius: 0.25rem;
+      border: 1px dashed green;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+
+      &.drag-over {
+        opacity: 1;
         height: 32px;
         border-color: green;
         background-color: rgba(40, 167, 69, 0.15);
         transform: scaleY(1.1);
         box-shadow: 0 2px 8px rgba(40, 167, 69, 0.3);
         border-width: 2px;
-}
+      }
 
-.final-drop-zone {
-    // border-color: #28a745;
+      &.drag-active {
+        opacity: 0.5;
+        height: 20px;
+        border-color: #007bff;
+        background-color: rgba(0, 123, 255, 0.08);
+        border-width: 1px;
+      }
+
+      .drop-indicator {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        color: #28a745;
+        font-size: 0.75rem;
+        font-weight: 500;
+        opacity: 0;
+        transition: opacity 0.2s ease;
+
+        i {
+          font-size: 0.9rem;
+        }
+      }
+
+      &.drag-over .drop-indicator {
+        opacity: 1;
+      }
+
+      &.final-drop-zone {
+        // border-color: #28a745;
         background-color: rgba(40, 167, 69, 0.15);
         margin-top: 5px;
         margin-bottom: 5px;
@@ -1074,11 +1114,29 @@
         border-style: dashed;
         // border-color: #e9ecef;
         opacity: 0.7;
-}
+
+        &.drag-over {
+          height: 40px;
+          border-color: green;
+          background-color: rgba(40, 167, 69, 0.15);
+          opacity: 1;
+        }
+
+        .drop-indicator {
+          opacity: 0.6;
+          color: #6c757d;
+        }
+
+        &.drag-over .drop-indicator {
+          opacity: 1;
+          color: #28a745;
+        }
+      }
+    }
 
 /* Slightly different visual inside datagrid/columns */
 .columns-container .component-drop-zone,
 .datagrid-container .component-drop-zone {
   margin: 4px 0;
-  min-height: 40px;
+  min-height: 24px;
 }

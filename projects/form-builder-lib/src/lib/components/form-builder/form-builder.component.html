@@ -1,8 +1,39 @@
-<div class="form-builder-container d-flex flex-column">
+<div class="form-builder-container d-flex flex-column position-relative" style="padding-bottom: 56px;">
   <!-- Modal de Apontamentos e Notas -->
   <app-annotations-modal #annotationsModal></app-annotations-modal>
   <!-- CKEditor Modal for Analysis Rich Text -->
   <app-ck-editor-modal #ckEditorModal></app-ck-editor-modal>
+
+  <!-- Fixed Footer -->
+  <div class="fixed-footer bg-white border-top py-2 px-3" 
+       style="position: fixed; bottom: 0; left: 0; right: 0; z-index: 1000;">
+    <div class="container-fluid">
+      <div class="d-flex justify-content-end gap-3">
+        <button class="btn btn-danger" type="button"
+                *ngIf="onCancelEvent"
+                (click)="onFooterCancel()">
+          <i class="bi bi-x-circle me-1"></i>
+          Cancelar
+        </button>
+        <button class="btn btn-warning" type="button"
+                *ngIf="hasChange()"
+                data-bs-toggle="tooltip"
+                data-bs-placement="top"
+                title="Desfazer última ação"
+                (click)="onFooterUndo()">
+          <i class="bi bi-arrow-counterclockwise me-1"></i>
+          Desfazer
+        </button>
+        <button class="btn btn-success" type="button"
+                *ngIf="onSaveEvent"
+                (click)="onFooterSave()">
+          <i class="bi bi-check-circle me-1"></i>
+          Salvar
+        </button>
+      </div>
+    </div>
+  </div>
+
 
   <!-- Edit Mode Layout -->
   <div *ngIf="!state.previewMode && !state.analysisMode">
@@ -82,13 +113,13 @@
     <!-- <div class="status-bar bg-light border-top px-1 py-1 small text-muted">
       <div class="d-flex justify-content-between">
         <span>
-          Components: {{ getCurrentStepComponentsCount() }}
+          Componentes: {{ getCurrentStepComponentsCount() }}
         </span>
         <span *ngIf="state.selectedComponent">
-          Selected: {{ getSelectedComponentLabel() }} - {{ state.selectedComponent.type }}
+          Selecionado: {{ getSelectedComponentLabel() }} - {{ state.selectedComponent.type }}
         </span>
         <span>
-          Steps: {{ getStepsCount() }}
+          Seções: {{ getStepsCount() }}
         </span>
       </div>
     </div> -->

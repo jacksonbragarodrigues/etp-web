@@ -272,4 +272,9 @@ export interface FormBuilderState {
   analysisMode?: boolean;
   dragInProgress: boolean;
   annotations?: AnnotationsMap;
+  isDirty?: boolean; // Track if form has unsaved changes
+  lastSavedState?: { // Store last saved state for comparison
+    formSchema: FormSchema;
+    annotations?: AnnotationsMap; 
+  };
 }

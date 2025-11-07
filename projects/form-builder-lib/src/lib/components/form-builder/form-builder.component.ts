@@ -91,8 +91,12 @@ export class FormBuilderComponent implements OnInit, OnDestroy, OnChanges {
   @Input() dataJson?: string | object | null;
   @Input() analysisJson?: string | object | null;
   @Input() ioEnabled: boolean = false; // show/hide import/export controls
+  @Input() onCancelEvent?: string; // Nome do evento para cancelar
+  @Input() onSaveEvent?: string; // Nome do evento para salvar
+  @Input() onUndoEvent?: string; // Nome do evento para desfazer
 
   @Output() formJsonChange = new EventEmitter<string>();
+  @Output() footerAction = new EventEmitter<{action: string, data?: any}>();
   @Output() dataJsonChange = new EventEmitter<string>();
   @Output() analysisJsonChange = new EventEmitter<string>();
 
@@ -1135,4 +1139,31 @@ export class FormBuilderComponent implements OnInit, OnDestroy, OnChanges {
       printWindow.print();
     }
   }
+
+  // Métodos do footer
+  onFooterCancel(): void {
+    if (this.onCancelEvent) {
+      this.footerAction.emit({ action: this.onCancelEvent });
+    }
+  }
+
+  onFooterSave(): void {
+    if (this.onSaveEvent) {
+      this.footerAction.emit({ action: this.onSaveEvent });
+    }
+  }
+
+  onFooterUndo(): void {
+    if (this.onUndoEvent) {
+      this.footerAction.emit({ action: this.onUndoEvent });
+    }
+  }
+
+  hasChange(): boolean {
+    console.log("hasChange()");
+    console.log(this.formBuilderService.getCurrentState());
+    console.log(this.formBuilderService.hasUnsavedChanges());
+    return this.formBuilderService.hasUnsavedChanges();
+  }
+  
 }

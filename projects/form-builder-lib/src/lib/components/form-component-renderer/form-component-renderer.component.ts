@@ -186,29 +186,29 @@ export class FormComponentRendererComponent implements OnInit, OnChanges, AfterV
     // console.log('Rows Count:', this.component.rows?.length || 0);
     // console.log('Children Count:', this.component.children?.length || 0);
 
-    if (this.component.children) {
-      console.log('Child Components:');
-      this.component.children.forEach((child, index) => {
-        console.log(`  Child ${index + 1}:`, {
-          id: child.id,
-          key: child.key,
-          label: child.label,
-          type: child.type,
-          required: child.required
-        });
-      });
-    }
+    // if (this.component.children) {
+    //   console.log('Child Components:');
+    //   this.component.children.forEach((child, index) => {
+    //     console.log(`  Child ${index + 1}:`, {
+    //       id: child.id,
+    //       key: child.key,
+    //       label: child.label,
+    //       type: child.type,
+    //       required: child.required
+    //     });
+    //   });
+    // }
 
-    if (this.component.rows) {
-      // console.log('Rows Data:');
-      this.component.rows.forEach((row, index) => {
-        console.log(`  Row ${index + 1}:`, {
-          id: row.id,
-          index: row.index,
-          data: row.data
-        });
-      });
-    }
+    // if (this.component.rows) {
+    //   // console.log('Rows Data:');
+    //   this.component.rows.forEach((row, index) => {
+    //     console.log(`  Row ${index + 1}:`, {
+    //       id: row.id,
+    //       index: row.index,
+    //       data: row.data
+    //     });
+    //   });
+    // }
 
     // Test validation using the current state
     const state = this.formBuilderService.getCurrentState();
@@ -1935,12 +1935,12 @@ export class FormComponentRendererComponent implements OnInit, OnChanges, AfterV
       });
     }
 
-    console.log('Adding new DataGrid row:', {
-      componentId: this.component.id,
-      rowId: newRow.id,
-      initialData: newRow.data,
-      totalRows: this.component.rows.length + 1
-    });
+    // console.log('Adding new DataGrid row:', {
+    //   componentId: this.component.id,
+    //   rowId: newRow.id,
+    //   initialData: newRow.data,
+    //   totalRows: this.component.rows.length + 1
+    // });
 
     this.component.rows.push(newRow);
     this.updateDataGridState();
@@ -1951,12 +1951,12 @@ export class FormComponentRendererComponent implements OnInit, OnChanges, AfterV
     if (!this.isDataGridType() || !this.component.rows || !this.previewMode) return;
 
     const removedRow = this.component.rows[rowIndex];
-    console.log('Removing DataGrid row:', {
-      componentId: this.component.id,
-      rowIndex: rowIndex,
-      rowId: removedRow?.id,
-      totalRowsBefore: this.component.rows.length
-    });
+    // console.log('Removing DataGrid row:', {
+    //   componentId: this.component.id,
+    //   rowIndex: rowIndex,
+    //   rowId: removedRow?.id,
+    //   totalRowsBefore: this.component.rows.length
+    // });
 
     this.component.rows.splice(rowIndex, 1);
 
@@ -2029,13 +2029,13 @@ export class FormComponentRendererComponent implements OnInit, OnChanges, AfterV
 
   onRowComponentChange(event: any, row: DataGridRow, key: string): void {
     // This will be called when a component in the row changes
-    console.log('DataGrid Row Change:', {
-      rowId: row.id,
-      key: key,
-      oldValue: row.data?.[key],
-      newValue: event,
-      componentId: this.component.id
-    });
+    // console.log('DataGrid Row Change:', {
+    //   rowId: row.id,
+    //   key: key,
+    //   oldValue: row.data?.[key],
+    //   newValue: event,
+    //   componentId: this.component.id
+    // });
 
     // Update the row data
     if (row.data) {
@@ -2078,12 +2078,12 @@ export class FormComponentRendererComponent implements OnInit, OnChanges, AfterV
       }
 
       // Debug: Log data changes
-      console.log('DataGrid Update:', {
-        componentId: this.component.id,
-        key: this.component.key,
-        rowsCount: this.component.rows?.length || 0,
-        value: this.component.value
-      });
+      // console.log('DataGrid Update:', {
+      //   componentId: this.component.id,
+      //   key: this.component.key,
+      //   rowsCount: this.component.rows?.length || 0,
+      //   value: this.component.value
+      // });
 
       // Atualizar o componente no FormBuilderService para persistir mudanças
       this.formBuilderService.updateComponent(this.component.id, {
@@ -2100,7 +2100,7 @@ export class FormComponentRendererComponent implements OnInit, OnChanges, AfterV
       }, 50);
     } else {
       // No builder mode, não persistir dados do DataGrid
-      console.log('Builder mode: dados do DataGrid não persistidos para', this.component.key);
+      // console.log('Builder mode: dados do DataGrid não persistidos para', this.component.key);
     }
   }
 

@@ -44,7 +44,7 @@ export class ModalConstruirFormularioComponent implements OnInit, OnDestroy {
     | undefined;
   modalRef!: NgbModalRef;
 
-    @ViewChild('registrarSeiModalForm') private modalContentRegistrar:
+  @ViewChild('registrarSeiModalForm') private modalContentRegistrar:
     | TemplateRef<EnvioSeiComponent>
     | undefined;
   modalRefRegistrar!: NgbModalRef;
@@ -77,7 +77,7 @@ export class ModalConstruirFormularioComponent implements OnInit, OnDestroy {
 
   @ViewChild('json') jsonElement?: ElementRef;
 
-    // Report management
+  // Report management
   isReportPanelOpen: boolean = false;
   currentReportContent: string = '';
 
@@ -94,6 +94,8 @@ export class ModalConstruirFormularioComponent implements OnInit, OnDestroy {
   @ViewChild('json') jsonElementRender?: ElementRef;
 
   public formRender: any
+  public formRenderAnterior: any
+
   functionAux: FunctionAux = new FunctionAux();
 
   undoManager: UndoManager;
@@ -109,7 +111,7 @@ export class ModalConstruirFormularioComponent implements OnInit, OnDestroy {
   clickRetornar: boolean = false;
   dados: any;
   pageRender: any = undefined;
-  
+
   tabsModel!: ITabsModel[];
   menuIndex = 0;
 
@@ -135,7 +137,7 @@ export class ModalConstruirFormularioComponent implements OnInit, OnDestroy {
     MSG_JSON_PADRAO_SALVO: 'Formulário padrão salvo com sucesso',
     MSG_SUCESSO_ALTERAR: 'Alterado com sucesso',
   };
-  
+
   constructor(
     private etpEnvioSeiService: EtpEnvioSeiService,
     public modalService: NgbModal,
@@ -150,8 +152,8 @@ export class ModalConstruirFormularioComponent implements OnInit, OnDestroy {
   ) {
     this.undoManager = new UndoManager();
 
-    window.removeEventListener('open-sei-dialog', () => {});
-    window.removeEventListener('link-custom-dialog', () => {});
+    window.removeEventListener('open-sei-dialog', () => { });
+    window.removeEventListener('link-custom-dialog', () => { });
 
     window.addEventListener('open-sei-dialog', () => {
       this.openRegistrar();
@@ -164,7 +166,6 @@ export class ModalConstruirFormularioComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    //this.formBuilderService.updateState({ previewMode: false, analysisMode: false });
     this.hasPermissionConsulta = this.authLoginGuard.hasPermission([
       'MODELO_CONSULTA;F',
     ]);
@@ -185,7 +186,7 @@ export class ModalConstruirFormularioComponent implements OnInit, OnDestroy {
         command: () => {
           this.menuIndex = 0;
           this.renderBuilder();
-           this.formBuilderService.updateState({ previewMode: false, analysisMode: false });
+          this.formBuilderService.updateState({ previewMode: false, analysisMode: false });
         },
         disabled: this.itemMenu[0],
       },
@@ -205,7 +206,7 @@ export class ModalConstruirFormularioComponent implements OnInit, OnDestroy {
         icon: 'fa fa-fw fa-file-pdf',
         command: () => {
           this.menuIndex = 2;
-        //  this.onGenerateReport();
+          //  this.onGenerateReport();
           this.renderRelatorio();
         },
         disabled: this.itemMenu[2],
@@ -413,12 +414,46 @@ export class ModalConstruirFormularioComponent implements OnInit, OnDestroy {
   }
 
   public open(formulario: any): Promise<boolean> {
-
     this.clickRetornar = false;
     this.initObjectForm();
     this.setDadosFormulario(formulario);
     if (formulario?.jsonForm) {
       this.parametros.IS_SALVAR = false;
+      // Detect whether jsonForm is a Form.io schema (has components)
+      // or our internal schema (has steps) and call the correct importer.
+      try {
+        const parsed = typeof formulario.jsonForm === 'string'
+          ? JSON.parse(formulario.jsonForm)
+          : formulario.jsonForm;
+
+        if (parsed && Array.isArray(parsed.components)) {
+          // It's a Form.io JSON
+          this.formBuilderService.importFormioSchema(JSON.stringify(parsed));
+        } else if (parsed && Array.isArray(parsed.steps)) {
+          // It's our internal schema
+          this.formBuilderService.importFormSchema(JSON.stringify(parsed));
+        } else {
+          // Unknown format: attempt to import as internal schema as a best-effort
+          this.formBuilderService.importFormSchema(JSON.stringify(parsed));
+        }
+
+        // Save loaded state as baseline for change tracking
+        this.formBuilderService.saveCurrentState();
+      } catch (err) {
+        console.error('Erro ao importar jsonForm:', err);
+        // Fallback attempts: try both importers with the raw string
+        try {
+          this.formBuilderService.importFormSchema(formulario.jsonForm);
+          this.formBuilderService.saveCurrentState();
+        } catch (err2) {
+          try {
+            this.formBuilderService.importFormioSchema(formulario.jsonForm);
+            this.formBuilderService.saveCurrentState();
+          } catch (err3) {
+            console.error('Import fallback falhou:', err2, err3);
+          }
+        }
+      }
     }
     this.configurarFuncionalidadesMenuLateral();
     this.renderBuilder();
@@ -518,65 +553,46 @@ export class ModalConstruirFormularioComponent implements OnInit, OnDestroy {
   preSaveRender() {
     const formJson = this.formBuilderService.exportFormSchema();
     const dataJson = this.formBuilderService.exportFormData();
-    
+
     let scriptFormulario = {
       id: this.formulario?.id,
       jsonForm: formJson,
       jsonDados: dataJson,
       versao: this.formulario?.versao,
     };
-    
-    this.gravarJsonFormulario.emit(scriptFormulario);
-    
-    // this.callPreSave = true;
 
-    // let msg = this.parametros.MSG_GRAVAR_FORMULARIO;
-    // let scriptFormulario = {
-    //   id: this.formulario?.id,
-    //   jsonForm: this.formulario.jsonForm,
-    //   jsonDados: this.formulario.jsonDados,
-    //   versao: this.formulario?.versao,
-    // };
-    // this.alertUtils.confirmDialog(msg).then((dataConfirme) => {
-    //   this.callPreSave = false;
-    //   if (dataConfirme) {
-    //     if (this.verificaMenuWizard()) {
-    //      // this.updateWizardJsonForm(this.form);
-    //       scriptFormulario = {
-    //         id: this.formulario?.id,
-    //         jsonForm: this.formulario.jsonForm,
-    //         jsonDados: this.formulario.jsonDados,
-    //         versao: this.formulario?.versao,
-    //       };
-    //     }
-    //     this.executarAposMinutos.emit(this.idFormulario);
-    //     this.gravarJsonFormulario.emit(scriptFormulario);
-    //     this.atualizaDadosRelatorioServiceService.updateJsonFormRelatorio(
-    //       this.formulario.jsonForm
-    //     );
-    //   }
-    // });
+    this.gravarJsonFormulario.emit(scriptFormulario);
+    this.formRenderAnterior = this.formRender;
+
+    this.formBuilderService.resetUnsavedChangesFlag();
   }
 
   close() {
-    if (!this.clickRetornar) {
-      this.clickRetornar = true;
-      let msg = this.parametros.MSG_SAIR_CONTRUROR;
-      this.alertUtils.confirmDialog(msg).then((dataConfirme) => {
-        if (dataConfirme) {
-          if (this.modalRef) {
-            this.initObjectForm();
-            // this.form = { components: [] };
-            this.formRender = { components: [] };
-            this.desbloquearFormulario.emit({
-              id: this.idFormulario,
-              bloqueado: false,
-            });
-            this.fecharModalConstruirFormulario.emit();
-            this.modalRef.close();
-          }
+    if (this.formBuilderService.hasUnsavedChanges()) {
+      this.alertUtils.confirmDialog(this.parametros.MSG_GRAVAR_FORMULARIO).then((dataConfirme) => {
+        if (!dataConfirme) {
+          this.modalRef.close();
         } else {
-          this.clickRetornar = false;
+          this.gravarJsonFormulario.emit({
+            id: this.idFormulario,
+            jsonForm: this.formRender,
+          });
+          this.formBuilderService.resetUnsavedChangesFlag();
+          this.modalRef.close();
+        }
+
+      });
+    } else {
+      this.alertUtils.confirmDialog(this.parametros.MSG_SAIR_CONTRUROR).then((dataConfirme) => {
+        if (dataConfirme) {
+          this.formRender = { components: [] };
+          this.formRenderAnterior = { components: [] };
+          this.desbloquearFormulario.emit({
+            id: this.idFormulario,
+            bloqueado: false,
+          });
+          this.fecharModalConstruirFormulario.emit();
+          this.modalRef.close();
         }
       });
     }
@@ -586,6 +602,7 @@ export class ModalConstruirFormularioComponent implements OnInit, OnDestroy {
     getEnvironment().formioTipo = 'SIMULADOR';
     this.renderFooter(this.parametros.ABA_FORMIO);
     this.formRender = JSON.parse(this.formulario?.jsonForm);
+    this.formRenderAnterior = JSON.parse(this.formulario?.jsonForm);
     let elemento = document.getElementById('rendererizador');
     if (elemento) {
       this.injectRender(elemento);
@@ -629,13 +646,10 @@ export class ModalConstruirFormularioComponent implements OnInit, OnDestroy {
         event.originalComponent,
         event.form
       );
-     //this.form = event.form;
+      //this.form = event.form;
       // if (this.formio) {
       //   this.formio.formio.setForm(this.form);
       // }
-    } else if (event.type == 'deleteComponent') {
-      let undo = this.formulario.jsonForm;
-      this.undoManager.add(undo);
     }
     this.updateJsonForm(event);
     this.executarAposMinutos.emit(this.idFormulario);
@@ -772,7 +786,7 @@ export class ModalConstruirFormularioComponent implements OnInit, OnDestroy {
   injectRender(elemento: HTMLElement) {
     let that = this;
     // seta enable para os campos processo-sei, numero-etp e tipo de contratação
- //   const formulario = JSON.parse(JSON.stringify(this.formRender, null, 4));
+    //   const formulario = JSON.parse(JSON.stringify(this.formRender, null, 4));
 
     // let component = FormioUtils.getComponent(
     //   formulario.components,
@@ -987,12 +1001,7 @@ export class ModalConstruirFormularioComponent implements OnInit, OnDestroy {
   }
 
   undo() {
-    const undo = this.undoManager.desfazer();
-    this.undoManager.add(this.formulario.jsonForm);
-    if (undo !== undefined) {
-      this.formulario.jsonForm = undo;
-     // this.form = JSON.parse(this.formulario.jsonForm);
-    }
+    this.formBuilderService.resetChanges();
   }
 
   alterarSituacao(acao: any) {
@@ -1097,6 +1106,7 @@ export class ModalConstruirFormularioComponent implements OnInit, OnDestroy {
   reloadFormularioVersaoMotivo() {
     if (this.modalRef) {
       this.formRender = { components: [] };
+      this.formRenderAnterior = { components: [] };
       this.initObjectForm();
       this.VERSIONAR_FORMULARIO.closeFormulario();
       this.fecharModalConstruirFormulario.emit();
@@ -1107,6 +1117,7 @@ export class ModalConstruirFormularioComponent implements OnInit, OnDestroy {
   reloadFormulario() {
     if (this.modalRef) {
       this.formRender = { components: [] };
+      this.formRenderAnterior = { components: [] };
       this.initObjectForm();
       this.fecharModalConstruirFormulario.emit();
       this.modalRef.close();
@@ -1116,6 +1127,7 @@ export class ModalConstruirFormularioComponent implements OnInit, OnDestroy {
   reloadFormularioVersoes() {
     if (this.modalRef) {
       this.formRender = { components: [] };
+      this.formRenderAnterior = { components: [] };
       this.initObjectForm();
       this.fecharModalConstruirFormulario.emit();
       this.VERSOES_FORMULARIO.close();
@@ -1230,8 +1242,8 @@ export class ModalConstruirFormularioComponent implements OnInit, OnDestroy {
     }
   }
 
-    public openRegistrar(): Promise<boolean> {
-    this. closeRegistrarLinkCustom();
+  public openRegistrar(): Promise<boolean> {
+    this.closeRegistrarLinkCustom();
     return new Promise<boolean>((resolve) => {
       this.modalRefRegistrar = this.modalService.open(
         this.modalContentRegistrar,
@@ -1268,7 +1280,7 @@ export class ModalConstruirFormularioComponent implements OnInit, OnDestroy {
     });
   }
 
-    registrarEnvioseiEtpFormModalConstruirFormulario() {
+  registrarEnvioseiEtpFormModalConstruirFormulario() {
     const dsdosDocumento = {
       procedimento: this.documentoForm,
     };
@@ -1342,7 +1354,7 @@ export class ModalConstruirFormularioComponent implements OnInit, OnDestroy {
     }
   }
 
-    onGenerateReport(): void {
+  onGenerateReport(): void {
     try {
       this.currentReportContent = this.reportService.generateHTMLReport();
       this.isReportPanelOpen = false;
@@ -1355,6 +1367,22 @@ export class ModalConstruirFormularioComponent implements OnInit, OnDestroy {
     } catch (error) {
       console.error('Erro ao gerar relatório:', error);
       alert('Erro ao gerar relatório: ' + error);
+    }
+  }
+
+  handleFormBuilderAction(event: { action: string, data?: any }): void {
+    switch (event.action) {
+      case 'saveFormulario':
+        this.preSaveRender();
+        break;
+      case 'closeFormulario':
+        this.close();
+        break;
+      case 'undoLastAction':
+        this.undo();
+        break;
+      default:
+        console.warn('Ação não reconhecida:', event.action);
     }
   }
 }

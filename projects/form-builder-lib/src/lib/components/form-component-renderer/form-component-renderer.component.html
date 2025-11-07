@@ -102,6 +102,8 @@
        ></i>
       </label>
 
+      {{ component.properties.allowsConfidentiality }}
+
       <!-- Sigilo checkbox when allowsConfidentiality is true -->
       <div *ngIf="component.properties.allowsConfidentiality" class="form-check form-check-inline mb-0">
         <input class="form-check-input"
@@ -836,7 +838,8 @@
            >
         <ng-container *ngFor="let childComponent of component.children || []; trackBy: trackByComponentId">
           <!-- Drop Zone Before Child -->
-          <div class="component-drop-zone"
+          <div class="component-drop-zone final-drop-zone"
+                 *ngIf="!previewMode"
                [class.drag-over]="dragOverChildId === childComponent.id"
                (dragover)="onChildDragOver($event, childComponent.id)"
                (dragleave)="onChildDragLeave($event, childComponent.id)"
@@ -885,6 +888,7 @@
          [title]="component.properties.tooltip"
          data-bs-toggle="tooltip"
          data-bs-placement="top"></i>
+
     </label>
 
     <div class="row g-3"
@@ -906,7 +910,8 @@
 
           <!-- Column components with hover behavior -->
           <ng-container *ngFor="let columnComponent of getColumnComponents(columnIndex); trackBy: trackByComponentId">
-            <div class="component-drop-zone"
+            <div class="component-drop-zone final-drop-zone" 
+                 *ngIf="!previewMode"
                  [class.drag-over]="dragOverChildId === columnComponent.id"
                  (dragover)="onChildDragOver($event, columnComponent.id)"
                  (dragleave)="onChildDragLeave($event, columnComponent.id)"
@@ -957,7 +962,8 @@
             <tr class="columns-row">
                   <td *ngFor="let childComponent of component.children || []; trackBy: trackByComponentId"
                       class="column-cell">
-                    <div class="component-drop-zone"
+                    <div class="component-drop-zone final-drop-zone"
+                           *ngIf="!previewMode"
                          [class.drag-over]="dragOverChildId === childComponent.id"
                          (dragover)="onChildDragOver($event, childComponent.id)"
                          (dragleave)="onChildDragLeave($event, childComponent.id)"

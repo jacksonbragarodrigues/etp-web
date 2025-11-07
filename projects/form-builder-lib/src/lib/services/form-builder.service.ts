@@ -9,7 +9,10 @@ import {
   ComponentCategory,
   TreeNode,
   FormBuilderState,
-  ConditionalLogic
+  ConditionalLogic,
+  DataGridRow,
+  AnnotationsMap,
+  AnnotationEntry
 } from '../models/form-builder.models';
 import FunctionAux from '../function/functions.aux';
 import { ValidationService } from './validation.service';
@@ -393,7 +396,41 @@ export class FormBuilderService {
 
   updateState(updates: Partial<FormBuilderState>): void {
     const currentState = this.stateSubject.value;
-    this.stateSubject.next({ ...currentState, ...updates });
+    const newState = { ...currentState, ...updates };
+
+    // Skip change tracking during initial load or import
+    if (!currentState.lastSavedState) {
+      this.stateSubject.next(newState);
+      return;
+    }
+
+    // If isDirty was explicitly provided, don't recalculate it
+    if ('isDirty' in updates) {
+      this.stateSubject.next(newState);
+      return;
+    }
+
+    // Check for changes by comparing with last saved state
+    if (updates.formSchema || updates.annotations || updates.selectedComponent) {
+      const hasFormChanges = this.hasFormSchemaChanges(newState.formSchema, currentState.lastSavedState.formSchema);
+      const hasAnnotationChanges = this.hasAnnotationChanges(
+        newState.annotations || {},
+        currentState.lastSavedState.annotations || {}
+      );
+
+      // Set isDirty when there are changes
+      if (hasFormChanges || hasAnnotationChanges) {
+        newState.isDirty = true;
+      } else {
+        // No changes detected - preserve current isDirty
+        newState.isDirty = currentState.isDirty;
+      }
+    } else {
+      // For other updates, preserve existing isDirty value
+      newState.isDirty = currentState.isDirty;
+    }
+
+    this.stateSubject.next(newState);
   }
 
   // ========== ANOTAÇÕES (APONTAMENTOS E OBSERVAÇÕES) ==========
@@ -662,7 +699,7 @@ export class FormBuilderService {
     }
   }
 
-  selectComponent(componentId: string | null): void {
+  selectComponent(componentId: string | null | undefined): void {
     const state = this.getCurrentState();
 
     if (!componentId) {
@@ -683,6 +720,7 @@ export class FormBuilderService {
 
   openPropertiesTab(): void {
     this.openPropertiesTabSubject.next();
+    
   }
 
   addStep(title: string = 'New Step'): FormStep {
@@ -1272,7 +1310,7 @@ export class FormBuilderService {
 
   // Método para sincronizar valor do componente com opções selecionadas
   private syncComponentValueWithOptions(component: FormComponent): void {
-    console.log("Syncing component:", component.type);
+    // console.log("Syncing component:", component.type);
     if (component.type === ComponentType.SELECT ||
       component.type === ComponentType.RADIO ||
       component.type === ComponentType.SELECT_BOX ||
@@ -1281,10 +1319,10 @@ export class FormBuilderService {
       component.type === ComponentType.UNIDADE ||
       component.type === ComponentType.SERVIDOR) {
 
-      console.log("Component matched type check:", component.type);
-      console.log("Has options:", !!component.properties.options);
-      console.log("Options is array:", Array.isArray(component.properties.options));
-      console.log("API Config:", component.properties.apiConfig);
+      // console.log("Component matched type check:", component.type);
+      // console.log("Has options:", !!component.properties.options);
+      // console.log("Options is array:", Array.isArray(component.properties.options));
+      // console.log("API Config:", component.properties.apiConfig);
 
       if (component.properties.options && component.value !== undefined && component.value !== null) {
         // Para select e radio com valor ��nico
@@ -2332,6 +2370,266 @@ export class FormBuilderService {
       // Recursivamente atualizar pais do pai
       this.updateParentComponentsValidation(parent, allComponents);
     }
+  }
+
+  // Change tracking methods
+  saveCurrentState(): void {
+    const currentState = this.getCurrentState();
+    this.updateState({
+      lastSavedState: {
+        formSchema: this.deepCopyFormSchema(currentState.formSchema),
+        annotations: this.deepCopyAnnotations(currentState.annotations || {})
+      },
+      isDirty: false
+    });
+  }
+
+  resetChanges(): void {
+    const currentState = this.getCurrentState();
+    if (currentState.lastSavedState) {
+      this.updateState({
+        formSchema: this.deepCopyFormSchema(currentState.lastSavedState.formSchema),
+        annotations: this.deepCopyAnnotations(currentState.lastSavedState.annotations || {}),
+        isDirty: false
+      });
+
+      // Refresh properties panel by re-opening it
+      this.selectComponent(currentState.selectedComponent?.id)
+      this.openPropertiesTab();
+    }
+  }
+
+  resetUnsavedChangesFlag(): void {
+    const currentState = this.getCurrentState();
+
+    this.updateState({
+      lastSavedState: {
+        formSchema: this.deepCopyFormSchema(currentState.formSchema),
+        annotations: this.deepCopyAnnotations(currentState.annotations || {})
+      },
+      isDirty: false
+    });
+  }
+
+  hasUnsavedChanges(): boolean {
+    return this.getCurrentState().isDirty || false;
+  }
+
+  private hasFormSchemaChanges(current: FormSchema, saved: FormSchema): boolean {
+    if (!saved) return true;
+    
+    // Compare metadata
+    if (current.name !== saved.name || current.id !== saved.id) {
+      return true;
+    }
+
+    // Compare steps length
+    if (current.steps.length !== saved.steps.length) {
+      return true;
+    }
+
+    // Compare each step
+    for (let i = 0; i < current.steps.length; i++) {
+      if (this.hasStepChanges(current.steps[i], saved.steps[i])) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  private hasStepChanges(current: FormStep, saved: FormStep): boolean {
+    if (!saved) return true;
+    
+    // Compare basic properties
+    if (current.id !== saved.id || 
+        current.title !== saved.title || 
+        current.order !== saved.order) {
+      return true;
+    }
+
+    // Compare description if exists
+    if ((current.description || saved.description) && 
+        current.description !== saved.description) {
+      return true;
+    }
+
+    // Compare properties if they exist
+    if (this.hasObjectChanges(current.properties, saved.properties)) {
+      return true;
+    }
+
+    // Compare components length
+    if (current.components.length !== saved.components.length) {
+      return true;
+    }
+
+    // Compare each component
+    for (let i = 0; i < current.components.length; i++) {
+      if (this.hasComponentChanges(current.components[i], saved.components[i])) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  private hasComponentChanges(current: FormComponent, saved: FormComponent): boolean {
+    if (!saved) return true;
+
+    // Compare basic properties
+    if (current.id !== saved.id || 
+        current.key !== saved.key || 
+        current.type !== saved.type || 
+        current.label !== saved.label || 
+        current.required !== saved.required ||
+        this.hasValueChange(current.value, saved.value, current.type)) {
+      return true;
+    }
+
+    // Compare properties
+    if (this.hasObjectChanges(current.properties, saved.properties)) {
+      return true;
+    }
+
+    // Compare rows for DataGrid
+    if (current.type === ComponentType.DATAGRID) {
+      if (this.hasDataGridRowChanges(current.rows, saved.rows)) {
+        return true;
+      }
+    }
+
+    // Compare children if they exist
+    if (current.children && saved.children) {
+      if (current.children.length !== saved.children.length) {
+        return true;
+      }
+      for (let i = 0; i < current.children.length; i++) {
+        if (this.hasComponentChanges(current.children[i], saved.children[i])) {
+          return true;
+        }
+      }
+    }
+
+    return false;
+  }
+
+  private hasValueChange(current: any, saved: any, type: ComponentType): boolean {
+    // Handle arrays (for multiple select, etc.)
+    if (Array.isArray(current) || Array.isArray(saved)) {
+      if (!Array.isArray(current) || !Array.isArray(saved)) {
+        return true;
+      }
+      if (current.length !== saved.length) {
+        return true;
+      }
+      return current.some((val, idx) => this.hasObjectChanges(val, saved[idx]));
+    }
+
+    // Handle objects (for SELECT_API, etc.)
+    if (typeof current === 'object' || typeof saved === 'object') {
+      return this.hasObjectChanges(current, saved);
+    }
+
+    // For other types, direct comparison
+    return current !== saved;
+  }
+
+  private hasDataGridRowChanges(current?: DataGridRow[], saved?: DataGridRow[]): boolean {
+    if (!current || !saved) {
+      return current !== saved;
+    }
+    if (current.length !== saved.length) {
+      return true;
+    }
+    return current.some((row, idx) => this.hasObjectChanges(row.data, saved[idx].data));
+  }
+
+  private hasAnnotationChanges(current: AnnotationsMap, saved: AnnotationsMap): boolean {
+    const currentKeys = Object.keys(current);
+    const savedKeys = Object.keys(saved);
+
+    // Compare number of annotations
+    if (currentKeys.length !== savedKeys.length) {
+      return true;
+    }
+
+    // Compare each component's annotations
+    for (const key of currentKeys) {
+      if (!saved[key]) {
+        return true;
+      }
+      if (current[key].length !== saved[key].length) {
+        return true;
+      }
+      for (let i = 0; i < current[key].length; i++) {
+        if (this.hasObjectChanges(current[key][i], saved[key][i])) {
+          return true;
+        }
+      }
+    }
+
+    return false;
+  }
+
+  private hasObjectChanges(current: any, saved: any): boolean {
+    if (current === saved) {
+      return false;
+    }
+    if (!current || !saved) {
+      return current !== saved;
+    }
+    const currentKeys = Object.keys(current);
+    const savedKeys = Object.keys(saved);
+
+    if (currentKeys.length !== savedKeys.length) {
+      return true;
+    }
+
+    return currentKeys.some(key => {
+      const currentValue = current[key];
+      const savedValue = saved[key];
+
+      if (typeof currentValue === 'object' || typeof savedValue === 'object') {
+        return this.hasObjectChanges(currentValue, savedValue);
+      }
+
+      return currentValue !== savedValue;
+    });
+  }
+
+  private deepCopyFormSchema(schema: FormSchema): FormSchema {
+    return {
+      ...schema,
+      metadata: { ...schema.metadata },
+      steps: schema.steps.map(step => ({
+        ...step,
+        components: this.deepCopyComponents(step.components),
+        properties: step.properties ? { ...step.properties } : undefined
+      }))
+    };
+  }
+
+  private deepCopyComponents(components: FormComponent[]): FormComponent[] {
+    return components.map(comp => ({
+      ...comp,
+      properties: this.deepCopyProperties(comp.properties),
+      children: comp.children ? this.deepCopyComponents(comp.children) : undefined,
+      rows: comp.rows ? comp.rows.map(row => ({
+        ...row,
+        data: { ...row.data }
+      })) : undefined
+    }));
+  }
+
+  private deepCopyAnnotations(annotations: AnnotationsMap): AnnotationsMap {
+    const copy: AnnotationsMap = {};
+    Object.keys(annotations).forEach(key => {
+      copy[key] = annotations[key].map((ann: AnnotationEntry) => ({
+        ...ann
+      }));
+    });
+    return copy;
   }
 
 }

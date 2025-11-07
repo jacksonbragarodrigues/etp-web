@@ -16,7 +16,14 @@
       <div id="conteudoMenu" class="col-12 py-1 ps-1 pe-1 border shadow">
         <div *ngIf="menuIndex == 0">
 
-          <app-form-builder class="host-builder" [formJson]="formRender" [dataJson]="formulario.jsonDados" [ioEnabled]="builderIoEnabled"></app-form-builder>
+          <app-form-builder class="host-builder" 
+            [(formJson)]="formRender" 
+            [dataJson]="formulario.jsonDados" 
+            [ioEnabled]="builderIoEnabled"
+            [onSaveEvent]="'saveFormulario'"
+            [onCancelEvent]="'closeFormulario'"
+            [onUndoEvent]="'undoLastAction'"
+            (footerAction)="handleFormBuilderAction($event)"></app-form-builder>
 
           <!-- <form-builder
             class="always-show-menu"
@@ -28,7 +35,17 @@
         </div>
 
         <div [hidden]="menuIndex != 1">
-            <app-form-builder class="host-builder" [formJson]="formRender" [dataJson]="formulario.jsonDados" [ioEnabled]="builderIoEnabled"></app-form-builder>
+
+             <app-form-builder class="host-builder" 
+            [(formJson)]="formRender" 
+            [dataJson]="formulario.jsonDados" 
+            [ioEnabled]="builderIoEnabled"
+            [onSaveEvent]="'saveFormulario'"
+            [onCancelEvent]="'closeFormulario'"
+            [onUndoEvent]="'undoLastAction'"
+            (footerAction)="handleFormBuilderAction($event)"></app-form-builder>
+
+            <!-- <app-form-builder class="host-builder" [formJson]="formRender" [dataJson]="formulario.jsonDados" [ioEnabled]="builderIoEnabled"></app-form-builder> -->
           <!-- <formio id="rendererizador"></formio> -->
 
         </div>
@@ -70,7 +87,7 @@
       </div>
     </div>
   </div>
-  <div class="modal-footer botoes" *ngIf="parametros.renderizarFooter">
+  <!-- <div class="modal-footer botoes" *ngIf="parametros.renderizarFooter">
     <div class="row botoes" style="width: 50%">
       <div class="col">
         <button
@@ -114,7 +131,7 @@
         </button>
       </div>
     </div>
-  </div> 
+  </div>  -->
 </ng-template>
 <app-versionar-formulario
   [executaVersionarFormularioGestao]="executaVersionar.bind(this)"
