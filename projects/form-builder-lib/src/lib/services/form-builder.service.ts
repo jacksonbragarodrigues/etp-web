@@ -411,7 +411,8 @@ export class FormBuilderService {
     }
 
     // Check for changes by comparing with last saved state
-    if (updates.formSchema || updates.annotations || updates.selectedComponent) {
+    // Note: selectedComponent is UI state only, not content - don't track it for dirty flag
+    if (updates.formSchema || updates.annotations) {
       const hasFormChanges = this.hasFormSchemaChanges(newState.formSchema, currentState.lastSavedState.formSchema);
       const hasAnnotationChanges = this.hasAnnotationChanges(
         newState.annotations || {},
@@ -599,7 +600,7 @@ export class FormBuilderService {
         cache: true,
         cacheTimeout: 30,
       };
-      console.log('Initialized SERVIDOR component:', component);
+      // console.log('Initialized SERVIDOR component:', component);
     }
 
     return component;
@@ -862,6 +863,9 @@ export class FormBuilderService {
         selectedStep: null
       });
 
+      // Initialize lastSavedState to mark imported schema as saved
+      this.resetUnsavedChangesFlag();
+
       // Atualizar validação após importação
       this.updateAllStepsValidation();
       this.triggerConditionalLogicUpdate();
@@ -979,6 +983,9 @@ export class FormBuilderService {
       selectedComponent: null,
       selectedStep: null
     });
+
+    // Initialize lastSavedState to mark imported schema as saved
+    this.resetUnsavedChangesFlag();
 
     this.updateAllStepsValidation();
     this.triggerConditionalLogicUpdate();
@@ -1354,7 +1361,7 @@ export class FormBuilderService {
         }
         // Para SELECT_API components (inclui TIPO_CONTRATACAO, UNIDADE, SERVIDOR)
         else if (component.type === ComponentType.SELECT_API || component.type === ComponentType.TIPO_CONTRATACAO || component.type === ComponentType.UNIDADE || component.type === ComponentType.SERVIDOR) {
-          console.log("Processing component type:", component.type);
+          // console.log("Processing component type:", component.type);
 
           // Certifica que temos um template apropriado
           if (!component.properties.apiConfig?.labelTemplate) {
@@ -1379,11 +1386,11 @@ export class FormBuilderService {
           // Processa as opções para usar o labelTemplate se existir
           if (component.properties.options && Array.isArray(component.properties.options)) {
             const template = component.properties.apiConfig?.labelTemplate;
-            console.log("Using template:", template);
+            // console.log("Using template:", template);
 
             if (template) {
-              console.log("jjjjjjjjjjjjjjj >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
-              console.log(template);
+              // console.log("jjjjjjjjjjjjjjj >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+              // console.log(template);
               component.properties.options = component.properties.options.map(opt => {
                 let label = template;
                 Object.keys(opt).forEach(key => {
@@ -2042,6 +2049,9 @@ export class FormBuilderService {
     });
 
     this.updateState({ annotations: normalized });
+
+    // Initialize lastSavedState to mark imported annotations as saved
+    this.resetUnsavedChangesFlag();
   }
 
   /**
@@ -2156,6 +2166,9 @@ export class FormBuilderService {
       };
 
       this.updateState({ formSchema: updatedSchema });
+
+      // Initialize lastSavedState to mark imported data as saved
+      this.resetUnsavedChangesFlag();
 
       // Atualizar validação após importação dos dados (com pequeno delay para garantir propagação)
       if (state.previewMode) {
@@ -2411,13 +2424,71 @@ export class FormBuilderService {
     });
   }
 
-  hasUnsavedChanges(): boolean {
-    return this.getCurrentState().isDirty || false;
+  /**
+   * Checks if there are unsaved changes in the form structure (components, properties, validation)
+   * Does NOT include data changes (component values)
+   */
+  hasUnsavedStructuralChanges(): boolean {
+    const currentState = this.getCurrentState();
+    if (!currentState.lastSavedState) {
+      return false;
+    }
+    return this.hasFormStructureChanges(currentState.formSchema, currentState.lastSavedState.formSchema) ||
+           this.hasAnnotationChanges(currentState.annotations || {}, currentState.lastSavedState.annotations || {});
+  }
+
+  /**
+   * Checks if there are unsaved changes in form data (component values)
+   * Does NOT include structural changes
+   * Only compares exported data (values and rows) - not schema structure
+   */
+  hasUnsavedDataChanges(): boolean {
+   
+    const currentState = this.getCurrentState();
+     console.log("currentState:", currentState)
+    if (!currentState.lastSavedState) {
+      return false;
+    }
+
+    const currentData = this.getFormDataSnapshot(currentState.formSchema, currentState.annotations);
+    const savedData = this.getFormDataSnapshot(currentState.lastSavedState.formSchema, currentState.lastSavedState.annotations);
+
+    console.log("currentData:", currentData);
+    console.log("savedData:", savedData);
+    return this.hasDeepDataChanges(currentData, savedData);
+  }
+
+  /**
+   * Extracts form data snapshot (values and rows only, no structural data)
+   * Returns the same data structure as exportFormData but as an object
+   */
+  private getFormDataSnapshot(formSchema: FormSchema, annotations?: AnnotationsMap): { [key: string]: any } {
+    const formData: { [key: string]: any } = {};
+
+    // Extract data from all steps
+    formSchema.steps.forEach(step => {
+      this.extractComponentData(step.components, formData);
+    });
+
+    // Include annotations if present
+    if (annotations && Object.keys(annotations).length > 0) {
+      formData['__annotations'] = annotations;
+    }
+
+    return formData;
+  }
+
+  /**
+   * Deep comparison of form data snapshots
+   * Compares only the actual data values, not the structure
+   */
+  private hasDeepDataChanges(current: any, saved: any): boolean {
+    return this.hasObjectChanges(current, saved);
   }
 
   private hasFormSchemaChanges(current: FormSchema, saved: FormSchema): boolean {
     if (!saved) return true;
-    
+
     // Compare metadata
     if (current.name !== saved.name || current.id !== saved.id) {
       return true;
@@ -2438,23 +2509,64 @@ export class FormBuilderService {
     return false;
   }
 
+  private hasFormStructureChanges(current: FormSchema, saved: FormSchema): boolean {
+    if (!saved) return true;
+    // Compare metadata
+    if (current.name !== saved.name || current.id !== saved.id) {
+      return true;
+    }
+    // Compare steps length
+    if (current.steps.length !== saved.steps.length) {
+      return true;
+    }
+
+    // Compare each step (structure only)
+    for (let i = 0; i < current.steps.length; i++) {
+
+      if (this.hasStepStructureChanges(current.steps[i], saved.steps[i])) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  private hasFormDataChanges(current: FormSchema, saved: FormSchema): boolean {
+
+    if (!saved) return true;
+
+    // Compare steps length
+    if (current.steps.length !== saved.steps.length) {
+      return true;
+    }
+
+    // Compare data in each step
+    for (let i = 0; i < current.steps.length; i++) {
+      if (this.hasStepDataChanges(current.steps[i], saved.steps[i])) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
   private hasStepChanges(current: FormStep, saved: FormStep): boolean {
     if (!saved) return true;
-    
+
     // Compare basic properties
-    if (current.id !== saved.id || 
-        current.title !== saved.title || 
+    if (current.id !== saved.id ||
+        current.title !== saved.title ||
         current.order !== saved.order) {
       return true;
     }
 
     // Compare description if exists
-    if ((current.description || saved.description) && 
+    if ((current.description || saved.description) &&
         current.description !== saved.description) {
       return true;
     }
 
-    // Compare properties if they exist
+    // Compare properties if they exist (includes all properties for this method)
     if (this.hasObjectChanges(current.properties, saved.properties)) {
       return true;
     }
@@ -2474,14 +2586,68 @@ export class FormBuilderService {
     return false;
   }
 
+  private hasStepStructureChanges(current: FormStep, saved: FormStep): boolean {
+    if (!saved) return true;
+
+    // Compare basic properties
+    if (current.id !== saved.id ||
+        current.title !== saved.title ||
+        current.order !== saved.order) {
+      return true;
+    }
+
+    // Compare description if exists
+    if ((current.description || saved.description) &&
+        current.description !== saved.description) {
+      return true;
+    }
+
+    // Compare structural properties only (ignore external API options)
+    if (this.hasStructuralPropertyChanges(current.properties, saved.properties)) {
+      return true;
+    }
+
+    // Compare components length
+    if (current.components.length !== saved.components.length) {
+      return true;
+    }
+
+    // Compare each component structure (excluding data)
+    for (let i = 0; i < current.components.length; i++) {
+      if (this.hasComponentStructureChanges(current.components[i], saved.components[i])) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  private hasStepDataChanges(current: FormStep, saved: FormStep): boolean {
+    if (!saved) return true;
+
+    // Compare components length
+    if (current.components.length !== saved.components.length) {
+      return true;
+    }
+
+    // Compare data in each component
+    for (let i = 0; i < current.components.length; i++) {
+      if (this.hasComponentDataChanges(current.components[i], saved.components[i])) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
   private hasComponentChanges(current: FormComponent, saved: FormComponent): boolean {
     if (!saved) return true;
 
     // Compare basic properties
-    if (current.id !== saved.id || 
-        current.key !== saved.key || 
-        current.type !== saved.type || 
-        current.label !== saved.label || 
+    if (current.id !== saved.id ||
+        current.key !== saved.key ||
+        current.type !== saved.type ||
+        current.label !== saved.label ||
         current.required !== saved.required ||
         this.hasValueChange(current.value, saved.value, current.type)) {
       return true;
@@ -2506,6 +2672,70 @@ export class FormBuilderService {
       }
       for (let i = 0; i < current.children.length; i++) {
         if (this.hasComponentChanges(current.children[i], saved.children[i])) {
+          return true;
+        }
+      }
+    }
+
+    return false;
+  }
+
+  private hasComponentStructureChanges(current: FormComponent, saved: FormComponent): boolean {
+    if (!saved) return true;
+
+    // Compare basic properties (structure only, no value)
+    if (current.id !== saved.id ||
+        current.key !== saved.key ||
+        current.type !== saved.type ||
+        current.label !== saved.label ||
+        current.required !== saved.required) {
+      return true;
+    }
+
+    // Compare structural properties only (ignore options from external API)
+    if (this.hasStructuralPropertyChanges(current.properties, saved.properties)) {
+      return true;
+    }
+
+    // Compare children if they exist (structure only)
+    if (current.children && saved.children) {
+      if (current.children.length !== saved.children.length) {
+        return true;
+      }
+      for (let i = 0; i < current.children.length; i++) {
+        if (this.hasComponentStructureChanges(current.children[i], saved.children[i])) {
+          return true;
+        }
+      }
+    } else if ((current.children && !saved.children) || (!current.children && saved.children)) {
+      return true;
+    }
+
+    return false;
+  }
+
+  private hasComponentDataChanges(current: FormComponent, saved: FormComponent): boolean {
+    if (!saved) return true;
+
+    // Compare component values
+    if (this.hasValueChange(current.value, saved.value, current.type)) {
+      return true;
+    }
+
+    // Compare rows for DataGrid
+    if (current.type === ComponentType.DATAGRID) {
+      if (this.hasDataGridRowChanges(current.rows, saved.rows)) {
+        return true;
+      }
+    }
+
+    // Compare data in children if they exist
+    if (current.children && saved.children) {
+      if (current.children.length !== saved.children.length) {
+        return true;
+      }
+      for (let i = 0; i < current.children.length; i++) {
+        if (this.hasComponentDataChanges(current.children[i], saved.children[i])) {
           return true;
         }
       }
@@ -2572,13 +2802,49 @@ export class FormBuilderService {
     return false;
   }
 
+  /**
+   * Compare structural properties only, ignoring external API data like options
+   */
+  private hasStructuralPropertyChanges(current: any, saved: any): boolean {
+    if (current === saved) {
+      return false;
+    }
+
+    if (!current || !saved) {
+      return current !== saved;
+    }
+
+    // Fields to exclude from structural comparison (external data)
+    const excludedFields = ['options', 'selectOptions', 'data', '__options'];
+
+    const currentKeys = Object.keys(current).filter(k => !excludedFields.includes(k));
+    const savedKeys = Object.keys(saved).filter(k => !excludedFields.includes(k));
+
+    if (currentKeys.length !== savedKeys.length) {
+      return true;
+    }
+
+    return currentKeys.some(key => {
+      const currentValue = current[key];
+      const savedValue = saved[key];
+
+      if (typeof currentValue === 'object' || typeof savedValue === 'object') {
+        return this.hasStructuralPropertyChanges(currentValue, savedValue);
+      }
+
+      return currentValue !== savedValue;
+    });
+  }
+
   private hasObjectChanges(current: any, saved: any): boolean {
     if (current === saved) {
       return false;
     }
+
     if (!current || !saved) {
       return current !== saved;
     }
+
     const currentKeys = Object.keys(current);
     const savedKeys = Object.keys(saved);
 

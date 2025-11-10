@@ -14,40 +14,27 @@
   <div class="modal-body" style="margin-top: 0px; padding-top: 0px">
     <div class="row mt-1">
       <div id="conteudoMenu" class="col-12 py-1 ps-1 pe-1 border shadow">
-        <div *ngIf="menuIndex == 0">
-
-          <app-form-builder class="host-builder" 
-            [(formJson)]="formRender" 
-            [dataJson]="formulario.jsonDados" 
+        <div *ngIf="menuIndex < 2">
+          <app-form-builder *ngIf="menuIndex == 0"
+            class="host-builder"
+            [(formJson)]="formulario.jsonForm"
+            [(dataJson)]="formulario.jsonDados"
             [ioEnabled]="builderIoEnabled"
             [onSaveEvent]="'saveFormulario'"
             [onCancelEvent]="'closeFormulario'"
-            [onUndoEvent]="'undoLastAction'"
-            (footerAction)="handleFormBuilderAction($event)"></app-form-builder>
-
-          <!-- <form-builder
-            class="always-show-menu"
-            id="construtor"
-            [options]="options"
-            (change)="onChangeBuilder($event)"
-            [form]="form"
-          ></form-builder> -->
-        </div>
-
-        <div [hidden]="menuIndex != 1">
-
-             <app-form-builder class="host-builder" 
-            [(formJson)]="formRender" 
-            [dataJson]="formulario.jsonDados" 
+            [onUndoEvent]="'undoLastActionFormulario'"
+            (footerAction)="handleFormBuilderAction($event)">
+          </app-form-builder>
+           <app-form-builder *ngIf="menuIndex == 1"
+            class="host-builder"
+            [(formJson)]="formulario.jsonForm"
+            [(dataJson)]="formulario.jsonDados"
             [ioEnabled]="builderIoEnabled"
-            [onSaveEvent]="'saveFormulario'"
-            [onCancelEvent]="'closeFormulario'"
-            [onUndoEvent]="'undoLastAction'"
-            (footerAction)="handleFormBuilderAction($event)"></app-form-builder>
-
-            <!-- <app-form-builder class="host-builder" [formJson]="formRender" [dataJson]="formulario.jsonDados" [ioEnabled]="builderIoEnabled"></app-form-builder> -->
-          <!-- <formio id="rendererizador"></formio> -->
-
+            [onSaveEvent]="'saveSimulador'"
+            [onCancelEvent]="'closeSimulador'"
+            [onUndoEvent]="'undoLastActionSimulador'"
+            (footerAction)="handleFormBuilderActionSimulador($event)">
+          </app-form-builder>
         </div>
         <div *ngIf="menuIndex == 2">
           <app-template-html
@@ -57,7 +44,7 @@
             [jsonDados]="this.formulario.jsonDados"
             [type]="'FORMULARIO'"
             [nomeRelatorio]="nomeArquivo"
-            (fecharModal)="close()"
+            (fecharModal)="closeFormulario()"
           ></app-template-html>
         </div>
         <div *ngIf="menuIndex == 3">
@@ -73,7 +60,7 @@
             [jsonDados]="this.formulario.jsonDados"
             [type]="'FORMULARIO_COMPLETO'"
             [nomeRelatorio]="nomeArquivo"
-            (fecharModal)="close()"
+            (fecharModal)="closeFormulario()"
           ></app-template-html>
         </div>
         <div *ngIf="false">
@@ -81,7 +68,7 @@
             [situacao]="this.formulario.situacao"
             [id]="this.formulario.id"
             [tipo]="'FORMULARIO'"
-            [closePai]="close.bind(this)"
+            [closePai]="closeFormulario.bind(this)"
           ></app-envio-sei>
         </div>
       </div>

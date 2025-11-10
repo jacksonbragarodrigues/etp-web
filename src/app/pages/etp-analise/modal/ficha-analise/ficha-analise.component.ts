@@ -290,7 +290,7 @@ export class FichaAnaliseComponent {
 
   private gerarFichaAnalise() {
     const analistasParse = this.analistasList.map((a: any) => {
-      console.log('Analista:', a);
+      // console.log('Analista:', a);
       return {
         // ...a,
         idUnidade: a.idUnidade,

@@ -1142,12 +1142,28 @@ export class FormBuilderComponent implements OnInit, OnDestroy, OnChanges {
 
   // Métodos do footer
   onFooterCancel(): void {
+    console.log("OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO");
     if (this.onCancelEvent) {
+        console.log("PPPPPPPPPPPPPPPPPPPPPPPPPPPPP");
+      this.footerAction.emit({ action: this.onCancelEvent });
+    }
+  }
+
+  onFooterCancelSimulador(): void {
+    console.log("OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO");
+    if (this.onCancelEvent) {
+        console.log("PPPPPPPPPPPPPPPPPPPPPPPPPPPPP");
       this.footerAction.emit({ action: this.onCancelEvent });
     }
   }
 
   onFooterSave(): void {
+    if (this.onSaveEvent) {
+      this.footerAction.emit({ action: this.onSaveEvent });
+    }
+  }
+
+   onFooterSaveSimulador(): void {
     if (this.onSaveEvent) {
       this.footerAction.emit({ action: this.onSaveEvent });
     }
@@ -1160,10 +1176,10 @@ export class FormBuilderComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   hasChange(): boolean {
-    console.log("hasChange()");
-    console.log(this.formBuilderService.getCurrentState());
-    console.log(this.formBuilderService.hasUnsavedChanges());
-    return this.formBuilderService.hasUnsavedChanges();
+    // console.log("hasChange()");
+    // console.log(this.formBuilderService.getCurrentState());
+    // console.log(this.formBuilderService.hasUnsavedChanges());
+    return this.formBuilderService.hasUnsavedStructuralChanges();
   }
   
 }

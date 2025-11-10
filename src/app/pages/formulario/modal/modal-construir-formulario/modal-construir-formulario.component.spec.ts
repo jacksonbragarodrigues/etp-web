@@ -101,7 +101,7 @@ describe('ModalConstruirFormularioComponent', () => {
     const alert: AlertUtils = fixture.debugElement.injector.get(AlertUtils);
     spyOn(alert, 'confirmDialog').and.returnValue(Promise.resolve(true));
 
-    component.preSaveRender();
+    component.saveFormulario();
     expect(alertUtils.confirmDialog).toHaveBeenCalledWith(
       'Deseja gravar as informações ?'
     );
@@ -118,7 +118,7 @@ describe('ModalConstruirFormularioComponent', () => {
     const alert: AlertUtils = fixture.debugElement.injector.get(AlertUtils);
     spyOn(alert, 'confirmDialog').and.returnValue(Promise.resolve(true));
 
-    component.preSaveRender();
+    component.saveFormulario();
     expect(alertUtils.confirmDialog).toHaveBeenCalledWith(
       'Deseja gravar as informações ?'
     );
@@ -136,7 +136,7 @@ describe('ModalConstruirFormularioComponent', () => {
     const alert: AlertUtils = fixture.debugElement.injector.get(AlertUtils);
     spyOn(alert, 'confirmDialog').and.returnValue(Promise.resolve(true));
 
-    component.preSaveRender();
+    component.saveFormulario();
 
     expect(alertUtils.confirmDialog).toHaveBeenCalledWith(
       'Deseja gravar as informações ?'
@@ -148,7 +148,7 @@ describe('ModalConstruirFormularioComponent', () => {
 
     spyOn(alert, 'confirmDialog').and.returnValue(Promise.resolve(true));
 
-    component.close();
+    component.closeFormulario();
     expect(alertUtils.confirmDialog).toHaveBeenCalledWith('Deseja sair ?');
   });
   it('deve fechar modal de contrução de formulario', () => {
@@ -159,7 +159,7 @@ describe('ModalConstruirFormularioComponent', () => {
     } as any;
     spyOn(alert, 'confirmDialog').and.returnValue(Promise.resolve(true));
     component.modalRef = modalRef;
-    component.close();
+    component.closeFormulario();
     expect(alertUtils.confirmDialog).toHaveBeenCalledWith('Deseja sair ?');
   });
   it('deve salvar as informações adicionadas no construtor para selectboxes', () => {

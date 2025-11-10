@@ -180,6 +180,7 @@ export class GestaoFormularioComponent implements OnInit {
       situacao: item?.situacao,
     };
     this.CONSTRUI_FORMULARIO.open(objConstrutorFormulario);
+    
   }
 
   executarAposMinutos(idFormulario: any) {

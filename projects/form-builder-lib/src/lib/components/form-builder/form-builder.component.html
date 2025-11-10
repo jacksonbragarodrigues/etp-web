@@ -10,13 +10,13 @@
     <div class="container-fluid">
       <div class="d-flex justify-content-end gap-3">
         <button class="btn btn-danger" type="button"
-                *ngIf="onCancelEvent"
+                *ngIf="onCancelEvent  && !state.previewMode"
                 (click)="onFooterCancel()">
           <i class="bi bi-x-circle me-1"></i>
-          Cancelar
+          Fechar
         </button>
         <button class="btn btn-warning" type="button"
-                *ngIf="hasChange()"
+                *ngIf="hasChange() && !state.previewMode"
                 data-bs-toggle="tooltip"
                 data-bs-placement="top"
                 title="Desfazer última ação"
@@ -25,11 +25,27 @@
           Desfazer
         </button>
         <button class="btn btn-success" type="button"
-                *ngIf="onSaveEvent"
+                *ngIf="onSaveEvent  && !state.previewMode"
                 (click)="onFooterSave()">
           <i class="bi bi-check-circle me-1"></i>
-          Salvar
+          Gravar
         </button>
+
+        <button class="btn btn-danger" type="button"
+                *ngIf="onCancelEvent && state.previewMode"
+                (click)="onFooterCancelSimulador()">
+          <i class="bi bi-x-circle me-1"></i>
+          Fechar
+        </button>
+        <button class="btn btn-success" type="button"
+                *ngIf="onSaveEvent && state.previewMode"
+                (click)="onFooterSaveSimulador()">
+          <i class="bi bi-check-circle me-1"></i>
+          Gravar
+        </button>
+
+
+
       </div>
     </div>
   </div>

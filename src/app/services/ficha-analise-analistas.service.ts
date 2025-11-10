@@ -37,11 +37,11 @@ export class FichaAnaliseAnalistasService {
     idEtpFichaAnalise: any,
     fichaAnaliseAnalistas: any[]
   ) {
-    console.log(
-      'Blocking analysts for analysis sheet:',
-      idEtpFichaAnalise,
-      fichaAnaliseAnalistas
-    );
+    // console.log(
+    //   'Blocking analysts for analysis sheet:',
+    //   idEtpFichaAnalise,
+    //   fichaAnaliseAnalistas
+    // );
     return this.http.put(
       `${this.apiEtpUrl}/in-block/${idEtpFichaAnalise}`,
       fichaAnaliseAnalistas

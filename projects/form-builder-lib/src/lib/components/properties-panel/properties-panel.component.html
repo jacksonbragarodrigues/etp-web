@@ -3,14 +3,15 @@
   <!-- Panel Header with Tabs -->
   <div class="panel-header border-bottom">
     <nav class="nav nav-tabs">
+           <button class="nav-link" [class.active]="activeTab === 'properties'" (click)="setActiveTab('properties')">
+        <i class="bi bi-gear me-2"></i>
+        Propriedades
+      </button>
       <button class="nav-link" [class.active]="activeTab === 'hierarchy'" (click)="setActiveTab('hierarchy')">
         <i class="bi bi-diagram-3 me-2"></i>
         Componentes
       </button>
-      <button class="nav-link" [class.active]="activeTab === 'properties'" (click)="setActiveTab('properties')">
-        <i class="bi bi-gear me-2"></i>
-        Propriedades
-      </button>
+ 
     </nav>
   </div>
 

@@ -217,7 +217,7 @@ export class FormComponentRendererComponent implements OnInit, OnChanges, AfterV
       this.validationService.debugValidationForStep(currentStep, this.formBuilderService);
     }
 
-    console.log('=== End DataGrid Validation Debug ===');
+    // console.log('=== End DataGrid Validation Debug ===');
   }
 
   private findComponentInState(state: any, componentId: string): FormComponent | null {
@@ -423,7 +423,7 @@ export class FormComponentRendererComponent implements OnInit, OnChanges, AfterV
     } else {
       // No builder mode, apenas atualizar valor local sem persistir
       // Isso permite visualizar o que seria digitado sem gravar
-      console.log('Builder mode: valor não persistido para', this.component.key, ':', value);
+      // console.log('Builder mode: valor não persistido para', this.component.key, ':', value);
     }
   }
 
