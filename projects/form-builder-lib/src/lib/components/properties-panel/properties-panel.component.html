@@ -3,7 +3,7 @@
   <!-- Panel Header with Tabs -->
   <div class="panel-header border-bottom">
     <nav class="nav nav-tabs">
-           <button class="nav-link" [class.active]="activeTab === 'properties'" (click)="setActiveTab('properties')">
+      <button class="nav-link" [class.active]="activeTab === 'properties'" (click)="setActiveTab('properties')">
         <i class="bi bi-gear me-2"></i>
         Propriedades
       </button>
@@ -11,7 +11,7 @@
         <i class="bi bi-diagram-3 me-2"></i>
         Componentes
       </button>
- 
+
     </nav>
   </div>
 
@@ -40,7 +40,8 @@
               <h6 class="mb-1 fw-semibold">Propriedades do Step</h6>
               <small class="text-muted">{{ state.selectedStep.title }}</small>
             </div> -->
-            <div [title]="getTitle(state.selectedStep.title, 'step')" class="badge bg-primary text-overflow" >{{ state.selectedStep.title }} ({{ "step" }})</div>
+            <div [title]="getTitle(state.selectedStep.title, 'step')" class="badge bg-primary text-overflow">{{
+              state.selectedStep.title }} ({{ "step" }})</div>
           </div>
         </div>
 
@@ -156,7 +157,9 @@
               <h6 class="mb-1 fw-semibold">{{ state.selectedComponent.type | titlecase }}</h6>
               <small class="text-muted">ID: {{ componentId }}</small>  
             </div> -->
-            <div [title]="getTitle(state.selectedComponent.label, state.selectedComponent.type)" class="badge bg-primary text-overflow" >{{ state.selectedComponent.label }} ({{ state.selectedComponent.type }})</div>
+            <div [title]="getTitle(state.selectedComponent.label, state.selectedComponent.type)"
+              class="badge bg-primary text-overflow">{{ state.selectedComponent.label }} ({{
+              state.selectedComponent.type }})</div>
           </div>
         </div>
 
@@ -378,8 +381,8 @@
                 </div>
               </div>
             </div>
-            
-            <div class="accordion-item" *ngIf="isSelectApiType()">
+
+            <div class="accordion-item" *ngIf="isSelectApiType() || isPermiteMultiple()">
               <h2 class="accordion-header" id="headingApiSelect">
                 <button class="accordion-button" [class.collapsed]="!isAccordionOpen('apiSelect')" type="button"
                   (click)="toggleAccordion('apiSelect')" [attr.aria-expanded]="isAccordionOpen('apiSelect')">
@@ -505,8 +508,10 @@
                       </div>
                     </div>
                   </div>
+
+
                   <!-- API Select Options (Multiple Selection & Layout) -->
-                  <div class="property-section mb-4" *ngIf="isSelectApiType()">
+                  <div class="property-section mb-4" *ngIf="isPermiteMultiple()">
                     <h6 class="section-title" style="font-weight: bold;">
                       <i class="bi bi-ui-checks me-2"></i>
                       OPÇÕES DE SELEÇÃO

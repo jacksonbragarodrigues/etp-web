@@ -857,6 +857,10 @@ export class PropertiesPanelComponent implements OnInit, OnDestroy, AfterViewIni
     return this.state.selectedComponent?.type === ComponentType.SELECT_API;
   }
 
+  isPermiteMultiple(): boolean {
+    return this.state.selectedComponent?.type === ComponentType.SERVIDOR || this.state.selectedComponent?.type === ComponentType.UNIDADE;
+  }
+
   isFileType(): boolean {
     return this.state.selectedComponent?.type === ComponentType.FILE;
   }

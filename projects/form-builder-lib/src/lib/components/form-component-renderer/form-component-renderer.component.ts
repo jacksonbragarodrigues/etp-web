@@ -12,6 +12,7 @@ import { CustomCKEditorService } from '../../services/custom-ckeditor.service';
 
 declare var bootstrap: any;
 
+
 @Component({
   selector: 'app-form-component-renderer',
   standalone: true,
@@ -53,6 +54,16 @@ export class FormComponentRendererComponent implements OnInit, OnChanges, AfterV
   apiLoading: boolean = false;
   apiError: string | null = null;
 
+  // Search/Filter properties for selects
+  selectSearchQuery: string = '';
+  delegationSearchQuery: string = '';
+
+  // Delegation properties (for panels)
+  isDelegateCheckboxChecked: boolean = false;
+  delegateServerValue: any = null;
+  showDelegationUI: boolean = false;
+  delegationServerOptions: SelectOption[] = [];
+
   // Subscription management
   private stateSub?: Subscription;
 
@@ -78,6 +89,9 @@ export class FormComponentRendererComponent implements OnInit, OnChanges, AfterV
 
     this.evaluateConditionalLogic();
     this.initializePanelState();
+
+    // Initialize delegation state for panels
+    this.initializeDelegationState();
 
     // Initialize DataGrid specific features
     this.initializeDataGrid();
@@ -110,6 +124,8 @@ export class FormComponentRendererComponent implements OnInit, OnChanges, AfterV
 
       this.evaluateConditionalLogic();
     });
+
+    this.loadDelegationServerOptions();
   }
 
   ngOnDestroy(): void {
@@ -354,6 +370,20 @@ export class FormComponentRendererComponent implements OnInit, OnChanges, AfterV
     }
   }
 
+  private initializeDelegationState(): void {
+    // Initialize delegation state for panels
+    if (this.component.type === ComponentType.PANEL && this.component.properties.delegation) {
+      this.isDelegateCheckboxChecked = this.component.properties.delegation?.isDelegated || this.component.properties.delegation?.delegationCheckbox || false;
+      this.delegateServerValue = this.component.properties.delegation?.delegatedTo || this.component.properties.delegation?.delegationServer || null;
+      this.showDelegationUI = false;
+
+      // If there's existing delegation data, load the server options to display the label
+      if (this.isDelegateCheckboxChecked && this.delegateServerValue) {
+        this.loadDelegationServerOptions();
+      }
+    }
+  }
+
   ngAfterViewInit(): void {
     this.initializeTooltips();
   }
@@ -505,30 +535,42 @@ export class FormComponentRendererComponent implements OnInit, OnChanges, AfterV
     this.onValueChange(target?.value || '');
   }
 
-  onSelectChange(event: Event): void {
-    const target = event.target as HTMLSelectElement;
+  onSelectChange(selectedValue: any): void {
+    // This handler works with ng-select which emits the selected value(s) directly
+    // The [(ngModel)] binding already updates this.value, but we need to sync other state
 
     if (this.component.properties.multiple) {
-      // Handle multiple selection - get all selected options
-      const selectedOptions = Array.from(target.selectedOptions);
-      const selectedValues = selectedOptions.map(option => {
-        if (this.isSelectApiType()) {
-          // For SELECT_API, find and return the full object
-          const apiOption = this.apiOptions.find(opt => opt.value == option.value);
-          return apiOption ? this.getFullObjectFromOption(apiOption) : option.value;
-        } else {
-          return option.value;
-        }
-      });
-      this.onValueChange(selectedValues);
+      // Handle multiple selection
+      const selectedValues = Array.isArray(selectedValue) ? selectedValue : (selectedValue ? [selectedValue] : []);
+
+      if (this.isSelectApiType()) {
+        // For SELECT_API, ensure we have the full objects
+        const processedValues = selectedValues.map(val => {
+          if (typeof val === 'object' && val !== null) {
+            // Already a full object
+            return this.getFullObjectFromOption(val);
+          } else {
+            // Find the full object from options
+            const apiOption = this.apiOptions.find(opt => opt.value == val);
+            return apiOption ? this.getFullObjectFromOption(apiOption) : val;
+          }
+        });
+        this.onValueChange(processedValues);
+      } else {
+        this.onValueChange(selectedValues);
+      }
     } else {
       // Handle single selection
       if (this.isSelectApiType()) {
-        // For SELECT_API, find and return the full object
-        const apiOption = this.apiOptions.find(opt => opt.value == target.value);
-        this.onValueChange(apiOption ? this.getFullObjectFromOption(apiOption) : (target?.value || ''));
+        // For SELECT_API, find and return the full object if needed
+        if (typeof selectedValue === 'object' && selectedValue !== null) {
+          this.onValueChange(this.getFullObjectFromOption(selectedValue));
+        } else {
+          const apiOption = this.apiOptions.find(opt => opt.value == selectedValue);
+          this.onValueChange(apiOption ? this.getFullObjectFromOption(apiOption) : selectedValue);
+        }
       } else {
-        this.onValueChange(target?.value || '');
+        this.onValueChange(selectedValue || '');
       }
     }
   }
@@ -1041,23 +1083,36 @@ export class FormComponentRendererComponent implements OnInit, OnChanges, AfterV
     this.onValueChange(selectedValues);
   }
 
-  onMultiSelectChange(event: Event): void {
-    const target = event.target as HTMLSelectElement;
-    const selectedValue = target.value;
+  onMultiSelectChange(selectedValue: any): void {
+    // This handler works with ng-select for multiple selection mode
+    // ng-select emits the selected value directly
 
     if (!selectedValue) {
       return;
     }
 
-    // Reset the dropdown to default
-    target.value = '';
-
     // Add the selected value to the current selection
     let selectedValues = Array.isArray(this.value) ? [...this.value] : (this.value ? [this.value] : []);
 
-    if (!selectedValues.includes(selectedValue)) {
-      selectedValues.push(selectedValue);
-      this.onValueChange(selectedValues);
+    // For SELECT_API, handle objects or primitive values
+    if (this.isSelectApiType()) {
+      const valueToAdd = typeof selectedValue === 'object' && selectedValue !== null
+        ? this.getFullObjectFromOption(selectedValue)
+        : selectedValue;
+
+      const alreadyExists = this.isSelectApiType()
+        ? selectedValues.some(val => this.compareValues(val, valueToAdd))
+        : selectedValues.includes(selectedValue);
+
+      if (!alreadyExists) {
+        selectedValues.push(valueToAdd);
+        this.onValueChange(selectedValues);
+      }
+    } else {
+      if (!selectedValues.includes(selectedValue)) {
+        selectedValues.push(selectedValue);
+        this.onValueChange(selectedValues);
+      }
     }
   }
 
@@ -1155,18 +1210,26 @@ export class FormComponentRendererComponent implements OnInit, OnChanges, AfterV
   getApiOptions(): SelectOption[] {
     if (this.isSelectApiType()) {
       const options = [...this.apiOptions];
-      
-      // If this is a SERVIDOR component and we have a labelTemplate, format the labels
-      if (this.component.type === ComponentType.SERVIDOR && this.component.properties.apiConfig?.labelTemplate) {
+
+      // Determine the labelTemplate to use
+      let labelTemplate = this.component.properties.apiConfig?.labelTemplate;
+
+      // For SERVIDOR components, apply default labelTemplate if not explicitly set
+      if (this.component.type === ComponentType.SERVIDOR && !labelTemplate) {
+        labelTemplate = '{matricula} - {nome} - {siglaUnidade}';
+      }
+
+      // If we have a labelTemplate, format the labels for all API select types
+      if (labelTemplate) {
         return options.map(option => {
           if (option.originalData) {
-            let formattedLabel = this.component.properties.apiConfig!.labelTemplate!;
-            
+            let formattedLabel = labelTemplate;
+
             // Replace template variables with actual values from originalData
             Object.keys(option.originalData).forEach(key => {
               formattedLabel = formattedLabel.replace(`{${key}}`, option.originalData[key] || '');
             });
-            
+
             return {
               ...option,
               label: formattedLabel
@@ -1175,7 +1238,7 @@ export class FormComponentRendererComponent implements OnInit, OnChanges, AfterV
           return option;
         });
       }
-      
+
       return options;
     }
     return this.getOptions();
@@ -2444,5 +2507,265 @@ export class FormComponentRendererComponent implements OnInit, OnChanges, AfterV
     return condicao;
   }
 
+  // Track by methods
+  trackByOption(index: number, option: SelectOption): any {
+    return option.value;
+  }
+
+  // Delegation methods for panel components
+  onDelegateCheckboxChange(event: Event): void {
+    const target = event.target as HTMLInputElement;
+    this.isDelegateCheckboxChecked = target?.checked || false;
+
+    if (this.isDelegateCheckboxChecked) {
+      this.showDelegationUI = true;
+      this.apiError = null;
+      // Load delegation options only if not already loaded
+      if (this.delegationServerOptions.length === 0) {
+        this.loadDelegationServerOptions();
+      }
+    } else {
+      this.showDelegationUI = false;
+      this.delegateServerValue = null;
+      this.apiLoading = false;
+      this.apiError = null;
+    }
+  }
+
+  onDelegateServerChange(selectedValue: any): void {
+    // ngModelChange already updates delegateServerValue via two-way binding
+    // This method can be used for any additional side effects if needed
+  }
+
+  private delegationOptionsLoadingInProgress: boolean = false;
+
+  loadDelegationServerOptions(): void {
+    // Prevent multiple simultaneous requests
+    if (this.delegationOptionsLoadingInProgress || this.delegationServerOptions.length > 0) {
+      return;
+    }
+
+    // Load SERVIDOR component options for delegation
+    const apiConfig = this.formBuilderService.getApiConfigServidor();
+
+    if (!apiConfig || !apiConfig.url) {
+      return;
+    }
+
+    this.delegationOptionsLoadingInProgress = true;
+    this.apiLoading = true;
+    this.apiError = null;
+
+    this.apiSelectService.fetchOptions(apiConfig as any)
+      .subscribe(
+        (options: SelectOption[]) => {
+          // Apply labelTemplate formatting if available
+          if (apiConfig.labelTemplate) {
+            this.delegationServerOptions = options.map(option => {
+              if (option.originalData) {
+                let formattedLabel = apiConfig.labelTemplate;
+
+                // Replace template variables with actual values from originalData
+                Object.keys(option.originalData).forEach(key => {
+                  formattedLabel = formattedLabel.replace(`{${key}}`, option.originalData[key] || '');
+                });
+
+                return {
+                  ...option,
+                  label: formattedLabel
+                };
+              }
+              return option;
+            });
+          } else {
+            this.delegationServerOptions = options;
+          }
+
+          console.log("9999999999999999999999999999999");
+          console.log(this.delegationServerOptions);
+          this.apiLoading = false;
+          this.delegationOptionsLoadingInProgress = false;
+        },
+        (error: any) => {
+          this.apiError = 'Erro ao carregar servidores';
+          this.apiLoading = false;
+          this.delegationOptionsLoadingInProgress = false;
+        }
+      );
+  }
+
+  onDelegationOkClick(): void {
+    if (!this.delegateServerValue) {
+      alert('Por favor, selecione um servidor para delegar');
+      return;
+    }
+
+    // Always update component properties delegation (works in both builder and preview modes)
+    if (!this.component.properties.delegation) {
+      this.component.properties.delegation = {
+        isDelegated: false,
+        delegatedTo: null,
+        delegationCheckbox: false,
+        delegationServer: null
+      };
+    }
+
+    const delegation = this.component.properties.delegation!;
+    delegation.isDelegated = true;
+    delegation.delegatedTo = this.delegateServerValue;
+    delegation.delegationCheckbox = this.isDelegateCheckboxChecked;
+    delegation.delegationServer = this.delegateServerValue;
+
+    if (this.previewMode) {
+      // In preview mode, also update form data
+      this.formBuilderService.updateComponent(this.component.id, {
+        properties: this.component.properties
+      });
+    } else {
+      // In builder mode, update component in service
+      this.formBuilderService.updateComponent(this.component.id, {
+        properties: this.component.properties
+      });
+    }
+
+    // Emit delegation event via parent form-builder
+    this.formBuilderService.emitDelegationEvent({
+      componentId: this.component.id,
+      componentLabel: this.component.label,
+      delegatedTo: this.delegateServerValue,
+      isDelegated: this.isDelegateCheckboxChecked,
+      delegationCheckbox: this.isDelegateCheckboxChecked
+    });
+
+    // Reset UI
+    this.showDelegationUI = false;
+  }
+
+  onDelegationCancelClick(): void {
+    // Clear delegation UI without saving
+    this.isDelegateCheckboxChecked = false;
+    this.showDelegationUI = false;
+    this.delegateServerValue = null;
+    this.apiLoading = false;
+    this.apiError = null;
+  }
+
+  onDelegationRemoveClick(): void {
+    // Clear delegation info from component properties (works in both modes)
+    if (this.component.properties.delegation) {
+      const delegation = this.component.properties.delegation;
+      delegation.isDelegated = false;
+      delegation.delegatedTo = null;
+      delegation.delegationCheckbox = false;
+      delegation.delegationServer = null;
+    }
+
+    // Update component in service
+    this.formBuilderService.updateComponent(this.component.id, {
+      properties: this.component.properties
+    });
+
+    // Reset local UI state
+    this.isDelegateCheckboxChecked = false;
+    this.showDelegationUI = false;
+    this.delegateServerValue = null;
+  }
+
+  getDelegationServerLabel(): string {
+    if (!this.delegateServerValue) {
+      return '';
+    }
+    console.log(this.delegateServerValue);
+    console.log(this.delegationServerOptions);
+    const option = this.delegationServerOptions.find(opt => opt.value === this.delegateServerValue);
+    return option?.label || this.delegateServerValue;
+  }
+
+  // ============ SEARCH/FILTER METHODS ============
+
+  /**
+   * Get filtered options based on search query for regular select
+   */
+  getFilteredOptions(): SelectOption[] {
+    if (!this.selectSearchQuery.trim()) {
+      return this.getOptions();
+    }
+
+    const query = this.selectSearchQuery.toLowerCase();
+    return this.getOptions().filter(option =>
+      option.label.toLowerCase().includes(query)
+    );
+  }
+
+  /**
+   * Get filtered API options based on search query
+   */
+  getFilteredApiOptions(): SelectOption[] {
+    if (!this.selectSearchQuery.trim()) {
+      return this.getApiOptions();
+    }
+
+    const query = this.selectSearchQuery.toLowerCase();
+    return this.getApiOptions().filter(option =>
+      option.label.toLowerCase().includes(query)
+    );
+  }
+
+  /**
+   * Get filtered delegation server options based on search query
+   */
+  getFilteredDelegationOptions(): SelectOption[] {
+    if (!this.delegationSearchQuery.trim()) {
+      return this.delegationServerOptions;
+    }
+
+    const query = this.delegationSearchQuery.toLowerCase();
+    return this.delegationServerOptions.filter(option =>
+      option.label.toLowerCase().includes(query)
+    );
+  }
+
+  /**
+   * Handle search input change for regular select
+   */
+  onSelectSearchChange(event: Event): void {
+    const target = event.target as HTMLInputElement;
+    this.selectSearchQuery = target.value;
+  }
+
+  /**
+   * Handle search input change for delegation select
+   */
+  onDelegationSearchChange(event: Event): void {
+    const target = event.target as HTMLInputElement;
+    this.delegationSearchQuery = target.value;
+  }
+
+  /**
+   * Clear search query for select
+   */
+  clearSelectSearch(): void {
+    this.selectSearchQuery = '';
+  }
+
+  /**
+   * Clear search query for delegation select
+   */
+  clearDelegationSearch(): void {
+    this.delegationSearchQuery = '';
+  }
+
+  /**
+   * Compare function for ng-select to properly match selected values with options
+   */
+  compareSelectOptions(o1: any, o2: any): boolean {
+    if (o1 === null || o2 === null) {
+      return o1 === o2;
+    }
+    if (typeof o1 === 'object' && typeof o2 === 'object') {
+      return o1.value === o2.value;
+    }
+    return o1 === o2;
+  }
 
 }

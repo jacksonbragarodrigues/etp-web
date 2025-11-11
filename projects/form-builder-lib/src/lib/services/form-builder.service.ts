@@ -48,6 +48,9 @@ export class FormBuilderService {
   private openPropertiesTabSubject = new Subject<void>();
   public openPropertiesTab$ = this.openPropertiesTabSubject.asObservable();
 
+  private delegationEventSubject = new Subject<any>();
+  public delegationEvent$ = this.delegationEventSubject.asObservable();
+
   private componentTemplates: ComponentTemplate[] = [
     {
       type: ComponentType.INPUT,
@@ -285,7 +288,7 @@ export class FormBuilderService {
       type: ComponentType.SELECT_API,
       label: 'Select API',
       icon: 'bi-cloud-download',
-      category: ComponentCategory.NENHUMA,
+      category: ComponentCategory.CUSTOM,
       description: 'Selecione com opções do endpoint externo da API',
       placeholder: '...',
       defaultProperties: {
@@ -364,8 +367,9 @@ export class FormBuilderService {
           method: 'GET',
           headers: {},
           token: '',
-          labelField: 'name',
+          labelField: 'nome',
           valueField: 'id',
+          labelTemplate: '{matricula} - {nome} - {siglaUnidade}',
           cache: true,
           cacheTimeout: 30,
         }
@@ -583,11 +587,14 @@ export class FormBuilderService {
       };
     }
 
+
     if (type === ComponentType.SERVIDOR) {
       component.label = 'Servidor';
       component.key = 'PAR_SERVIDOR_PAR';
       // Initialize empty options array first
       component.properties.options = [];
+      //component.properties.multiple = true;
+      
       component.properties.apiConfig = {
         url: this.environmenter.apiFormulario + '/sarhclient/listaservidores?limit=' + this.environmenter.formioLimitReturnAPI,
         method: 'GET',
@@ -839,9 +846,65 @@ export class FormBuilderService {
     }));
   }
 
+  /**
+   * Exporta apenas a estrutura do formulário, sem dados de usuário
+   * Remove: value, rows, selected, valid, etc.
+   */
   exportFormSchema(): string {
     const state = this.getCurrentState();
-    return JSON.stringify(state.formSchema, null, 2);
+    const cleanSchema = this.cleanSchemaForExport(state.formSchema);
+    return JSON.stringify(cleanSchema, null, 2);
+  }
+
+  /**
+   * Remove todos os dados de usuário do schema, mantendo apenas a estrutura
+   */
+  private cleanSchemaForExport(schema: FormSchema): FormSchema {
+    const cleanedSchema: FormSchema = {
+      ...schema,
+      steps: schema.steps.map(step => ({
+        ...step,
+        components: this.cleanComponentsForExport(step.components),
+        valid: undefined // Remove validation state
+      }))
+    };
+    return cleanedSchema;
+  }
+
+  /**
+   * Limpa componentes recursivamente, removendo valores e dados de runtime
+   */
+  private cleanComponentsForExport(components: FormComponent[]): FormComponent[] {
+    return components.map(component => {
+      const cleaned: FormComponent = {
+        ...component,
+        value: undefined, // Remove dados de usuário
+        rows: undefined, // Remove dados de DataGrid
+        valid: undefined, // Remove estado de validação runtime
+        properties: {
+          ...component.properties,
+          delegation: component.properties.delegation ? {
+            isDelegated: false, // Reset delegation state
+            delegatedTo: undefined
+          } : undefined
+        }
+      };
+
+      // Limpar opções selecionadas
+      if (cleaned.properties.options && Array.isArray(cleaned.properties.options)) {
+        cleaned.properties.options = cleaned.properties.options.map(opt => ({
+          ...opt,
+          selected: undefined // Remove selected flag
+        }));
+      }
+
+      // Processar componentes filhos recursivamente
+      if (component.children && component.children.length > 0) {
+        cleaned.children = this.cleanComponentsForExport(component.children);
+      }
+
+      return cleaned;
+    });
   }
 
   importFormSchema(schemaJson: string): void {
@@ -2038,7 +2101,7 @@ export class FormBuilderService {
       : (payload && typeof payload === 'object' ? payload : null);
 
     if (!annotationsMap || Array.isArray(annotationsMap)) {
-      throw new Error('Formato inválido: esperado objeto com "annotations" ou mapa de anotações');
+      throw new Error('Formato inv��lido: esperado objeto com "annotations" ou mapa de anotações');
     }
 
     // Normaliza: garantir arrays
@@ -2217,6 +2280,15 @@ export class FormBuilderService {
         formData[component.key] = component.value;
       }
 
+      // Extrair dados de delegação para PANEL components
+      if (component.type === ComponentType.PANEL && component.key && component.properties.delegation) {
+        const delegation = component.properties.delegation;
+        formData[`${component.key}__delegate_checkbox`] = delegation.isDelegated || false;
+        if (delegation.delegatedTo) {
+          formData[`${component.key}__delegate_server`] = delegation.delegatedTo;
+        }
+      }
+
       // Processar componentes filhos recursivamente
       // CORREÇÃO: Para DataGrid, não processar children pois são templates
       // e seus dados já estão extraídos das rows acima
@@ -2248,6 +2320,24 @@ export class FormBuilderService {
 
         // Sincronizar valor com opções selecionadas para select e radio
         this.syncComponentValueWithOptions(component);
+      }
+
+      // Restaurar dados de delegação para PANEL components
+      if (component.type === ComponentType.PANEL && component.key) {
+        const delegateCheckboxKey = `${component.key}__delegate_checkbox`;
+        const delegateServerKey = `${component.key}__delegate_server`;
+
+        if (!component.properties.delegation) {
+          component.properties.delegation = { isDelegated: false };
+        }
+
+        if (formData.hasOwnProperty(delegateCheckboxKey)) {
+          component.properties.delegation.isDelegated = formData[delegateCheckboxKey] === true;
+        }
+
+        if (formData.hasOwnProperty(delegateServerKey)) {
+          component.properties.delegation.delegatedTo = formData[delegateServerKey];
+        }
       }
 
       // Processar componentes filhos recursivamente
@@ -2898,4 +2988,24 @@ export class FormBuilderService {
     return copy;
   }
 
+  // Delegation event methods
+  emitDelegationEvent(data: any): void {
+    this.delegationEventSubject.next(data);
+  }
+
+  getApiConfigServidor() : any {
+        return {
+        url: this.environmenter.apiFormulario + '/sarhclient/listaservidores?limit=' + this.environmenter.formioLimitReturnAPI,
+        method: 'GET',
+        headers: {},
+        token: '',
+        labelField: "nome",
+        valueField: 'matricula',
+        labelTemplate: '{matricula} - {nome} - {siglaUnidade}',
+        requestBody: '',
+        cache: true,
+        cacheTimeout: 30,
+      };
+  }
+  
 }

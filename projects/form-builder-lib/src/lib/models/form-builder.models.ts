@@ -98,6 +98,13 @@ export interface ComponentProperties {
   // Text Help specific properties
   help?: string; // HTML content for help text
   onlyInternal?: boolean; // Flag to determine styling
+  // Delegation properties (for panel components)
+  delegation?: {
+    isDelegated: boolean;
+    delegatedTo?: any; // The selected server/delegate
+    delegationCheckbox?: boolean;
+    delegationServer?: any;
+  };
 }
 
 export interface ColumnDefinition {

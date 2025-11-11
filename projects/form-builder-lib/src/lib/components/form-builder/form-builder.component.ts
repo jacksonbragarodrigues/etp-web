@@ -94,11 +94,13 @@ export class FormBuilderComponent implements OnInit, OnDestroy, OnChanges {
   @Input() onCancelEvent?: string; // Nome do evento para cancelar
   @Input() onSaveEvent?: string; // Nome do evento para salvar
   @Input() onUndoEvent?: string; // Nome do evento para desfazer
+  @Input() onDelegateEvent?: string; // Nome do evento para delegação
 
   @Output() formJsonChange = new EventEmitter<string>();
   @Output() footerAction = new EventEmitter<{action: string, data?: any}>();
   @Output() dataJsonChange = new EventEmitter<string>();
   @Output() analysisJsonChange = new EventEmitter<string>();
+  @Output() delegationEvent = new EventEmitter<{action: string, data?: any}>();
 
   // Analysis feature state
   activeAnalysisTab: 'lista' | 'nova' = 'lista';
@@ -154,6 +156,15 @@ export class FormBuilderComponent implements OnInit, OnDestroy, OnChanges {
     this.formBuilderService.stepLoading$
       .pipe(takeUntil(this.destroy$))
       .subscribe(isLoading => { this.isStepLoading = isLoading; this.cdr.markForCheck(); });
+
+    // Delegation event subscription
+    this.formBuilderService.delegationEvent$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(data => {
+        if (this.onDelegateEvent) {
+          this.delegationEvent.emit({ action: this.onDelegateEvent, data });
+        }
+      });
 
     // Apply initial inputs if provided
     this.applyInputs();
@@ -1015,7 +1026,7 @@ export class FormBuilderComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   buildNumberedItems() {
-    const items: { stepNumber: number; number: string; component: FormComponent; depth: number }[] = [];
+    const items: { stepNumber: number; number: string; component: FormComponent; depth: number; displayLabel: string }[] = [];
 
     this.state.formSchema.steps.forEach((step, sIdx) => {
       if (!this.shouldIncludeStep(step)) return;
@@ -1044,7 +1055,13 @@ export class FormBuilderComponent implements OnInit, OnDestroy, OnChanges {
         }
 
         const num = getNumber(depth);
-        items.push({ stepNumber: sIdx + 1, number: num, component: comp, depth });
+        items.push({
+          stepNumber: sIdx + 1,
+          number: num,
+          component: comp,
+          depth,
+          displayLabel: `${num} - ${comp.label || this.getComponentTypeLabel(comp.type)}`
+        });
 
         if (this.isContainerComponent(comp) && comp.children && comp.children.length) {
           comp.children.forEach(child => visit(child, depth + 1));
