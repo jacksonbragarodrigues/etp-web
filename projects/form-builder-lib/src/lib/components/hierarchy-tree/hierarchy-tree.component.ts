@@ -113,19 +113,12 @@ export class HierarchyTreeComponent implements OnInit, OnDestroy {
 
     // Prevent multiple drag starts
     if (this.dragInProgress) {
-      // console.log('Drag already in progress, ignoring');
       event.preventDefault();
       return;
     }
 
     this.dragInProgress = true;
     this.draggedNode = node;
-    // console.log('Starting drag for node:', {
-    //   id: node.id,
-    //   label: node.label,
-    //   type: node.type,
-    //   parentId: node.parentId
-    // });
 
     event.dataTransfer!.setData('application/json', JSON.stringify({
       nodeId: node.id,
@@ -167,19 +160,6 @@ export class HierarchyTreeComponent implements OnInit, OnDestroy {
     event.preventDefault();
     event.stopPropagation();
 
-    // console.log('Drop event triggered:', {
-    //   draggedNode: this.draggedNode ? {
-    //     id: this.draggedNode.id,
-    //     label: this.draggedNode.label,
-    //     parentId: this.draggedNode.parentId
-    //   } : null,
-    //   targetNode: targetNode ? {
-    //     id: targetNode.id,
-    //     label: targetNode.label,
-    //     parentId: targetNode.parentId
-    //   } : null
-    // });
-
     if (!this.draggedNode) {
       console.warn('No dragged node found');
       return;
@@ -187,13 +167,10 @@ export class HierarchyTreeComponent implements OnInit, OnDestroy {
 
     try {
       const data = JSON.parse(event.dataTransfer!.getData('application/json'));
-  // console.log('Drop data:', data);
 
       if (data.source === 'tree' && data.nodeId !== targetNode?.id) {
-        // console.log('Proceeding with move operation');
         this.moveNode(this.draggedNode, targetNode);
       } else {
-        // console.log('Drop cancelled - same node or invalid source');
       }
     } catch (error) {
       console.error('Error handling tree drop:', error);
@@ -209,7 +186,6 @@ export class HierarchyTreeComponent implements OnInit, OnDestroy {
       return;
     }
 
-  // console.log('Cleaning up drag state');
     this.draggedNode = null;
     this.dragOverNode = null;
     this.dragInProgress = false;
@@ -217,7 +193,6 @@ export class HierarchyTreeComponent implements OnInit, OnDestroy {
     // Force a tree rebuild to ensure consistency
     setTimeout(() => {
       this.buildTree();
-  // console.log('Tree rebuilt after drag operation');
     }, 50);
   }
 
@@ -380,23 +355,9 @@ export class HierarchyTreeComponent implements OnInit, OnDestroy {
       return;
     }
 
-    // console.log('Found dragged component:', {
-    //   id: draggedComponent.id,
-    //   label: draggedComponent.label,
-    //   parentId: draggedComponent.parentId,
-    //   hasChildren: !!draggedComponent.children
-    // });
-
     // Store original position info before removal
     const originalParentId = draggedComponent.parentId;
     const originalIndex = this.getComponentIndex(currentStep.components, draggedComponent.id, originalParentId);
-
-    // console.log('Moving component:', {
-    //   label: draggedNode.label,
-    //   originalParentId,
-    //   originalIndex,
-    //   targetLabel: targetNode?.label || 'root'
-    // });
 
     // Create a deep copy of the component
     const componentCopy = this.deepCopyComponent(draggedComponent);
@@ -419,13 +380,6 @@ export class HierarchyTreeComponent implements OnInit, OnDestroy {
 
       newParentId = targetComponent.parentId;
       insertIndex = this.getComponentIndex(currentStep.components, targetNode.id, newParentId);
-
-      // console.log('Target component details:', {
-      //   targetId: targetNode.id,
-      //   targetLabel: targetNode.label,
-      //   targetParentId: targetComponent.parentId,
-      //   calculatedIndex: insertIndex
-      // });
 
       // Adjust index for same parent moves
       if (originalParentId === newParentId) {
@@ -457,10 +411,6 @@ export class HierarchyTreeComponent implements OnInit, OnDestroy {
         this.formBuilderService.addComponent(componentCopy, undefined, newParentId);
       }
 
-      // console.log('Moved node successfully:', {
-      //   from: { parentId: originalParentId, index: originalIndex },
-      //   to: { parentId: newParentId, index: insertIndex }
-      // });
     }, 10);
   }
 
@@ -477,14 +427,6 @@ export class HierarchyTreeComponent implements OnInit, OnDestroy {
     }
 
     const index = targetComponents.findIndex(c => c.id === componentId);
-    // console.log('getComponentIndex:', {
-    //   componentId,
-    //   parentId,
-    //   targetComponentsCount: targetComponents.length,
-    //   foundIndex: index,
-    //   targetComponentIds: targetComponents.map(c => c.id),
-    //   parentFound: parentId ? !!this.findComponentById(components, parentId) : 'root'
-    // });
 
     return index;
   }

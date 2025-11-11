@@ -29,13 +29,8 @@ function generateHash() {
 
   return hash.digest('hex');
 }
-
-// console.log('Gerando novo hash para versionamento...');
-
 const hash = generateHash();
 
 // Grava apenas o version.json em assets
 const versionJsonPath = path.join(__dirname, 'src', 'assets', 'version.json');
 fs.writeFileSync(versionJsonPath, JSON.stringify({ version: hash }));
-// console.log(`Novo version.json criado: ${versionJsonPath}`);
-// console.log(`Hash: ${hash}`);

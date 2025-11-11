@@ -36,13 +36,13 @@ export class ReportService {
     const state = this.formBuilderService.getCurrentState();
     const formSchema = state.formSchema;
 
-    // Include ALL steps without any filtering
+    // Include ALL steps - no filtering for conditional logic
     const allSteps = formSchema.steps;
     const summary = this.generateSummary(allSteps);
 
     const content = allSteps.map((step, stepIndex) => {
       const context: NumberingContext = { stepIndex: stepIndex + 1, componentNumbers: [] };
-      return this.generateStepContentFullStructure(step, context);
+      return this.generateStepContentFull(step, context);
     }).join('\n');
 
     return this.generateFullHTML(formSchema.name || 'Formulário', summary, content);
@@ -117,7 +117,7 @@ ${summaryItems}
     return stepHeader + '\n' + componentsContent;
   }
 
-  private generateStepContentFullStructure(step: FormStep, context: NumberingContext): string {
+  private generateStepContentFull(step: FormStep, context: NumberingContext): string {
     const stepNumber = context.stepIndex;
 
     context.componentNumbers = [0];
@@ -129,10 +129,166 @@ ${summaryItems}
   </section>`;
 
     const componentsContent = step.components.map(component => {
-      return this.generateComponentStructure(component, context, 0);
+      return this.generateComponentContentFull(component, context, 0);
     }).filter(c => c && c.trim() !== '').join('\n');
 
     return stepHeader + '\n' + componentsContent;
+  }
+
+  private generateComponentContentFull(component: FormComponent, context: NumberingContext, depth: number): string {
+    // Full report: render ALL components in exact JSON order
+    // - No data values
+    // - No conditional logic filtering
+    // - No hideLabel accumulation
+    // - Just show structure with labels
+    // - Include TEXT_HELP with their styled content
+    // - Include metadata: required status, hideLabel status, conditional logic
+
+    if (context.componentNumbers.length <= depth) {
+      context.componentNumbers.push(1);
+    } else {
+      context.componentNumbers[depth]++;
+      context.componentNumbers = context.componentNumbers.slice(0, depth + 1);
+    }
+
+    const currentNumber = this.getComponentNumber(context, depth);
+    const numberedLabel = `${currentNumber} - ${component.label || this.getComponentTypeLabel(component.type)}`;
+
+    let html = '';
+
+    if (this.isContainerComponent(component)) {
+      // For containers, just show the label
+      html += `  <article class="inner-section small-number" id="${currentNumber.replace(/\s/g, '')}">
+    ${numberedLabel}
+  </article>\n`;
+
+      // Add metadata information below the component
+      html += this.generateComponentMetadataFull(component);
+
+      // Render ALL children in JSON order
+      if (component.children && component.children.length > 0) {
+        const childrenContent = component.children.map(child => {
+          return this.generateComponentContentFull(child, context, depth + 1);
+        }).filter(content => content.trim() !== '').join('\n');
+
+        html += childrenContent;
+      }
+    } else if (component.type === ComponentType.TEXT_HELP) {
+      // For TEXT_HELP components, show label and the help content with styling
+      const helpContent = (component.properties as any).help || '';
+      const isInternal = (component.properties as any).onlyInternal || false;
+
+      // Style for internal vs external notes
+      const bgColor = isInternal ? '#fff3cd' : '#e7f3ff';  // Yellow for internal, blue for external
+      const borderColor = isInternal ? '#ffc107' : '#0066cc';  // Yellow border for internal, blue for external
+      const textColor = isInternal ? '#856404' : '#003d99';  // Dark yellow for internal, dark blue for external
+
+      html += `  <article class="inner-section small-number" id="${currentNumber.replace(/\s/g, '')}">
+    ${numberedLabel}
+  </article>`;
+
+      if (helpContent.trim()) {
+        html += `
+  <div style="border-left: 1px solid black; border-right: 1px solid black; border-bottom: 1px solid black; padding: 0px; margin: 0px 0; background-color: inherit;">
+    <div style="background-color: ${bgColor}; padding: 12px 16px; margin: 0px 10px 0px 10px; color: ${textColor}; border-left: 1px solid ${borderColor}; border-right: 1px solid ${borderColor};">
+      ${helpContent}
+    </div>
+  </div>`;
+      }
+
+      // Add metadata information below TEXT_HELP component
+      html += this.generateComponentMetadataFull(component);
+    } else if (component.type === ComponentType.DATAGRID) {
+      // For datagrids, just show the label (no table content)
+      html += `  <article class="inner-section small-number" id="${currentNumber.replace(/\s/g, '')}">
+    ${numberedLabel}
+  </article>`;
+
+      // Add metadata information below the component
+      html += this.generateComponentMetadataFull(component);
+    } else {
+      // For leaf components, show label only (no value)
+      html += `  <article class="inner-section small-number" id="${currentNumber.replace(/\s/g, '')}">
+    ${numberedLabel}
+  </article>`;
+
+      // Add metadata information below the component
+      html += this.generateComponentMetadataFull(component);
+    }
+
+    return html;
+  }
+
+  private generateComponentMetadataFull(component: FormComponent): string {
+    const metadataItems: string[] = [];
+
+    // Add required status
+    if (component.required !== undefined) {
+      const requiredText = component.required ? 'Obrigatório' : 'Não Obrigatório';
+      metadataItems.push(`Preenchimento: ${requiredText}`);
+    }
+
+    // Add hideLabel status
+    if (component.properties?.hideLabel === true) {
+      metadataItems.push('Rótulo: Oculto');
+    }
+
+    // Add conditional logic
+    const conditionalText = this.getConditionalTextFull(component);
+    if (conditionalText) {
+      metadataItems.push(`Condicional: ${conditionalText}`);
+    }
+
+    // If no metadata items, return empty string
+    if (metadataItems.length === 0) {
+      return '';
+    }
+
+    // Generate HTML with borders matching inner-section style
+    let metadata = '';
+    metadataItems.forEach((item, index) => {
+      const isLast = index === metadataItems.length - 1;
+      const borderBottom = isLast ? 'border-bottom: 1px solid black;' : '';
+      metadata += `  <div class="component-meta-item" style="border-left: 1px solid black; border-right: 1px solid black; ${borderBottom} padding: 2px; margin: 0px 0; font-size: 0.9em; color: #555; background-color: inherit;">
+    ${item}
+  </div>\n`;
+    });
+
+    return metadata;
+  }
+
+  private getConditionalTextFull(component: FormComponent): string {
+    const conditional = component.properties?.conditional;
+    if (!conditional || !conditional.when) {
+      return '';
+    }
+
+    // Resolve watched component id
+    const whenIds = Array.isArray(conditional.when)
+      ? conditional.when.filter((w: any) => w && String(w).trim())
+      : (String(conditional.when).trim() ? [String(conditional.when).trim()] : []);
+
+    const watchedId = whenIds[0];
+    if (!watchedId) {
+      return '';
+    }
+
+    // Get the watched component by id
+    const watchedComponent = this.formBuilderService.getComponentById(watchedId);
+    const watchedLabel = watchedComponent ? watchedComponent.label : 'indefinido';
+
+    // Get the expected value label
+    let eqLabel = conditional.eq;
+    if (watchedComponent && watchedComponent.properties?.options && Array.isArray(watchedComponent.properties.options)) {
+      const option = watchedComponent.properties.options.find((o: any) => o.value === conditional.eq);
+      if (option) {
+        eqLabel = option.label;
+      }
+    }
+
+    // Build the conditional text
+    const action = conditional.show === 'true' ? 'Mostrar' : 'Ocultar';
+    return `${action} quando ${watchedLabel} = ${eqLabel}`;
   }
 
   private generateComponentContent(component: FormComponent, context: NumberingContext, depth: number, mode: 'full' | 'summary' = 'full'): string {
@@ -212,42 +368,7 @@ ${summaryItems}
     return html;
   }
 
-  private generateComponentStructure(component: FormComponent, context: NumberingContext, depth: number): string {
-    // Full structure report: show component labels/structure in JSON order
-    // - No data values
-    // - No accumulation of hideLabel components
-    // - No filtering or special processing
-    // - Just list in the exact order they appear in JSON
 
-    if (context.componentNumbers.length <= depth) {
-      context.componentNumbers.push(1);
-    } else {
-      context.componentNumbers[depth]++;
-      context.componentNumbers = context.componentNumbers.slice(0, depth + 1);
-    }
-
-    const currentNumber = this.getComponentNumber(context, depth);
-    const componentLabel = component.label || this.getComponentTypeLabel(component.type);
-    const numberedLabel = `${currentNumber} - ${componentLabel}`;
-
-    let html = '';
-
-    // Always render the component label (regardless of type or hideLabel)
-    html += `  <article class="inner-section small-number" id="${currentNumber.replace(/\s/g, '')}">
-    ${numberedLabel}
-  </article>\n`;
-
-    // If component has children, render them recursively in JSON order
-    if (component.children && component.children.length > 0) {
-      const childrenContent = component.children.map(child => {
-        return this.generateComponentStructure(child, context, depth + 1);
-      }).filter(content => content.trim() !== '').join('\n');
-
-      html += childrenContent;
-    }
-
-    return html;
-  }
 
   private generateDataGridContent(component: FormComponent, currentNumber: string, numberedLabel: string): string {
     let html = `  <article class="inner-section small-number" id="${currentNumber.replace(/\s/g, '')}">

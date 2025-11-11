@@ -297,7 +297,8 @@ export class ModalConstruirFormularioComponent implements OnInit, OnDestroy {
         label: 'Relatório Completo',
         icon: 'fa fa-fw fa-file-invoice',
         command: () => {
-          this.onGenerateReport();
+          this.menuIndex = 4;
+          this.onGenerateReportCompleto();
 
           // if (
           //   this.formulario.jsonDados === null ||
@@ -323,15 +324,15 @@ export class ModalConstruirFormularioComponent implements OnInit, OnDestroy {
         },
         disabled: this.itemMenu[4],
       },
-      {
-        icon: 'fa fa-fw fa-code-compare',
-        label: 'Comparar Versões',
-        command: () => {
-          this.menuIndex = 3;
-          this.renderCompararHtml();
-        },
-        disabled: this.itemMenu[3],
-      },
+      // {
+      //   icon: 'fa fa-fw fa-code-compare',
+      //   label: 'Comparar Versões',
+      //   command: () => {
+      //     this.menuIndex = 3;
+      //     this.renderCompararHtml();
+      //   },
+      //   disabled: this.itemMenu[3],
+      // },
       // {
       //   label: 'Salvar Padrão',
       //   icon: 'fa fa-fw fa-save',
@@ -415,9 +416,6 @@ export class ModalConstruirFormularioComponent implements OnInit, OnDestroy {
     this.initObjectForm();
     this.setDadosFormulario(formulario);
     if (formulario?.jsonForm) {
-      console.log("MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM");
-      // console.log("MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM");
-      // console.log(formulario);
       this.parametros.IS_SALVAR = false;
       // Detect whether jsonForm is a Form.io schema (has components)
       // or our internal schema (has steps) and call the correct importer.
@@ -425,17 +423,13 @@ export class ModalConstruirFormularioComponent implements OnInit, OnDestroy {
         const parsed = typeof formulario.jsonForm === 'string'
           ? JSON.parse(formulario.jsonForm)
           : formulario.jsonForm;
-        // console.log(parsed);
         if (parsed && Array.isArray(parsed.components)) {
-          // console.log("PASSO 11111");
           // It's a Form.io JSON
           this.formBuilderService.importFormioSchema(JSON.stringify(parsed));
         } else if (parsed && Array.isArray(parsed.steps)) {
-          // console.log("PASSO 222222");
           // It's our internal schema
           this.formBuilderService.importFormSchema(JSON.stringify(parsed));
         } else {
-          // console.log("PASSO 333333");
           // Unknown format: attempt to import as internal schema as a best-effort
           this.formBuilderService.importFormSchema(JSON.stringify(parsed));
         }
@@ -575,7 +569,6 @@ export class ModalConstruirFormularioComponent implements OnInit, OnDestroy {
 
   saveSimulador() {
     const dataJson = this.formBuilderService.exportFormData();
-    console.log(dataJson);
     const dadosInformados = {
       id: this.formulario?.id,
       jsonDados: dataJson,
@@ -634,7 +627,6 @@ export class ModalConstruirFormularioComponent implements OnInit, OnDestroy {
 
 
   closeFormulario() {
-    console.log("closeFormulario");
     if (this.formBuilderService.hasUnsavedStructuralChanges()) {
       this.alertUtils.confirmDialog(this.parametros.MSG_GRAVAR_CONSTRUTOR).then((dataConfirme) => {
         if (!dataConfirme) {
@@ -1210,13 +1202,15 @@ export class ModalConstruirFormularioComponent implements OnInit, OnDestroy {
   onGenerateReport(): void {
     try {
       this.currentReportContent = this.reportService.generateHTMLReport();
-      this.isReportPanelOpen = false;
-      const reportWindow = window.open('', '_blank');
-      if (reportWindow) {
-        reportWindow.document.open();
-        reportWindow.document.write(this.currentReportContent);
-        reportWindow.document.close();
-      }
+
+     
+      // this.isReportPanelOpen = false;
+      // const reportWindow = window.open('', '_blank');
+      // if (reportWindow) {
+      //   reportWindow.document.open();
+      //   reportWindow.document.write(this.currentReportContent);
+      //   reportWindow.document.close();
+      // }
     } catch (error) {
       console.error('Erro ao gerar relatório:', error);
       alert('Erro ao gerar relatório: ' + error);
@@ -1226,13 +1220,13 @@ export class ModalConstruirFormularioComponent implements OnInit, OnDestroy {
   onGenerateReportCompleto(): void {
     try {
       this.currentReportContent = this.reportService.generateHTMLReportFull();
-      this.isReportPanelOpen = false;
-      const reportWindow = window.open('', '_blank');
-      if (reportWindow) {
-        reportWindow.document.open();
-        reportWindow.document.write(this.currentReportContent);
-        reportWindow.document.close();
-      }
+      // this.isReportPanelOpen = false;
+      // const reportWindow = window.open('', '_blank');
+      // if (reportWindow) {
+      //   reportWindow.document.open();
+      //   reportWindow.document.write(this.currentReportContent);
+      //   reportWindow.document.close();
+      // }
     } catch (error) {
       console.error('Erro ao gerar relatório:', error);
       alert('Erro ao gerar relatório: ' + error);
@@ -1257,7 +1251,6 @@ export class ModalConstruirFormularioComponent implements OnInit, OnDestroy {
   }
 
   handleFormBuilderActionSimulador(event: { action: string, data?: any }): void {
-    console.log("handleFormBuilderActionSimulador >>>>>>>>>>>>>>>>>>>....")
     switch (event.action) {
       case 'saveSimulador':
         this.saveSimulador();
@@ -1271,7 +1264,6 @@ export class ModalConstruirFormularioComponent implements OnInit, OnDestroy {
   }
 
   undoLastActionFormulario() {
-    console.log("undoLastActionFormulario")
     this.formBuilderService.resetChanges();
   }
 

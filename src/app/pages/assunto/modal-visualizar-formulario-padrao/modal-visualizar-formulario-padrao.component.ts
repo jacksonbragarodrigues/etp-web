@@ -435,7 +435,6 @@ export class ModalVisualizarFormularioPadraoComponent
     if (btnFechaFormulario) {
       btnFechaFormulario?.parentNode?.removeChild(btnFechaFormulario);
     } else {
-      // console.log('Botão com ref="btnFechaFormulario" não encontrado.');
     }
     const existingButtonView = document.querySelector(
       `.${uniqueNameFormulario}`

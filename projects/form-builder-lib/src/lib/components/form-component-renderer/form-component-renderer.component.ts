@@ -197,82 +197,29 @@ export class FormComponentRendererComponent implements OnInit, OnChanges, AfterV
       this.component.value = [];
     }
 
-    // console.log('DataGrid initialized:', {
-    //   componentId: this.component.id,
-    //     key: this.component.key,
-    //       rowsCount: this.component.rows.length,
-    //         valueLength: this.component.value?.length || 0,
-    //           previewMode: this.previewMode
-    // });
   }
 
   // Debug method to test data export
   debugDataGridExport(): void {
     if (!this.isDataGridType()) return;
 
-    // console.log('=== DataGrid Debug Export ===');
-    // console.log('Component ID:', this.component.id);
-    // console.log('Component Key:', this.component.key);
-    // console.log('Preview Mode:', this.previewMode);
-    // console.log('Rows Count:', this.component.rows?.length || 0);
-    // console.log('Rows Data:', this.component.rows);
-    // console.log('Component Value:', this.component.value);
-
     // Test export functionality with debug
     try {
-      // console.log('=== Testing Export Functionality ===');
       const debugResult = this.formBuilderService.debugExportFormData();
-      // console.log('DataGrid in exported data:', debugResult.data[this.component.key]);
 
       // Also test regular export
       const normalExport = this.formBuilderService.exportFormData();
       const normalParsed = JSON.parse(normalExport);
-      // console.log('Normal export DataGrid data:', normalParsed[this.component.key]);
 
       // Compare results
-      // console.log('Results match:', JSON.stringify(debugResult.data[this.component.key]) === JSON.stringify(normalParsed[this.component.key]));
     } catch (error) {
       console.error('Error exporting data:', error);
     }
-    // console.log('=== End DataGrid Debug ===');
   }
 
   // Debug method to test validation
   debugDataGridValidation(): void {
     if (!this.isDataGridType()) return;
-
-    // console.log('=== DataGrid Debug Validation ===');
-    // console.log('Component ID:', this.component.id);
-    // console.log('Component Key:', this.component.key);
-    // console.log('Component Label:', this.component.label);
-    // console.log('Component Required:', this.component.required);
-    // console.log('Preview Mode:', this.previewMode);
-    // console.log('Rows Count:', this.component.rows?.length || 0);
-    // console.log('Children Count:', this.component.children?.length || 0);
-
-    // if (this.component.children) {
-    //   console.log('Child Components:');
-    //   this.component.children.forEach((child, index) => {
-    //     console.log(`  Child ${index + 1}:`, {
-    //       id: child.id,
-    //       key: child.key,
-    //       label: child.label,
-    //       type: child.type,
-    //       required: child.required
-    //     });
-    //   });
-    // }
-
-    // if (this.component.rows) {
-    //   // console.log('Rows Data:');
-    //   this.component.rows.forEach((row, index) => {
-    //     console.log(`  Row ${index + 1}:`, {
-    //       id: row.id,
-    //       index: row.index,
-    //       data: row.data
-    //     });
-    //   });
-    // }
 
     // Test validation using the current state
     const state = this.formBuilderService.getCurrentState();
@@ -281,7 +228,6 @@ export class FormComponentRendererComponent implements OnInit, OnChanges, AfterV
       this.validationService.debugValidationForStep(currentStep, this.formBuilderService);
     }
 
-    // console.log('=== End DataGrid Validation Debug ===');
   }
 
   private findComponentInState(state: any, componentId: string): FormComponent | null {
@@ -510,7 +456,6 @@ export class FormComponentRendererComponent implements OnInit, OnChanges, AfterV
     } else {
       // No builder mode, apenas atualizar valor local sem persistir
       // Isso permite visualizar o que seria digitado sem gravar
-      // console.log('Builder mode: valor não persistido para', this.component.key, ':', value);
     }
   }
 
@@ -1675,8 +1620,6 @@ export class FormComponentRendererComponent implements OnInit, OnChanges, AfterV
 
   onCKEditorReady(editor: any): void {
     // Custom CKEditor is ready
-    // console.log('Custom CKEditor ready for component:', this.component.id, 'with ID:', this.ckEditorId);
-
     // Store editor reference for potential future use
     this.ckEditorInstance = editor;
   }
@@ -2087,13 +2030,6 @@ export class FormComponentRendererComponent implements OnInit, OnChanges, AfterV
       });
     }
 
-    // console.log('Adding new DataGrid row:', {
-    //   componentId: this.component.id,
-    //   rowId: newRow.id,
-    //   initialData: newRow.data,
-    //   totalRows: this.component.rows.length + 1
-    // });
-
     this.component.rows.push(newRow);
     this.updateDataGridState();
   }
@@ -2103,12 +2039,6 @@ export class FormComponentRendererComponent implements OnInit, OnChanges, AfterV
     if (!this.isDataGridType() || !this.component.rows || !this.previewMode) return;
 
     const removedRow = this.component.rows[rowIndex];
-    // console.log('Removing DataGrid row:', {
-    //   componentId: this.component.id,
-    //   rowIndex: rowIndex,
-    //   rowId: removedRow?.id,
-    //   totalRowsBefore: this.component.rows.length
-    // });
 
     this.component.rows.splice(rowIndex, 1);
 
@@ -2181,14 +2111,7 @@ export class FormComponentRendererComponent implements OnInit, OnChanges, AfterV
 
   onRowComponentChange(event: any, row: DataGridRow, key: string): void {
     // This will be called when a component in the row changes
-    // console.log('DataGrid Row Change:', {
-    //   rowId: row.id,
-    //   key: key,
-    //   oldValue: row.data?.[key],
-    //   newValue: event,
-    //   componentId: this.component.id
-    // });
-
+   
     // Update the row data
     if (row.data) {
       row.data[key] = event;
@@ -2230,12 +2153,6 @@ export class FormComponentRendererComponent implements OnInit, OnChanges, AfterV
       }
 
       // Debug: Log data changes
-      // console.log('DataGrid Update:', {
-      //   componentId: this.component.id,
-      //   key: this.component.key,
-      //   rowsCount: this.component.rows?.length || 0,
-      //   value: this.component.value
-      // });
 
       // Atualizar o componente no FormBuilderService para persistir mudanças
       this.formBuilderService.updateComponent(this.component.id, {
@@ -2252,7 +2169,6 @@ export class FormComponentRendererComponent implements OnInit, OnChanges, AfterV
       }, 50);
     } else {
       // No builder mode, não persistir dados do DataGrid
-      // console.log('Builder mode: dados do DataGrid não persistidos para', this.component.key);
     }
   }
 
@@ -2541,24 +2457,15 @@ export class FormComponentRendererComponent implements OnInit, OnChanges, AfterV
   }
 
   getLabelWhen(key: string | string[] | undefined): string {
-    // console.log("1111 HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH");
-    //    console.log(key);
-
     if (key instanceof Array) {
       const chave = key[0] as string;
-      // console.log("1111 OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO");
-      //  console.log(chave);
       const component = this.formBuilderService.getComponentById(chave);
       if (component) {
-        //      console.log("RRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR");
-        //  console.log(component);
         return component.label;
       }
     }
     else {
       const chave = key as string;
-      //           console.log("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF");
-      //  console.log(chave);
       const component = this.formBuilderService.getComponentById(chave.trim());
       if (component) {
         return component.label;
@@ -2578,19 +2485,12 @@ export class FormComponentRendererComponent implements OnInit, OnChanges, AfterV
     }
   let valor = eq;
     
-    // console.log("MMMMMMMMMMMMMMMMMMMMMMMMMM");
-    // console.log(component);
     if (component && this.componentHasOptions(component) && component.properties.options) {
       const conditionalWhenComponentOptions = component.properties.options;
     
       if (conditionalWhenComponentOptions.length > 0) {
-        // console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
-        // console.log(conditionalWhenComponentOptions);
 
         conditionalWhenComponentOptions.forEach((option: any) => {
-          // console.log(" value [" + option.value + "]");
-          // console.log(" label [" + option.label + "]");
-          // console.log(" eq [" + eq + "]");
 
           const teste = option.value as string;
           const teste2 = eq as string;
@@ -2792,9 +2692,6 @@ export class FormComponentRendererComponent implements OnInit, OnChanges, AfterV
       return '';
     }
     const option = this.delegationServerOptions.find(opt => opt.value === this.delegateServerValue.value);
-    console.log("DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD");
-    console.log(  this.delegateServerValue);
-    console.log(option);
     return option?.label || this.delegateServerValue;
   }
 

@@ -264,8 +264,6 @@ export class CkEditorModalComponent {
   }
 
   onEditorReady(editor: any): void {
-    // console.log('Custom CKEditor modal ready with ID:', this.modalEditorId);
-
     // Garantir que o editor funcione corretamente dentro do modal
     if (editor && editor.ui && editor.ui.getEditableElement) {
       const editableElement = editor.ui.getEditableElement();

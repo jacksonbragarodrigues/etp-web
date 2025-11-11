@@ -32,7 +32,6 @@ describe('NotaInterna', () => {
     const renderedOutput = component.render(mockOptions);
     expect(renderedOutput).toContain('formio-notainterna');
     expect(renderedOutput).not.toContain('formio-component-htmlelement');
-    // expect(console.log).toHaveBeenCalledWith(renderedOutput);
   });
 
   it('should attach component properly', () => {

@@ -520,8 +520,6 @@ export class FormBuilderService {
     if (template?.defaultProperties) {
       defaultProperties = this.deepCopyProperties(template.defaultProperties);
     }
-    //  console.log("SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS");
-    //  console.log(defaultProperties);
     const component: FormComponent = {
       id,
       key,
@@ -607,7 +605,6 @@ export class FormBuilderService {
         cache: true,
         cacheTimeout: 30,
       };
-      // console.log('Initialized SERVIDOR component:', component);
     }
 
     return component;
@@ -615,8 +612,6 @@ export class FormBuilderService {
   }
 
   addComponent(component: FormComponent, stepId?: string, parentId?: string): void {
-    // console.log("PASSSO 55 1111111111111111111");
-    //   console.log(component);
     const state = this.getCurrentState();
     const targetStepId = stepId || state.currentStep;
     const targetStep = state.formSchema.steps.find(s => s.id === targetStepId);
@@ -1417,7 +1412,6 @@ export class FormBuilderService {
 
   // Método para sincronizar valor do componente com opções selecionadas
   private syncComponentValueWithOptions(component: FormComponent): void {
-    // console.log("Syncing component:", component.type);
     if (component.type === ComponentType.SELECT ||
       component.type === ComponentType.RADIO ||
       component.type === ComponentType.SELECT_BOX ||
@@ -1425,11 +1419,6 @@ export class FormBuilderService {
       component.type === ComponentType.TIPO_CONTRATACAO ||
       component.type === ComponentType.UNIDADE ||
       component.type === ComponentType.SERVIDOR) {
-
-      // console.log("Component matched type check:", component.type);
-      // console.log("Has options:", !!component.properties.options);
-      // console.log("Options is array:", Array.isArray(component.properties.options));
-      // console.log("API Config:", component.properties.apiConfig);
 
       if (component.properties.options && component.value !== undefined && component.value !== null) {
         // Para select e radio com valor ��nico
@@ -1461,7 +1450,6 @@ export class FormBuilderService {
         }
         // Para SELECT_API components (inclui TIPO_CONTRATACAO, UNIDADE, SERVIDOR)
         else if (component.type === ComponentType.SELECT_API || component.type === ComponentType.TIPO_CONTRATACAO || component.type === ComponentType.UNIDADE || component.type === ComponentType.SERVIDOR) {
-          // console.log("Processing component type:", component.type);
 
           // Certifica que temos um template apropriado
           if (!component.properties.apiConfig?.labelTemplate) {
@@ -1486,11 +1474,8 @@ export class FormBuilderService {
           // Processa as opções para usar o labelTemplate se existir
           if (component.properties.options && Array.isArray(component.properties.options)) {
             const template = component.properties.apiConfig?.labelTemplate;
-            // console.log("Using template:", template);
 
             if (template) {
-              // console.log("jjjjjjjjjjjjjjj >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
-              // console.log(template);
               component.properties.options = component.properties.options.map(opt => {
                 let label = template;
                 Object.keys(opt).forEach(key => {
@@ -2180,19 +2165,11 @@ export class FormBuilderService {
    * Debug method to test data export with detailed logging
    */
   debugExportFormData(): { data: any, json: string } {
-    // console.log('=== Debug Export Form Data ===');
     const state = this.getCurrentState();
     const formData: { [key: string]: any } = {};
 
-    // console.log('Form Schema Steps:', state.formSchema.steps.length);
-
     // Debug cada step
     state.formSchema.steps.forEach((step, stepIndex) => {
-      // console.log(`Step ${stepIndex + 1} (${step.title}):`, {
-      //   componentsCount: step.components.length,
-      //   stepId: step.id
-      // });
-
       // Debug cada componente no step
       this.debugComponentsForExport(step.components, 0);
 
@@ -2200,9 +2177,6 @@ export class FormBuilderService {
     });
 
     const jsonResult = JSON.stringify(formData, null, 2);
-
-    // console.log('Final Exported Data:', formData);
-    // console.log('=== End Debug Export ===');
 
     return {
       data: formData,
@@ -2217,17 +2191,6 @@ export class FormBuilderService {
     const indent = '  '.repeat(level);
 
     components.forEach(component => {
-      // console.log(`${indent}Component:`, {
-      //   id: component.id,
-      //   key: component.key,
-      //   type: component.type,
-      //   label: component.label,
-      //   hasValue: component.value !== undefined && component.value !== null,
-      //   value: component.value,
-      //   hasRows: component.rows ? component.rows.length : 0,
-      //   rows: component.rows,
-      //   hasChildren: component.children ? component.children.length : 0
-      // });
 
       if (component.children && component.children.length > 0) {
         this.debugComponentsForExport(component.children, level + 1);
@@ -2573,7 +2536,6 @@ export class FormBuilderService {
   hasUnsavedDataChanges(): boolean {
    
     const currentState = this.getCurrentState();
-     console.log("currentState:", currentState)
     if (!currentState.lastSavedState) {
       return false;
     }
@@ -2581,8 +2543,6 @@ export class FormBuilderService {
     const currentData = this.getFormDataSnapshot(currentState.formSchema, currentState.annotations);
     const savedData = this.getFormDataSnapshot(currentState.lastSavedState.formSchema, currentState.lastSavedState.annotations);
 
-    console.log("currentData:", currentData);
-    console.log("savedData:", savedData);
     return this.hasDeepDataChanges(currentData, savedData);
   }
 
@@ -3055,8 +3015,6 @@ export class FormBuilderService {
     const state = this.getCurrentState();
     const panel = this.findParentPanelOfComponent(state.formSchema, panelId);
 
-    console.log("panel:", panel?.id, panelId);
-
     if (panel && panel.type === ComponentType.PANEL) {
       this.expandPanelRecursive(panel);
       // Update state to persist the changes
@@ -3071,7 +3029,6 @@ export class FormBuilderService {
   private expandPanelRecursive(component: FormComponent): void {
     // Expand the current panel if it's collapsible
     if (component.type === ComponentType.PANEL && component.properties.collapsible) {
-      console.log("expandPanelRecursive:", component.id);
       (component.properties as any).panelCollapsed = false;
     }
 

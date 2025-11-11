@@ -1,5 +1,13 @@
 <div style="width: 100%; height: 1000px; overflow: hidden">
-  <ng2-pdfjs-viewer
+  <iframe
+     [attr.srcdoc]="jsonForm | safeUrl"
+    title="Relatório"
+    width="100%"
+    height="100%"
+    style="border: none; min-height: calc(100vh - 100px);">
+  </iframe>
+
+  <!-- <ng2-pdfjs-viewer
     #pdfViewer
     zoom="auto"
     [downloadFileName]="nomeRelatorio"
@@ -8,7 +16,7 @@
     [openFile]="false"
     style="width: 100%; height: 100%; display: block"
   >
-  </ng2-pdfjs-viewer>
+  </ng2-pdfjs-viewer> -->
 </div>
 <div class="modal-footer botoes" *ngIf="true">
   <div class="row botoes" style="width: 25%">

@@ -130,7 +130,6 @@ export class FormBuilderComponent implements OnInit, OnDestroy, OnChanges {
   ) { }
 
   ngOnInit(): void {
-  // console.log(this.dataJson);
     this.formBuilderService.state$
       .pipe(takeUntil(this.destroy$))
       .subscribe(state => {
@@ -377,25 +376,11 @@ export class FormBuilderComponent implements OnInit, OnDestroy, OnChanges {
 
   onDebugExportData(): void {
     try {
-      // console.log('=== Debug Export Data ===');
       const debugResult = this.formBuilderService.debugExportFormData();
 
       // Especificamente verificar DataGrids
       const dataGridComponents = this.findDataGridComponents();
-      // console.log('DataGrid components found:', dataGridComponents.length);
 
-      dataGridComponents.forEach(comp => {
-        // console.log(`DataGrid "${comp.label}" (${comp.key}):`, {
-        //   hasRows: comp.rows ? comp.rows.length : 0,
-        //   hasValue: comp.value ? comp.value.length : 0,
-        //   inExportedData: debugResult.data[comp.key] ? debugResult.data[comp.key].length : 'NOT FOUND',
-        //   rows: comp.rows,
-        //   value: comp.value,
-        //   exportedValue: debugResult.data[comp.key]
-        // });
-      });
-
-      // console.log('Debug export completed. Check console for details.');
       alert('Debug export executado! Verifique o console para detalhes.');
     } catch (error) {
       console.error('Erro no debug export:', error);
@@ -1143,6 +1128,37 @@ export class FormBuilderComponent implements OnInit, OnDestroy, OnChanges {
     }
   }
 
+  onDownloadReportPDF(): void {
+    // if (!this.currentReportContent) {
+    //   alert('Nenhum relatório foi gerado ainda.');
+    //   return;
+    // }
+
+    // try {
+    //   const formName = this.state.formSchema.name || 'Formulario';
+    //   const fileName = `relatorio-${formName.replace(/\s+/g, '-').toLowerCase()}.pdf`;
+
+    //   // Create a temporary element to hold the HTML content
+    //   const element = document.createElement('div');
+    //   element.innerHTML = this.currentReportContent;
+
+    //   // Configure html2pdf options
+    //   const options = {
+    //     margin: 10,
+    //     filename: fileName,
+    //     image: { type: 'jpeg', quality: 0.98 },
+    //     html2canvas: { scale: 2 },
+    //     jsPDF: { orientation: 'portrait', unit: 'mm', format: 'a4' }
+    //   };
+
+    //   // Generate PDF from HTML
+    //   html2pdf().set(options).from(element).save();
+    // } catch (error) {
+    //   console.error('Erro ao gerar PDF do relatório:', error);
+    //   alert('Erro ao gerar PDF do relatório');
+    // }
+  }
+
   onPrintReport(): void {
     if (!this.currentReportContent) {
       alert('Nenhum relatório foi gerado ainda.');
@@ -1159,17 +1175,13 @@ export class FormBuilderComponent implements OnInit, OnDestroy, OnChanges {
 
   // Métodos do footer
   onFooterCancel(): void {
-    console.log("OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO");
     if (this.onCancelEvent) {
-        console.log("PPPPPPPPPPPPPPPPPPPPPPPPPPPPP");
       this.footerAction.emit({ action: this.onCancelEvent });
     }
   }
 
   onFooterCancelSimulador(): void {
-    console.log("OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO");
     if (this.onCancelEvent) {
-        console.log("PPPPPPPPPPPPPPPPPPPPPPPPPPPPP");
       this.footerAction.emit({ action: this.onCancelEvent });
     }
   }
@@ -1193,9 +1205,6 @@ export class FormBuilderComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   hasChange(): boolean {
-    // console.log("hasChange()");
-    // console.log(this.formBuilderService.getCurrentState());
-    // console.log(this.formBuilderService.hasUnsavedChanges());
     return this.formBuilderService.hasUnsavedStructuralChanges();
   }
   

@@ -165,19 +165,11 @@ export class ValidationService {
 
       // Special handling for DataGrid - only validate individual cells, not the component itself
       if (component.type === ComponentType.DATAGRID) {
-          // console.log('Validating DataGrid:', {
-          //   componentId: component.id,
-          //   label: component.label,
-          //   required: component.required,
-          //   rowsCount: component.rows?.length || 0,
-          //   childrenCount: component.children?.length || 0
-          // });
 
           if (component.children && component.rows) {
             const errorsBefore = errors.length;
             this.validateDataGridRows(component, errors, stepId, stepTitle);
             const errorsAdded = errors.length - errorsBefore;
-            // console.log(`DataGrid validation added ${errorsAdded} cell-level errors`);
           }
           return;
         }
@@ -647,22 +639,9 @@ export class ValidationService {
    * Debug method to test validation for a specific step
    */
   debugValidationForStep(step: FormStep, formBuilderService?: any): void {
-  // console.log('=== Debug Validation ===');
-  // console.log('Step:', step.title, '(ID:', step.id, ')');
 
     const errors = this.validateStepWithErrors(step, formBuilderService);
 
-    // console.log('Total validation errors found:', errors.length);
-    // errors.forEach((error, index) => {
-    //   console.log(`Error ${index + 1}:`, {
-    //     component: error.componentLabel,
-    //     message: error.message,
-    //     componentId: error.componentId,
-    //     componentKey: error.componentKey
-    //   });
-    // });
-
-    // console.log('=== End Debug Validation ===');
     return;
   }
 }

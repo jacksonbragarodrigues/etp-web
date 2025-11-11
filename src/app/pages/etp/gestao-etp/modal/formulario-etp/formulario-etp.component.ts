@@ -931,7 +931,6 @@ export class FormularioEtpComponent implements OnInit, OnDestroy {
     this.alertUtils.alertDialog(
       'Erro ao carregar Formio: ' + JSON.stringify(erro.stack)
     );
-    console.log('Erro ao carregar Formio:', erro.stack);
   }
 
   setarPropriedades() {

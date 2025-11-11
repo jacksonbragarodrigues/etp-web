@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { PrincipalComponent } from './principal.component';
 import { NgbDatepickerModule, NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { MenuLateralModule, TableModule } from '@administrativo/components';
+import { MenuLateralModule, SafeHtmlPipe, TableModule } from '@administrativo/components';
 import { TabelaSortableHeader } from 'src/app/shared/tables/table-sortable';
 import { GestaoFormularioComponent } from '../formulario/gestao-formulario/gestao-formulario.component';
 import { ModalCadastrarFormularioComponent } from '../formulario/modal/modal-cadastrar-formulario/modal-cadastrar-formulario.component';
@@ -30,9 +30,11 @@ import { MenubarModule } from 'primeng/menubar';
 import { DelegarAcessoModule } from '../delegacao-acesso/gestao-delegacao-acesso/delegar-acesso.module';
 import { ENVIRONMENTER, FormBuilderLibModule } from 'form-builder-lib';
 import { environment } from '../../../environments/environment';
+import { SafeUrlPipe } from 'src/app/shared/directive/safe-url.pipe';
 
 @NgModule({
   declarations: [
+    SafeUrlPipe,
     PrincipalComponent,
     TabelaSortableHeader,
     GestaoFormularioComponent,

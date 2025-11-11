@@ -21,7 +21,6 @@ export const hooks = {
   editForm: editFormCustom,
   hooks: {
     "changes": function(submission:any, callback:any) {
-      // console.log('change hooks');
       // Do something asynchronously.
       setTimeout(function() {
         // Callback with a possibly manipulated submission.

@@ -40,15 +40,15 @@ export class TemplateHtmlComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    if (this.type === 'ETP') {
-      this.geradorPDFEtp();
-    } else if (this.type === 'ETP_ANALISE') {
-      this.geradorPDFEtpAnalise();
-    } else if (this.type === 'FORMULARIO_COMPLETO') {
-      this.geradorPDFFormularioCompleto();
-    } else {
-      this.geradorPDF();
-    }
+    // if (this.type === 'ETP') {
+    //   this.geradorPDFEtp();
+    // } else if (this.type === 'ETP_ANALISE') {
+    //   this.geradorPDFEtpAnalise();
+    // } else if (this.type === 'FORMULARIO_COMPLETO') {
+    //   this.geradorPDFFormularioCompleto();
+    // } else {
+    //   this.geradorPDF();
+    // }
   }
 
   geradorPDF() {

@@ -39,7 +39,7 @@
         <div *ngIf="menuIndex == 2">
           <app-template-html
             [idForm]="this.formulario.id"
-            [jsonForm]="this.formulario.jsonForm"
+            [jsonForm]="this.currentReportContent"
             [descricao]="this.formulario.descricao"
             [jsonDados]="this.formulario.jsonDados"
             [type]="'FORMULARIO'"
@@ -55,7 +55,7 @@
         <div *ngIf="menuIndex == 4">
           <app-template-html
             [idForm]="this.formulario.id"
-            [jsonForm]="this.formulario.jsonForm"
+            [jsonForm]="this.currentReportContent"
             [descricao]="this.formulario.descricao"
             [jsonDados]="this.formulario.jsonDados"
             [type]="'FORMULARIO_COMPLETO'"

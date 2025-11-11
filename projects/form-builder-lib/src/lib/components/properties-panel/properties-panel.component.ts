@@ -199,9 +199,6 @@ export class PropertiesPanelComponent implements OnInit, OnDestroy, AfterViewIni
 
   private loadComponentProperties(): void {
     const component = this.state.selectedComponent;
-    //  console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.");
-    // console.log(component);
-    // console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.");
     if (!component) {
       this.resetForm();
       return;
@@ -209,9 +206,6 @@ export class PropertiesPanelComponent implements OnInit, OnDestroy, AfterViewIni
 
     // Basic properties
     this.componentLabel = component.label;
-    // console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.");
-    // console.log(component);
-    // console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.");
     this.componentPlaceholder = component.placeholder || '';
     this.componentRequired = component.required;
     this.componentId = component.id;
@@ -363,7 +357,6 @@ export class PropertiesPanelComponent implements OnInit, OnDestroy, AfterViewIni
     switch (propertyPath) {
       case 'label':
         updates.label = value;
-        // console.log(this.componentKey);
         const key = this.formBuilderService.generateUniqueKeyPAR(value, this.componentId)
         updates.key = key;
         break;

@@ -111,7 +111,6 @@ export class CompararHtmlEtpNovaVersaoComponent  {
     setTimeout(() => {
       const targetElement = document.querySelector('[id="compararHtmlNovo"]');
       if (targetElement) {
-        console.log('Elemento encontrado via querySelector:', targetElement);
         targetElement.innerHTML = html;
       } else {
         console.warn('Elemento #compararHtmlNovo ainda não está no DOM.');

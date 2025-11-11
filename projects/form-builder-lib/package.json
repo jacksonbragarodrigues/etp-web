@@ -10,5 +10,8 @@
   "dependencies": {
     "ngx-select-dropdown": "^3.3.2",
     "tslib": "^2.3.0"
+  },
+  "devDependencies": {
+    "@types/html2pdf.js": "^0.10.0"
   }
 }
