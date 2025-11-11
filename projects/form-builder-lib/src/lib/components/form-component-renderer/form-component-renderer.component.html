@@ -255,14 +255,14 @@
       </div>
 
       <!-- Dropdown for adding items -->
-      <select [class]="getFormControlClasses()" [id]="component.id + '_dropdown'" (change)="onMultiSelectChange($event)"
-        [disabled]="component.properties.disabled && previewMode">
-
-        <option value="">+ Adicionar item...</option>
-        <option *ngFor="let option of getAvailableOptions(); trackBy: trackByOptionValue" [value]="option.value">
-          {{ option.label }}
-        </option>
-      </select>
+      <ngx-select-dropdown
+        [config]="dropdownConfig"
+        [options]="getAvailableOptions()"
+        (change)="onMultiSelectChange()"
+        [(ngModel)]="selectedAddItem"
+        [multiple]="false"
+        class="w-100">
+      </ngx-select-dropdown>
     </div>
 
     <!-- Standard Select (Single or Horizontal layout) -->
@@ -281,20 +281,14 @@
       </div>
 
       <ng-template #verticalSelect>
-        <select [class]="getFormControlClasses()" [id]="component.id" [value]="value" (change)="onSelectChange($event)"
-          [attr.required]="component.required && previewMode ? true : null"
-          [disabled]="component.properties.disabled && previewMode"
-          [multiple]="component.properties.multiple && previewMode">
-
-          <option value="" *ngIf="!component.properties.multiple">
-            {{ component.placeholder || 'Selecione...' }}
-          </option>
-
-          <option *ngFor="let option of getOptions(); trackBy: trackByOptionValue" [value]="option.value"
-            [selected]="option.selected">
-            {{ option.label }}
-          </option>
-        </select>
+        <ngx-select-dropdown
+          [config]="dropdownConfig"
+          [options]="getOptions()"
+          (change)="onSelectChange()"
+          [(ngModel)]="value"
+          [multiple]="!!(component.properties.multiple && previewMode)"
+          [disabled]="!!(component.properties.disabled && previewMode)">
+        </ngx-select-dropdown>
       </ng-template>
     </ng-template>
 
@@ -558,15 +552,15 @@
       </div>
 
       <!-- Dropdown for adding items -->
-      <select [class]="getFormControlClasses()" [id]="component.id + '_dropdown'" (change)="onMultiSelectChange($event)"
-        [disabled]="component.properties.disabled && previewMode || isApiLoading()">
-
-
-        <option value="">+ Adicionar item...</option>
-        <option *ngFor="let option of getAvailableOptions(); trackBy: trackByOptionValue" [value]="option.value">
-          {{ option.label }}
-        </option>
-      </select>
+      <ngx-select-dropdown
+        [config]="dropdownConfig"
+        [options]="getAvailableOptions()"
+        (change)="onMultiSelectChange()"
+        [(ngModel)]="selectedAddItemApi"
+        [multiple]="false"
+        [disabled]="component.properties.disabled && previewMode || isApiLoading()"
+        class="w-100">
+      </ngx-select-dropdown>
     </div>
 
     <!-- Standard API Select (Single or Horizontal layout) -->
@@ -605,20 +599,13 @@
       </div>
 
       <ng-template #verticalApiSelect>
-        <select [class]="getFormControlClasses()" [id]="component.id" [value]="getDisplayValue()"
-          (change)="onSelectChange($event)" [attr.required]="component.required && previewMode ? true : null"
-          [disabled]="component.properties.disabled && previewMode || isApiLoading()"
-          [multiple]="component.properties.multiple && previewMode">
-
-          <option value="" *ngIf="!component.properties.multiple">
-            {{ isApiLoading() ? 'Carregando...' : (component.placeholder || 'Selecione...') }}
-          </option>
-
-          <option *ngFor="let option of getApiOptions(); trackBy: trackByOptionValue" [value]="option.value"
-            [selected]="option.selected">
-            {{ option.label }}
-          </option>
-        </select>
+        <ngx-select-dropdown
+          [config]="dropdownConfig"
+          [options]="getApiOptions()"
+          (change)="onSelectChange()"
+          [(ngModel)]="value"
+          [multiple]="false">
+        </ngx-select-dropdown>
       </ng-template>
     </ng-template>
 
@@ -692,13 +679,15 @@
 
             <!-- <div *ngIf="showDelegationUI && isDelegateCheckboxChecked" class="d-flex align-items-center gap-2"> -->
             <label for="delegation_server" class="form-label mb-0">Servidor:</label>
-            <select class="form-select form-select-sm w-auto" id="delegation_server" [(ngModel)]="delegateServerValue"
-              (change)="onDelegateServerChange($event)">
-              <option value="">Selecione...</option>
-              <option *ngFor="let option of delegationServerOptions; trackBy: trackByOption" [value]="option.value">
-                {{ option.label }}
-              </option>
-            </select>
+            <ngx-select-dropdown
+              [config]="dropdownConfig"
+              [options]="delegationServerOptions"
+              [(ngModel)]="delegateServerValue"
+              [multiple]="false"
+              class="w-100">
+            </ngx-select-dropdown>
+
+            
 
             <!-- Botões -->
             <div class="d-flex gap-1">

@@ -9,6 +9,7 @@ import { HelpContentService } from '../../services/help-content.service';
 import { ValidationService } from '../../services/validation.service';
 import { CustomCKEditorComponent } from '../custom-ckeditor/custom-ckeditor.component';
 import { CustomCKEditorService } from '../../services/custom-ckeditor.service';
+import { SelectDropDownModule } from 'ngx-select-dropdown';
 
 declare var bootstrap: any;
 
@@ -16,7 +17,7 @@ declare var bootstrap: any;
 @Component({
   selector: 'app-form-component-renderer',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, CustomCKEditorComponent],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, CustomCKEditorComponent, SelectDropDownModule],
   templateUrl: './form-component-renderer.component.html',
   styleUrls: ['./form-component-renderer.component.scss']
 })
@@ -34,6 +35,23 @@ export class FormComponentRendererComponent implements OnInit, OnChanges, AfterV
   @Output() valueChange = new EventEmitter<any>();
 
   ComponentType = ComponentType;
+
+  // ngx-select-dropdown configuration
+  dropdownConfig = {
+    displayKey: "label",
+    valueKey: "value",
+    search: true,
+    height: '200px',
+    placeholder: 'Selecione uma opção',
+    customComparator: (a: any, b: any) => this.compareDropdownValues(a, b),
+    limitTo: 0,
+    moreText: 'mais',
+    noResultsFound: 'Nenhum resultado!',
+    searchPlaceholder: 'Pesquisar',
+    clearOnSelection: false,
+    inputDirection: 'ltr'
+  };
+
   value: any = '';
   dragOverContainer: boolean = false;
   dragOverColumn: number = -1;
@@ -64,6 +82,10 @@ export class FormComponentRendererComponent implements OnInit, OnChanges, AfterV
   showDelegationUI: boolean = false;
   delegationServerOptions: SelectOption[] = [];
 
+  // Select add item tracking for multi-select dropdowns
+  selectedAddItem: any = null;
+  selectedAddItemApi: any = null;
+
   // Subscription management
   private stateSub?: Subscription;
 
@@ -77,7 +99,13 @@ export class FormComponentRendererComponent implements OnInit, OnChanges, AfterV
   ) { }
 
   ngOnInit(): void {
-    this.value = this.component.value || this.getDefaultValue();
+    // For SELECT_API components, extract the primitive value for display
+    // while keeping the full object in component.value for storage
+    if (this.isSelectApiType()) {
+      this.value = this.extractPrimitiveValue(this.component.value);
+    } else {
+      this.value = this.component.value || this.getDefaultValue();
+    }
 
     // Generate unique CKEditor ID for rich text components
     if (this.isRichTextType()) {
@@ -105,19 +133,31 @@ export class FormComponentRendererComponent implements OnInit, OnChanges, AfterV
     this.stateSub = this.formBuilderService.state$.subscribe(state => {
       // Find the current component in the updated state and sync local value
       const updatedComponent = this.findComponentInState(state, this.component.id);
-      if (updatedComponent && updatedComponent.value !== this.value) {
-        this.value = updatedComponent.value !== undefined && updatedComponent.value !== null
-          ? updatedComponent.value
-          : this.getDefaultValue();
+      if (updatedComponent && updatedComponent.value !== this.component.value) {
+        this.component.value = updatedComponent.value;
+
+        // For SELECT_API, extract the primitive value for display
+        if (this.isSelectApiType()) {
+          this.value = this.extractPrimitiveValue(updatedComponent.value);
+        } else {
+          this.value = updatedComponent.value !== undefined && updatedComponent.value !== null
+            ? updatedComponent.value
+            : this.getDefaultValue();
+        }
 
         // Re-sync options after value update
         this.syncValueWithOptions();
 
         // For SELECT_API, ensure options are loaded if needed
-        if (this.isSelectApiType() && (!this.apiOptions || this.apiOptions.length === 0)) {
-          const hasApiConfig = !!updatedComponent.properties?.apiConfig;
-          if (hasApiConfig) {
-            this.loadApiOptions();
+        if (this.isSelectApiType()) {
+          if (!this.apiOptions || this.apiOptions.length === 0) {
+            const hasApiConfig = !!updatedComponent.properties?.apiConfig;
+            if (hasApiConfig) {
+              this.loadApiOptions();
+            }
+          } else {
+            // Options already loaded, match the new value to them
+            this.matchStoredValueToOptions();
           }
         }
       }
@@ -260,9 +300,14 @@ export class FormComponentRendererComponent implements OnInit, OnChanges, AfterV
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['component']) {
       // Update local value from the updated component input (important for import)
-      this.value = this.component.value !== undefined && this.component.value !== null
-        ? this.component.value
-        : this.getDefaultValue();
+      // For SELECT_API components, extract the primitive value for display
+      if (this.isSelectApiType()) {
+        this.value = this.extractPrimitiveValue(this.component.value);
+      } else {
+        this.value = this.component.value !== undefined && this.component.value !== null
+          ? this.component.value
+          : this.getDefaultValue();
+      }
 
       // If this is an API select, ensure options are loaded so we can sync selection
       if (this.isSelectApiType()) {
@@ -270,8 +315,9 @@ export class FormComponentRendererComponent implements OnInit, OnChanges, AfterV
         const shouldLoad = hasApiConfig && (!this.apiOptions || this.apiOptions.length === 0);
         if (shouldLoad) {
           this.loadApiOptions();
-        } else {
-          // If options already exist, simply sync the selection
+        } else if (this.apiOptions && this.apiOptions.length > 0) {
+          // If options already exist, match stored value and sync
+          this.matchStoredValueToOptions();
           this.syncValueWithOptions();
         }
       } else {
@@ -322,13 +368,14 @@ export class FormComponentRendererComponent implements OnInit, OnChanges, AfterV
         // Para SELECT_API components (inclui TIPO_CONTRATACAO)
         else if (this.component.type === ComponentType.SELECT_API || this.component.type === ComponentType.TIPO_CONTRATACAO || this.component.type === ComponentType.UNIDADE || this.component.type === ComponentType.SERVIDOR) {
           if (this.component.properties.multiple) {
+            // For SELECT_API, this.value contains primitive values for comparison
             const selectedValues = Array.isArray(this.value) ? this.value : [this.value];
             this.component.properties.options.forEach(option => {
-              option.selected = selectedValues.some(val => this.compareValues(val, option));
+              option.selected = selectedValues.some(val => option.value == val);
             });
           } else {
             this.component.properties.options.forEach(option => {
-              option.selected = this.compareValues(this.value, option);
+              option.selected = option.value == this.value;
             });
           }
         }
@@ -338,13 +385,15 @@ export class FormComponentRendererComponent implements OnInit, OnChanges, AfterV
       if (this.isSelectApiType() && this.apiOptions.length > 0) {
         if (this.value !== undefined && this.value !== null && this.value !== '') {
           if (this.component.properties.multiple) {
+            // For SELECT_API, this.value contains primitive values from the dropdown
             const selectedValues = Array.isArray(this.value) ? this.value : [this.value];
             this.apiOptions.forEach(option => {
-              option.selected = selectedValues.some(val => this.compareValues(val, option));
+              option.selected = selectedValues.some(val => option.value == val);
             });
           } else {
+            // Compare primitive value with option's value field
             this.apiOptions.forEach(option => {
-              option.selected = this.compareValues(this.value, option);
+              option.selected = option.value == this.value;
             });
           }
         } else {
@@ -535,25 +584,23 @@ export class FormComponentRendererComponent implements OnInit, OnChanges, AfterV
     this.onValueChange(target?.value || '');
   }
 
-  onSelectChange(selectedValue: any): void {
-    // This handler works with ng-select which emits the selected value(s) directly
-    // The [(ngModel)] binding already updates this.value, but we need to sync other state
+  onSelectChange(selectedValue?: any): void {
+    // This handler works with ngx-select-dropdown
+    // The [(ngModel)] binding updates this.value with the primitive value from the dropdown
+    // We need to find the corresponding full object for storage in component.value
+
+    const primitiveValue = selectedValue !== undefined ? selectedValue : this.value;
 
     if (this.component.properties.multiple) {
       // Handle multiple selection
-      const selectedValues = Array.isArray(selectedValue) ? selectedValue : (selectedValue ? [selectedValue] : []);
+      const selectedValues = Array.isArray(primitiveValue) ? primitiveValue : (primitiveValue ? [primitiveValue] : []);
 
       if (this.isSelectApiType()) {
-        // For SELECT_API, ensure we have the full objects
+        // For SELECT_API, convert primitive values to full objects
         const processedValues = selectedValues.map(val => {
-          if (typeof val === 'object' && val !== null) {
-            // Already a full object
-            return this.getFullObjectFromOption(val);
-          } else {
-            // Find the full object from options
-            const apiOption = this.apiOptions.find(opt => opt.value == val);
-            return apiOption ? this.getFullObjectFromOption(apiOption) : val;
-          }
+          // Find the full object from options by matching the primitive value
+          const apiOption = this.apiOptions.find(opt => opt.value == val);
+          return apiOption ? apiOption.originalData : val;
         });
         this.onValueChange(processedValues);
       } else {
@@ -563,14 +610,11 @@ export class FormComponentRendererComponent implements OnInit, OnChanges, AfterV
       // Handle single selection
       if (this.isSelectApiType()) {
         // For SELECT_API, find and return the full object if needed
-        if (typeof selectedValue === 'object' && selectedValue !== null) {
-          this.onValueChange(this.getFullObjectFromOption(selectedValue));
-        } else {
-          const apiOption = this.apiOptions.find(opt => opt.value == selectedValue);
-          this.onValueChange(apiOption ? this.getFullObjectFromOption(apiOption) : selectedValue);
-        }
+        const apiOption = this.apiOptions.find(opt => opt.value == primitiveValue);
+        const fullObject = apiOption ? apiOption.originalData : primitiveValue;
+        this.onValueChange(fullObject);
       } else {
-        this.onValueChange(selectedValue || '');
+        this.onValueChange(primitiveValue || '');
       }
     }
   }
@@ -1083,11 +1127,16 @@ export class FormComponentRendererComponent implements OnInit, OnChanges, AfterV
     this.onValueChange(selectedValues);
   }
 
-  onMultiSelectChange(selectedValue: any): void {
-    // This handler works with ng-select for multiple selection mode
-    // ng-select emits the selected value directly
+  onMultiSelectChange(selectedValue?: any): void {
+    // This handler works with ngx-select-dropdown for multiple selection mode
+    // ngx-select-dropdown emits the selected value directly via change event
 
-    if (!selectedValue) {
+    // Determine the value to add based on whether a parameter was passed
+    // If no parameter, use the selectedAddItem/selectedAddItemApi from ngModel
+    let valueToProcess = selectedValue !== undefined ? selectedValue :
+      (this.isSelectApiType() ? this.selectedAddItemApi : this.selectedAddItem);
+
+    if (!valueToProcess) {
       return;
     }
 
@@ -1096,22 +1145,26 @@ export class FormComponentRendererComponent implements OnInit, OnChanges, AfterV
 
     // For SELECT_API, handle objects or primitive values
     if (this.isSelectApiType()) {
-      const valueToAdd = typeof selectedValue === 'object' && selectedValue !== null
-        ? this.getFullObjectFromOption(selectedValue)
-        : selectedValue;
+      const valueToAdd = typeof valueToProcess === 'object' && valueToProcess !== null
+        ? this.getFullObjectFromOption(valueToProcess)
+        : valueToProcess;
 
       const alreadyExists = this.isSelectApiType()
         ? selectedValues.some(val => this.compareValues(val, valueToAdd))
-        : selectedValues.includes(selectedValue);
+        : selectedValues.includes(valueToProcess);
 
       if (!alreadyExists) {
         selectedValues.push(valueToAdd);
         this.onValueChange(selectedValues);
+        // Clear the dropdown selection after adding
+        this.selectedAddItemApi = null;
       }
     } else {
-      if (!selectedValues.includes(selectedValue)) {
-        selectedValues.push(selectedValue);
+      if (!selectedValues.includes(valueToProcess)) {
+        selectedValues.push(valueToProcess);
         this.onValueChange(selectedValues);
+        // Clear the dropdown selection after adding
+        this.selectedAddItem = null;
       }
     }
   }
@@ -1165,6 +1218,9 @@ export class FormComponentRendererComponent implements OnInit, OnChanges, AfterV
         // Update component's options for consistency
         this.component.properties.options = [...options];
 
+        // If we have a stored value, find and match it to the loaded options
+        this.matchStoredValueToOptions();
+
         // Sync selected values with loaded options
         this.syncValueWithOptions();
       },
@@ -1175,6 +1231,60 @@ export class FormComponentRendererComponent implements OnInit, OnChanges, AfterV
         console.error('API Select Error:', error);
       }
     });
+  }
+
+  // Compare dropdown values for proper matching
+  private compareDropdownValues(a: any, b: any): number {
+    // For SELECT_API components, compare by the value field
+    if (this.isSelectApiType()) {
+      const aValue = typeof a === 'object' && a !== null ? a.value : a;
+      const bValue = typeof b === 'object' && b !== null ? b.value : b;
+
+      // Return 0 if equal, 1 if not equal
+      return aValue == bValue ? 0 : 1;
+    }
+
+    // For other components, use direct comparison
+    return a == b ? 0 : 1;
+  }
+
+  // Match stored primitive value to options and update this.value to the full option object
+  private matchStoredValueToOptions(): void {
+    if (!this.component.value || !this.apiOptions || this.apiOptions.length === 0) {
+      return;
+    }
+
+    // Get the primitive value that's currently stored
+    const storedPrimitiveValue = this.extractPrimitiveValue(this.component.value);
+
+    if (!storedPrimitiveValue) {
+      return;
+    }
+
+    // For multiple selection
+    if (this.component.properties.multiple) {
+      const storedValues = Array.isArray(storedPrimitiveValue) ? storedPrimitiveValue : [storedPrimitiveValue];
+
+      // Find matching option objects for each stored value
+      const matchedOptions = storedValues.map(val => {
+        const matchedOption = this.apiOptions.find(opt => opt.value == val);
+        return matchedOption || val;
+      });
+
+      // Update this.value to the matched options (or primitive values if no match)
+      this.value = matchedOptions;
+    } else {
+      // For single selection, find the matching option object
+      const matchedOption = this.apiOptions.find(opt => opt.value == storedPrimitiveValue);
+
+      // Update this.value to the full option object so dropdown can display label
+      if (matchedOption) {
+        this.value = matchedOption;
+      } else {
+        // Fallback to primitive value if no match found
+        this.value = storedPrimitiveValue;
+      }
+    }
   }
 
   reloadApiOptions(): void {
@@ -1209,37 +1319,7 @@ export class FormComponentRendererComponent implements OnInit, OnChanges, AfterV
 
   getApiOptions(): SelectOption[] {
     if (this.isSelectApiType()) {
-      const options = [...this.apiOptions];
-
-      // Determine the labelTemplate to use
-      let labelTemplate = this.component.properties.apiConfig?.labelTemplate;
-
-      // For SERVIDOR components, apply default labelTemplate if not explicitly set
-      if (this.component.type === ComponentType.SERVIDOR && !labelTemplate) {
-        labelTemplate = '{matricula} - {nome} - {siglaUnidade}';
-      }
-
-      // If we have a labelTemplate, format the labels for all API select types
-      if (labelTemplate) {
-        return options.map(option => {
-          if (option.originalData) {
-            let formattedLabel = labelTemplate;
-
-            // Replace template variables with actual values from originalData
-            Object.keys(option.originalData).forEach(key => {
-              formattedLabel = formattedLabel.replace(`{${key}}`, option.originalData[key] || '');
-            });
-
-            return {
-              ...option,
-              label: formattedLabel
-            };
-          }
-          return option;
-        });
-      }
-
-      return options;
+      return this.apiOptions;
     }
     return this.getOptions();
   }
@@ -2221,6 +2301,35 @@ export class FormComponentRendererComponent implements OnInit, OnChanges, AfterV
 
   // Panel validation methods removed - now using universal validation in FormBuilderService
 
+  // Helper method to extract primitive value from stored object (for SELECT_API display)
+  private extractPrimitiveValue(storedValue: any): any {
+    if (!this.isSelectApiType()) {
+      return storedValue;
+    }
+
+    // If value is not defined or is already a primitive, return as-is
+    if (!storedValue || typeof storedValue !== 'object') {
+      return storedValue;
+    }
+
+    // If value is a full object (from API), extract the primitive value field
+    const config = this.component.properties.apiConfig;
+    const valueField = config?.valueField || 'id';
+
+    if (Array.isArray(storedValue)) {
+      // For multiple selection, extract primitive values from each object
+      return storedValue.map(item => {
+        if (typeof item === 'object' && item !== null) {
+          return item[valueField] || item.value || item.id || item;
+        }
+        return item;
+      });
+    } else {
+      // For single selection, extract the primitive value
+      return storedValue[valueField] || storedValue.value || storedValue.id || storedValue;
+    }
+  }
+
   // Helper method to get full object from API option for SELECT_API
   private getFullObjectFromOption(option: any): any {
     if (!this.isSelectApiType() || !option) {
@@ -2563,7 +2672,7 @@ export class FormComponentRendererComponent implements OnInit, OnChanges, AfterV
           if (apiConfig.labelTemplate) {
             this.delegationServerOptions = options.map(option => {
               if (option.originalData) {
-                let formattedLabel = apiConfig.labelTemplate;
+                let formattedLabel = apiConfig.labelTemplate!;
 
                 // Replace template variables with actual values from originalData
                 Object.keys(option.originalData).forEach(key => {
@@ -2581,8 +2690,6 @@ export class FormComponentRendererComponent implements OnInit, OnChanges, AfterV
             this.delegationServerOptions = options;
           }
 
-          console.log("9999999999999999999999999999999");
-          console.log(this.delegationServerOptions);
           this.apiLoading = false;
           this.delegationOptionsLoadingInProgress = false;
         },
@@ -2675,8 +2782,6 @@ export class FormComponentRendererComponent implements OnInit, OnChanges, AfterV
     if (!this.delegateServerValue) {
       return '';
     }
-    console.log(this.delegateServerValue);
-    console.log(this.delegationServerOptions);
     const option = this.delegationServerOptions.find(opt => opt.value === this.delegateServerValue);
     return option?.label || this.delegateServerValue;
   }

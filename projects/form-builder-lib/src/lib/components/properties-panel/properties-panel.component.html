@@ -92,11 +92,13 @@
 
           <div class="form-group mb-3">
             <label class="form-label">Mostrar</label>
-            <select class="form-select form-select-sm" [(ngModel)]="stepConditionalShow"
-              (change)="onStepConditionalShowChange()">
-              <option value="true">Verdadeiro</option>
-              <option value="false">Falso</option>
-            </select>
+            <ngx-select-dropdown
+              [config]="config"
+              [options]="[{id: 'true', name: 'Verdadeiro'}, {id: 'false', name: 'Falso'}]"
+              (change)="onStepConditionalShowChange()"
+              [(ngModel)]="stepConditionalShow"
+              [multiple]="false">
+            </ngx-select-dropdown>
           </div>
 
           <!-- <div class="form-group mb-3">
@@ -131,13 +133,14 @@
             <label class="form-label">Igual a</label>
 
             <!-- Show select dropdown if the when component has options -->
-            <select class="form-select form-control-sm" [(ngModel)]="stepConditionalEq"
-              (change)="onStepConditionalEqChange()" *ngIf="hasStepConditionalWhenComponentOptions()">
-              <option value="">Selecione um valor...</option>
-              <option *ngFor="let option of stepConditionalWhenComponentOptions" [value]="option.value">
-                {{ option.label }}
-              </option>
-            </select>
+            <ngx-select-dropdown
+              *ngIf="hasStepConditionalWhenComponentOptions()"
+              [config]="config"
+              [options]="stepConditionalWhenComponentOptions"
+              (change)="onStepConditionalEqChange()"
+              [(ngModel)]="stepConditionalEq"
+              [multiple]="false">
+            </ngx-select-dropdown>
 
             <!-- Show text input if the when component doesn't have options -->
             <input type="text" class="form-control form-control-sm" [(ngModel)]="stepConditionalEq"
@@ -396,7 +399,7 @@
 
 
                   <!-- API Configuration (for SELECT_API) -->
-                  <div class="property-section mb-4">
+                  <div class="property-section mb-4" *ngIf="isSelectApiType()">
                     <!-- <h6 class="section-title" style="font-weight: bold;">
                 <i class="bi bi-cloud-download me-2"></i>
                 CONFIGURAÇÃO DA API
@@ -422,13 +425,13 @@
                       <!-- HTTP Method -->
                       <div class="form-group mb-3">
                         <label class="form-label">Método HTTP</label>
-                        <select class="form-select form-control-sm" [(ngModel)]="apiMethod"
-                          (change)="onApiMethodChange()">
-                          <option value="GET">GET</option>
-                          <option value="POST">POST</option>
-                          <option value="PUT">PUT</option>
-                          <option value="DELETE">DELETE</option>
-                        </select>
+                        <ngx-select-dropdown
+                          [config]="config"
+                          [options]="[{id: 'GET', name: 'GET'}, {id: 'POST', name: 'POST'}, {id: 'PUT', name: 'PUT'}, {id: 'DELETE', name: 'DELETE'}]"
+                          (change)="onApiMethodChange()"
+                          [(ngModel)]="apiMethod"
+                          [multiple]="false">
+                        </ngx-select-dropdown>
                       </div>
 
                       <!-- JWT Token -->
@@ -794,14 +797,15 @@
                       <label class="form-label">Valor igual</label>
 
                       <!-- Show select dropdown if the when component has options -->
-                      <select [disabled]="isComponentChave()" class="form-select form-control-sm"
-                        [(ngModel)]="conditionalEq" (change)="onConditionalEqChange()"
-                        *ngIf="hasConditionalWhenComponentOptions()">
-                        <option value="">Selecione um valor...</option>
-                        <option *ngFor="let option of conditionalWhenComponentOptions" [value]="option.value">
-                          {{ option.label }}
-                        </option>
-                      </select>
+                      <ngx-select-dropdown
+                        *ngIf="hasConditionalWhenComponentOptions()"
+                        [disabled]="isComponentChave()"
+                        [config]="config"
+                        [options]="conditionalWhenComponentOptions"
+                        (change)="onConditionalEqChange()"
+                        [(ngModel)]="conditionalEq"
+                        [multiple]="false">
+                      </ngx-select-dropdown>
 
                       <!-- Show text input if the when component doesn't have options -->
                       <input [disabled]="isComponentChave()" type="text" class="form-control form-control-sm"
@@ -939,13 +943,13 @@
                       <!-- Language -->
                       <div class="form-group mb-3">
                         <label class="form-label">Idioma</label>
-                        <select class="form-select form-control-sm" [(ngModel)]="ckEditorLanguage"
-                          (change)="onCkEditorLanguageChange()">
-                          <option value="pt-br">Português (Brasil)</option>
-                          <option value="en">English</option>
-                          <option value="es">Español</option>
-                          <option value="fr">Français</option>
-                        </select>
+                        <ngx-select-dropdown
+                          [config]="config"
+                          [options]="[{id: 'pt-br', name: 'Português (Brasil)'}, {id: 'en', name: 'English'}, {id: 'es', name: 'Español'}, {id: 'fr', name: 'Français'}]"
+                          (change)="onCkEditorLanguageChange()"
+                          [(ngModel)]="ckEditorLanguage"
+                          [multiple]="false">
+                        </ngx-select-dropdown>
                       </div>
 
                       <!-- Toolbar Configuration -->

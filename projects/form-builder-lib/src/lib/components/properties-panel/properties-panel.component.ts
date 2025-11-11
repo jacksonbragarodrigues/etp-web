@@ -48,6 +48,7 @@ export class PropertiesPanelComponent implements OnInit, OnDestroy, AfterViewIni
 
   config = {
     displayKey: "name",
+    valueKey: "id",
     search: true,
     height: '300px',
     placeholder: 'Selecione uma opção',
@@ -858,7 +859,7 @@ export class PropertiesPanelComponent implements OnInit, OnDestroy, AfterViewIni
   }
 
   isPermiteMultiple(): boolean {
-    return this.state.selectedComponent?.type === ComponentType.SERVIDOR || this.state.selectedComponent?.type === ComponentType.UNIDADE;
+    return this.state.selectedComponent?.type === ComponentType.SERVIDOR || this.state.selectedComponent?.type === ComponentType.UNIDADE || this.state.selectedComponent?.type === ComponentType.TIPO_CONTRATACAO;
   }
 
   isFileType(): boolean {
@@ -1100,9 +1101,74 @@ export class PropertiesPanelComponent implements OnInit, OnDestroy, AfterViewIni
     }
 
     // Check if component has options
-    if (this.componentHasOptions(component) && component.properties.options) {
-      this.conditionalWhenComponentOptions = [...component.properties.options];
+    if (this.componentHasOptions(component)) {
+      // For SELECT_API components, we need to fetch options from the API
+      if (this.isComponentSelectApiType(component) && component.properties.apiConfig) {
+        this.loadApiOptionsForConditionalWhen(component);
+      } else if (component.properties.options && component.properties.options.length > 0) {
+        // For regular select components, use the stored options and normalize them
+        this.conditionalWhenComponentOptions = this.normalizeOptionsForDisplay(component.properties.options);
+      }
     }
+  }
+
+  // Helper method to check if component is a SELECT_API type
+  private isComponentSelectApiType(component: FormComponent): boolean {
+    return component.type === ComponentType.SELECT_API ||
+      component.type === ComponentType.TIPO_CONTRATACAO ||
+      component.type === ComponentType.UNIDADE ||
+      component.type === ComponentType.SERVIDOR;
+  }
+
+  // Helper method to normalize options for display (ensure value is primitive and add 'name' property for ngx-select-dropdown)
+  private normalizeOptionsForDisplay(options: SelectOption[]): any[] {
+    return options.map(option => {
+      // Extract primitive value if needed
+      let primitiveValue = option.value;
+      if (typeof option.value === 'object' && option.value !== null) {
+        primitiveValue = (option.value as any).id || (option.value as any).value || option.value;
+      }
+
+      // Transform to format expected by ngx-select-dropdown (id/name)
+      return {
+        id: primitiveValue,
+        name: option.label || String(primitiveValue),
+        value: primitiveValue,
+        label: option.label,
+        selected: option.selected || false,
+        originalData: option.originalData
+      };
+    });
+  }
+
+  // Load API options for conditional logic
+  private loadApiOptionsForConditionalWhen(component: FormComponent): void {
+    const apiConfig = component.properties.apiConfig;
+    if (!apiConfig || !apiConfig.url) {
+      return;
+    }
+
+    this.apiSelectService.fetchOptions({
+      url: apiConfig.url,
+      method: apiConfig.method || 'GET',
+      labelField: apiConfig.labelField || 'name',
+      valueField: apiConfig.valueField || 'id',
+      headers: apiConfig.headers,
+      token: apiConfig.token,
+      requestBody: apiConfig.requestBody,
+      cache: apiConfig.cache,
+      cacheTimeout: apiConfig.cacheTimeout
+    }).subscribe({
+      next: (options) => {
+        // Transform SelectOption to format expected by ngx-select-dropdown
+        this.conditionalWhenComponentOptions = this.normalizeOptionsForDisplay(options);
+        this.cdr.markForCheck();
+      },
+      error: (error) => {
+        console.error('Error loading API options for conditional logic:', error);
+        this.conditionalWhenComponentOptions = [];
+      }
+    });
   }
 
   // Method to check if a component has options
@@ -1176,9 +1242,45 @@ export class PropertiesPanelComponent implements OnInit, OnDestroy, AfterViewIni
     }
 
     // Check if component has options
-    if (this.componentHasOptions(component) && component.properties.options) {
-      this.stepConditionalWhenComponentOptions = [...component.properties.options];
+    if (this.componentHasOptions(component)) {
+      // For SELECT_API components, we need to fetch options from the API
+      if (this.isComponentSelectApiType(component) && component.properties.apiConfig) {
+        this.loadApiOptionsForStepConditionalWhen(component);
+      } else if (component.properties.options && component.properties.options.length > 0) {
+        // For regular select components, use the stored options and normalize them
+        this.stepConditionalWhenComponentOptions = this.normalizeOptionsForDisplay(component.properties.options);
+      }
     }
+  }
+
+  // Load API options for step conditional logic
+  private loadApiOptionsForStepConditionalWhen(component: FormComponent): void {
+    const apiConfig = component.properties.apiConfig;
+    if (!apiConfig || !apiConfig.url) {
+      return;
+    }
+
+    this.apiSelectService.fetchOptions({
+      url: apiConfig.url,
+      method: apiConfig.method || 'GET',
+      labelField: apiConfig.labelField || 'name',
+      valueField: apiConfig.valueField || 'id',
+      headers: apiConfig.headers,
+      token: apiConfig.token,
+      requestBody: apiConfig.requestBody,
+      cache: apiConfig.cache,
+      cacheTimeout: apiConfig.cacheTimeout
+    }).subscribe({
+      next: (options) => {
+        // Transform SelectOption to format expected by ngx-select-dropdown
+        this.stepConditionalWhenComponentOptions = this.normalizeOptionsForDisplay(options);
+        this.cdr.markForCheck();
+      },
+      error: (error) => {
+        console.error('Error loading API options for step conditional logic:', error);
+        this.stepConditionalWhenComponentOptions = [];
+      }
+    });
   }
 
   // Method to check if the selected step conditional when component has options
