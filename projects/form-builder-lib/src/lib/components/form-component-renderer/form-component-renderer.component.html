@@ -674,36 +674,34 @@
             <label class="form-check-label ms-1" [for]="component.id + '_delegation'">Delega</label>
           </div>
 
-          <!-- Select Servidor -->
-          <ng-container *ngIf="showDelegationUI && isDelegateCheckboxChecked">
+        <!-- Select Servidor -->
+<ng-container *ngIf="showDelegationUI && isDelegateCheckboxChecked">
+  <div class="d-flex align-items-center gap-2 w-100">
+    <label for="delegation_server" class="form-label mb-0">Servidor:</label>
 
-            <!-- <div *ngIf="showDelegationUI && isDelegateCheckboxChecked" class="d-flex align-items-center gap-2"> -->
-            <label for="delegation_server" class="form-label mb-0">Servidor:</label>
-            <ngx-select-dropdown
-              [config]="dropdownConfig"
-              [options]="delegationServerOptions"
-              [(ngModel)]="delegateServerValue"
-              [multiple]="false"
-              class="w-100">
-            </ngx-select-dropdown>
+    <div class="flex-grow-1" style="min-width: 300px">
+      <ngx-select-dropdown
+        [config]="dropdownConfig"
+        [options]="delegationServerOptions"
+        [(ngModel)]="delegateServerValue"
+        [multiple]="false"
+        class="w-100">
+      </ngx-select-dropdown>
+    </div>
 
-            
-
-            <!-- Botões -->
-            <div class="d-flex gap-1">
-              <button type="button" *ngIf="delegateServerValue" class="btn btn-sm btn-danger" (click)="onDelegationRemoveClick()">
-                <i class="bi bi-trash me-1"></i>
-              </button>
-              <button type="button" class="btn btn-sm btn-secondary" (click)="onDelegationCancelClick()">
-                <i class="bi bi-x-lg me-1"></i>
-              </button>
-              <button type="button" class="btn btn-sm btn-success" (click)="onDelegationOkClick()">
-                <i class="bi bi-check-lg me-1"></i>
-              </button>
-            </div>
-
-            <!-- </div> -->
-          </ng-container>
+    <div class="d-flex gap-1">
+      <button type="button" *ngIf="delegateServerValue" class="btn btn-sm btn-danger" (click)="onDelegationRemoveClick()">
+        <i class="bi bi-trash me-1"></i>
+      </button>
+      <button type="button" class="btn btn-sm btn-secondary" (click)="onDelegationCancelClick()">
+        <i class="bi bi-x-lg me-1"></i>
+      </button>
+      <button type="button" class="btn btn-sm btn-success" (click)="onDelegationOkClick()">
+        <i class="bi bi-check-lg me-1"></i>
+      </button>
+    </div>
+  </div>
+</ng-container>
 
           <!-- Preview Mode: Display Badge + Remove (quando há delegação salva) -->
         <ng-container *ngIf="previewMode && isDelegateCheckboxChecked && delegateServerValue && !showDelegationUI">
@@ -735,7 +733,9 @@
             [class.drag-over]="dragOverChildId === childComponent.id"
             (dragover)="onChildDragOver($event, childComponent.id)"
             (dragleave)="onChildDragLeave($event, childComponent.id)" (drop)="onChildDrop($event, childComponent.id)">
-            <div class="drop-indicator"><i class="bi bi-plus"></i></div>
+            <div class="drop-indicator">
+              <i class="bi bi-plus"></i>
+            </div>
           </div>
 
           <app-form-component-renderer [component]="childComponent" [previewMode]="previewMode"
@@ -745,20 +745,28 @@
           </app-form-component-renderer>
         </ng-container>
 
-        <!-- Empty panel indicator -->
-        <div class="empty-panel text-center text-muted py-3"
-          *ngIf="(!component.children || component.children.length === 0) && !previewMode">
-          <i class="bi bi-plus-circle-dotted"></i>
-          <p class="mb-0 small">Drop components here</p>
+        <!-- Empty panel drop zone -->
+        <div style="height: 24px"  class="component-drop-zone final-drop-zone"
+          *ngIf="(!component.children || component.children.length === 0) && !previewMode"
+          [class.drag-over]="dragOverChildId === null"
+          (dragover)="onChildDragOver($event, null)"
+          (dragleave)="onChildDragLeave($event, null)"
+          (drop)="onChildDrop($event, null)">
+          <div class="drop-indicator">
+            <i class="bi bi-plus"></i>
+          </div>
         </div>
 
-        <!-- Final Drop Zone -->
-        <div class="component-drop-zone final-drop-zone"
+        <!-- Final Drop Zone (for panels with children) -->
+        <div style="height: 24px" class="component-drop-zone final-drop-zone"
           *ngIf="component.children && component.children.length > 0 && !previewMode"
           [class.drag-over]="dragOverChildId === null" (dragover)="onChildDragOver($event, null)"
           (dragleave)="onChildDragLeave($event, null)" (drop)="onChildDrop($event, null)">
-          <div class="drop-indicator"><i class="bi bi-plus"></i></div>
+          <div class="drop-indicator">
+            <i class="bi bi-plus"></i>
+          </div>
         </div>
+       
       </div>
     </div>
   </div>

@@ -11,6 +11,7 @@ export interface ApiSelectConfig {
   token?: string;
   labelField?: string;
   valueField?: string;
+  labelTemplate?: string;
   requestBody?: any;
   cache?: boolean;
   cacheTimeout?: number; // in minutes
@@ -188,23 +189,29 @@ export class ApiSelectService {
 
     const labelField = config.labelField || 'name';
     const valueField = config.valueField || 'id';
+    const labelTemplate = config.labelTemplate;
 
     return dataArray.map((item, index) => {
       let label: string;
       let value: any;
 
       if (typeof item === 'object' && item !== null) {
-        // Extract label
-        label = this.getNestedProperty(item, labelField) || 
-                this.getNestedProperty(item, 'label') || 
-                this.getNestedProperty(item, 'name') || 
-                this.getNestedProperty(item, 'title') || 
-                `Item ${index + 1}`;
+        // If labelTemplate is provided, use it to build the label
+        if (labelTemplate) {
+          label = this.renderTemplate(labelTemplate, item);
+        } else {
+          // Extract label from labelField
+          label = this.getNestedProperty(item, labelField) ||
+                  this.getNestedProperty(item, 'label') ||
+                  this.getNestedProperty(item, 'name') ||
+                  this.getNestedProperty(item, 'title') ||
+                  `Item ${index + 1}`;
+        }
 
         // Extract value
-        value = this.getNestedProperty(item, valueField) || 
-                this.getNestedProperty(item, 'value') || 
-                this.getNestedProperty(item, 'id') || 
+        value = this.getNestedProperty(item, valueField) ||
+                this.getNestedProperty(item, 'value') ||
+                this.getNestedProperty(item, 'id') ||
                 index;
       } else {
         // Handle primitive values
@@ -227,6 +234,14 @@ export class ApiSelectService {
     }, obj);
   }
 
+  private renderTemplate(template: string, data: any): string {
+    // Replace {fieldName} with the value from the data object
+    return template.replace(/\{([^}]+)\}/g, (match, fieldName) => {
+      const value = this.getNestedProperty(data, fieldName.trim());
+      return value !== undefined ? String(value) : match;
+    });
+  }
+
   private generateCacheKey(config: ApiSelectConfig): string {
     const keyData = {
       url: config.url,
@@ -235,6 +250,7 @@ export class ApiSelectService {
       token: config.token || '',
       labelField: config.labelField || 'name',
       valueField: config.valueField || 'id',
+      labelTemplate: config.labelTemplate || '',
       requestBody: config.requestBody || {}
     };
 

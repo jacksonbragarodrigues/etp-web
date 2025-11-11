@@ -1200,6 +1200,7 @@ export class FormComponentRendererComponent implements OnInit, OnChanges, AfterV
       token: rawConfig.token || '',
       labelField: rawConfig.labelField || 'name',
       valueField: rawConfig.valueField || 'id',
+      labelTemplate: rawConfig.labelTemplate,
       requestBody: rawConfig.requestBody,
       cache: rawConfig.cache !== false,
       cacheTimeout: rawConfig.cacheTimeout || 30
@@ -2782,7 +2783,10 @@ export class FormComponentRendererComponent implements OnInit, OnChanges, AfterV
     if (!this.delegateServerValue) {
       return '';
     }
-    const option = this.delegationServerOptions.find(opt => opt.value === this.delegateServerValue);
+    const option = this.delegationServerOptions.find(opt => opt.value === this.delegateServerValue.value);
+    console.log("DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD");
+    console.log(  this.delegateServerValue);
+    console.log(option);
     return option?.label || this.delegateServerValue;
   }
 

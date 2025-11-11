@@ -1086,6 +1086,8 @@ export class FormBuilderService {
       notainterna: ComponentType.TEXT_HELP,
       botaoajuda: ComponentType.TEXT_HELP,
       tipocontratacaoselect: ComponentType.TIPO_CONTRATACAO,
+      unidadeselect: ComponentType.UNIDADE,
+      servidorselect: ComponentType.SERVIDOR,
       processoseitextfield: ComponentType.PROCESSO_SEI,
       numeroetptextfield: ComponentType.NUMERO_ETP
 
@@ -1221,23 +1223,33 @@ export class FormBuilderService {
           base.properties.multiple = !!src.multiple;
           base.properties.options = [];
 
-          // Manter o labelTemplate existente ou configurar um padrão baseado no tipo
+          // Configure based on component type
+          let url = '';
+          let labelField = '';
+          let valueField = '';
           let labelTemplate = '';
+
           if (base.type === ComponentType.SERVIDOR) {
-            labelTemplate = '{nome} ({matricula})';
+            url = this.environmenter.apiFormulario + '/sarhclient/listaservidores?limit=' + this.environmenter.formioLimitReturnAPI;
+            labelField = 'nome';
+            valueField = 'matricula';
+            labelTemplate = '{matricula} - {nome} - {siglaUnidade}';
           } else if (base.type === ComponentType.UNIDADE) {
-            labelTemplate = '{descricao} ({sigla})';
+            url = this.environmenter.apiFormulario + '/sarhclient/listaunidades?limit=' + this.environmenter.formioLimitReturnAPI;
+            labelField = 'descricao';
+            valueField = 'sigla';
+            labelTemplate = '{sigla} - {descricao}';
           } else if (base.type === ComponentType.TIPO_CONTRATACAO) {
             labelTemplate = '{chave} - {descricao}';
           }
 
           base.properties.apiConfig = {
-            url: '',  // URL será configurada na criação do componente
+            url: url || '',
             method: 'GET',
             headers: {},
-            labelField: '',  // Será configurado na criação do componente
-            valueField: '',  // Será configurado na criação do componente
-            labelTemplate: labelTemplate,
+            labelField: labelField,
+            valueField: valueField,
+            labelTemplate: labelTemplate || undefined,
             cache: true,
             cacheTimeout: 30
           };
@@ -1677,9 +1689,9 @@ export class FormBuilderService {
 
 
   // Método para obter todos os pares key/value dos componentes
-  getAllComponentKeyValues(): { id: string, key: string, name: string }[] {
+  getAllComponentKeyValues(): { id: string, key: string, name: string, type: string}[] {
     const state = this.getCurrentState();
-    const keyValues: { id: string, key: string, name: string }[] = [];
+    const keyValues: { id: string, key: string, name: string, type: string }[] = [];
 
     const extractKeyValues = (components: FormComponent[]) => {
       components.forEach(component => {
@@ -1687,7 +1699,8 @@ export class FormBuilderService {
           keyValues.push({
             id: component.id,
             key: component.key,
-            name: component.label || String(component.type) || ''
+            name: component.label || String(component.type) || '',
+            type: String(component.type)
           });
         }
         if (component.children) {

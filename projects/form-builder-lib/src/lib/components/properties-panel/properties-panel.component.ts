@@ -84,7 +84,7 @@ export class PropertiesPanelComponent implements OnInit, OnDestroy, AfterViewIni
   componentCollapsible: boolean = false;
   componentInitCollapsed: boolean = false;
   componentKey: string = '';
- 
+
   // Conditional logic properties
   conditionalShow: string = 'true';
   conditionalWhen: ConditionalWhenValue = [];
@@ -127,6 +127,7 @@ export class PropertiesPanelComponent implements OnInit, OnDestroy, AfterViewIni
   apiToken: string = '';
   apiLabelField: string = 'name';
   apiValueField: string = 'id';
+  apiLabelTemplate: string = '';
   apiHeaders: string = '';
   apiRequestBody: string = '';
   apiCache: boolean = true;
@@ -157,7 +158,7 @@ export class PropertiesPanelComponent implements OnInit, OnDestroy, AfterViewIni
   }
 
   constructor(
-     private apiSelectService: ApiSelectService,
+    private apiSelectService: ApiSelectService,
     private formBuilderService: FormBuilderService,
     private cdr: ChangeDetectorRef
   ) { }
@@ -283,11 +284,12 @@ export class PropertiesPanelComponent implements OnInit, OnDestroy, AfterViewIni
     this.apiToken = component.properties.apiConfig?.token || '';
     this.apiLabelField = component.properties.apiConfig?.labelField || 'name';
     this.apiValueField = component.properties.apiConfig?.valueField || 'id';
+    this.apiLabelTemplate = component.properties.apiConfig?.labelTemplate || '';
     this.apiHeaders = component.properties.apiConfig?.headers ? JSON.stringify(component.properties.apiConfig.headers, null, 2) : '';
     this.apiRequestBody = component.properties.apiConfig?.requestBody ? JSON.stringify(component.properties.apiConfig.requestBody, null, 2) : '';
     this.apiCache = component.properties.apiConfig?.cache !== false;
     this.apiCacheTimeout = component.properties.apiConfig?.cacheTimeout || 30;
-  
+
     // Confidentiality property
     this.allowsConfidentiality = component.properties.allowsConfidentiality || false;
 
@@ -342,6 +344,7 @@ export class PropertiesPanelComponent implements OnInit, OnDestroy, AfterViewIni
     this.apiToken = '';
     this.apiLabelField = 'name';
     this.apiValueField = 'id';
+    this.apiLabelTemplate = '';
     this.apiHeaders = '';
     this.apiRequestBody = '';
     this.apiCache = true;
@@ -626,7 +629,7 @@ export class PropertiesPanelComponent implements OnInit, OnDestroy, AfterViewIni
 
   private loadAvailableComponentKeysValues(): void {
     this.availableComponentKeysValues = this.formBuilderService.getAllComponentKeyValues()
-      .filter(kv => kv.id !== this.componentId); // Exclude current component
+      .filter(kv => kv.id !== this.componentId && this.componentHasOptionsType(kv.type)); 
   }
 
   private loadStepProperties(): void {
@@ -770,6 +773,10 @@ export class PropertiesPanelComponent implements OnInit, OnDestroy, AfterViewIni
     this.updateApiConfig();
   }
 
+  onApiLabelTemplateChange(): void {
+    this.updateApiConfig();
+  }
+
   onApiHeadersChange(): void {
     this.updateApiConfig();
   }
@@ -817,6 +824,7 @@ export class PropertiesPanelComponent implements OnInit, OnDestroy, AfterViewIni
       token: this.apiToken.trim(),
       labelField: this.apiLabelField.trim() || 'name',
       valueField: this.apiValueField.trim() || 'id',
+      labelTemplate: this.apiLabelTemplate.trim() || undefined,
       requestBody: Object.keys(requestBody).length > 0 ? requestBody : undefined,
       cache: this.apiCache,
       cacheTimeout: this.apiCacheTimeout
@@ -859,7 +867,7 @@ export class PropertiesPanelComponent implements OnInit, OnDestroy, AfterViewIni
   }
 
   isPermiteMultiple(): boolean {
-    return this.state.selectedComponent?.type === ComponentType.SERVIDOR || this.state.selectedComponent?.type === ComponentType.UNIDADE || this.state.selectedComponent?.type === ComponentType.TIPO_CONTRATACAO;
+    return this.state.selectedComponent?.type === ComponentType.SERVIDOR || this.state.selectedComponent?.type === ComponentType.UNIDADE;
   }
 
   isFileType(): boolean {
@@ -1182,6 +1190,17 @@ export class PropertiesPanelComponent implements OnInit, OnDestroy, AfterViewIni
       component.type === ComponentType.SERVIDOR;
   }
 
+    // Method to check if a component has options
+  private componentHasOptionsType(type: string): boolean {
+    return type === ComponentType.SELECT ||
+      type === ComponentType.RADIO ||
+      type === ComponentType.SELECT_BOX ||
+      type === ComponentType.SELECT_API ||
+      type === ComponentType.TIPO_CONTRATACAO ||
+      type === ComponentType.UNIDADE ||
+      type === ComponentType.SERVIDOR;
+  }
+
   // Method to check if the selected conditional when component has options
   hasConditionalWhenComponentOptions(): boolean {
     return this.conditionalWhenComponentOptions.length > 0;
@@ -1296,12 +1315,11 @@ export class PropertiesPanelComponent implements OnInit, OnDestroy, AfterViewIni
     return this.accordionState[category] || false;
   }
 
-  isComponentChave():  boolean {
+  isComponentChave(): boolean {
     if (this.state.selectedComponent?.type === ComponentType.PROCESSO_SEI ||
       this.state.selectedComponent?.type === ComponentType.NUMERO_ETP ||
-    this.state.selectedComponent?.type === ComponentType.TIPO_CONTRATACAO )
-     {
-      
+      this.state.selectedComponent?.type === ComponentType.TIPO_CONTRATACAO) {
+
       return true;
     }
     else {
@@ -1310,8 +1328,8 @@ export class PropertiesPanelComponent implements OnInit, OnDestroy, AfterViewIni
 
   }
 
-  getTitle(label: string, type:string) {
+  getTitle(label: string, type: string) {
     return label + " (" + type + ")";
   }
-  
+
 }

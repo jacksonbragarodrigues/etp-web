@@ -385,7 +385,9 @@
               </div>
             </div>
 
-            <div class="accordion-item" *ngIf="isSelectApiType() || isPermiteMultiple()">
+            <!-- isSelectApiType() || -->
+
+            <div class="accordion-item" *ngIf="isPermiteMultiple()">
               <h2 class="accordion-header" id="headingApiSelect">
                 <button class="accordion-button" [class.collapsed]="!isAccordionOpen('apiSelect')" type="button"
                   (click)="toggleAccordion('apiSelect')" [attr.aria-expanded]="isAccordionOpen('apiSelect')">
@@ -398,8 +400,10 @@
                 <div class="accordion-body p-2">
 
 
+                  <!-- *ngIf="isSelectApiType()" -->
+
                   <!-- API Configuration (for SELECT_API) -->
-                  <div class="property-section mb-4" *ngIf="isSelectApiType()">
+                  <div class="property-section mb-4" >
                     <!-- <h6 class="section-title" style="font-weight: bold;">
                 <i class="bi bi-cloud-download me-2"></i>
                 CONFIGURAÇÃO DA API
@@ -466,6 +470,16 @@
                               Campo do objeto que será usado como valor
                             </div>
                           </div>
+                        </div>
+                      </div>
+
+                      <!-- Label Template -->
+                      <div class="form-group mb-3">
+                        <label class="form-label">Template para Rótulo</label>
+                        <input type="text" class="form-control form-control-sm" [(ngModel)]="apiLabelTemplate"
+                          (input)="onApiLabelTemplateChange()" placeholder="sigla - descricao">
+                        <div class="form-text">
+                          Template para montar o rótulo usando os campos da API. Use {{'{{'}}nomeDocampo{{'}}'}} para referência aos campos
                         </div>
                       </div>
 

@@ -1141,8 +1141,9 @@
   min-height: 24px;
 }
 
-::ng-deep ngx-select-dropdown .ngx-dropdown-container {
-  width: auto !important;
-  min-width: 350px;
-  white-space: nowrap;
-}
+// ::ng-deep ngx-select-dropdown {
+//   width: fit-content !important;
+// }
+// ::ng-deep ngx-select-dropdown .ngx-dropdown-button {
+//   width: fit-content !important;
+// }
