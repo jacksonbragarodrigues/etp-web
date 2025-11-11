@@ -1099,12 +1099,36 @@ export class FormBuilderService {
     // ID deve vir do 'key' do Form.io quando existir
     const registry = usedIds || new Set<string>();
     let desiredId = this.sanitizeId(String(src.key || ''));
-    //if (!desiredId) desiredId = this.generateIdPAR();
+    if (!desiredId) desiredId = this.generateIdPAR();
+
     let finalId = desiredId;
-    let counter = 1;
-    // while (registry.has(finalId)) {
-    //   finalId = `${desiredId}_${counter++}`;
-    // }
+
+    // If ID already exists, append a random number before the last segment
+    if (registry.has(finalId)) {
+      const randomNumber = String(Math.floor(Math.random() * 1000000)).padStart(6, '0');
+
+      // Check if the ID ends with _PAR or similar suffix pattern
+      const lastUnderscoreIndex = desiredId.lastIndexOf('_');
+      if (lastUnderscoreIndex > 0 && lastUnderscoreIndex < desiredId.length - 1) {
+        // Insert random number before the last segment
+        // Example: PAR_DIGITE_ROTULO_PAR -> PAR_DIGITE_ROTULO_000001_PAR
+        const prefix = desiredId.substring(0, lastUnderscoreIndex);
+        const suffix = desiredId.substring(lastUnderscoreIndex);
+        finalId = `${prefix}_${randomNumber}${suffix}`;
+      } else {
+        // If no clear suffix, just append the random number
+        finalId = `${desiredId}_${randomNumber}`;
+      }
+
+      // Ensure the new ID is also unique
+      while (registry.has(finalId)) {
+        const newRandomNumber = String(Math.floor(Math.random() * 1000000)).padStart(6, '0');
+        const prefix = desiredId.substring(0, lastUnderscoreIndex > 0 ? lastUnderscoreIndex : desiredId.length);
+        const suffix = lastUnderscoreIndex > 0 ? desiredId.substring(lastUnderscoreIndex) : '';
+        finalId = `${prefix}_${newRandomNumber}${suffix}`;
+      }
+    }
+
     registry.add(finalId);
 
     // Para painéis, o "label" deve vir do campo "title" do Form.io

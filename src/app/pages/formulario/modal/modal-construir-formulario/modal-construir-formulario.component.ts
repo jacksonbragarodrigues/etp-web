@@ -297,27 +297,29 @@ export class ModalConstruirFormularioComponent implements OnInit, OnDestroy {
         label: 'Relatório Completo',
         icon: 'fa fa-fw fa-file-invoice',
         command: () => {
-          if (
-            this.formulario.jsonDados === null ||
-            this.formulario.jsonDados === undefined ||
-            this.formulario.jsonDados === ''
-          ) {
-            let dados = JSON.stringify({});
-            const dadosInformados = {
-              id: this.formulario?.id,
-              jsonDados: dados,
-            };
-            this.formulario.jsonDados = dados;
-            this.atualizaDadosRelatorioServiceService.updateJsonDadosRelatorio(
-              this.formulario.jsonDados
-            );
-            this.gravarDadosInformados.emit(dadosInformados);
-            this.menuIndex = 4;
-            this.renderRelatorioCompleto();
-          } else {
-            this.menuIndex = 4;
-            this.renderRelatorioCompleto();
-          }
+          this.onGenerateReport();
+
+          // if (
+          //   this.formulario.jsonDados === null ||
+          //   this.formulario.jsonDados === undefined ||
+          //   this.formulario.jsonDados === ''
+          // ) {
+          //   let dados = JSON.stringify({});
+          //   const dadosInformados = {
+          //     id: this.formulario?.id,
+          //     jsonDados: dados,
+          //   };
+          //   this.formulario.jsonDados = dados;
+          //   this.atualizaDadosRelatorioServiceService.updateJsonDadosRelatorio(
+          //     this.formulario.jsonDados
+          //   );
+          //   this.gravarDadosInformados.emit(dadosInformados);
+          //   this.menuIndex = 4;
+          //   this.renderRelatorioCompleto();
+          // } else {
+          //   this.menuIndex = 4;
+          //   this.renderRelatorioCompleto();
+          // }
         },
         disabled: this.itemMenu[4],
       },
@@ -1220,6 +1222,23 @@ export class ModalConstruirFormularioComponent implements OnInit, OnDestroy {
       alert('Erro ao gerar relatório: ' + error);
     }
   }
+
+  onGenerateReportCompleto(): void {
+    try {
+      this.currentReportContent = this.reportService.generateHTMLReportFull();
+      this.isReportPanelOpen = false;
+      const reportWindow = window.open('', '_blank');
+      if (reportWindow) {
+        reportWindow.document.open();
+        reportWindow.document.write(this.currentReportContent);
+        reportWindow.document.close();
+      }
+    } catch (error) {
+      console.error('Erro ao gerar relatório:', error);
+      alert('Erro ao gerar relatório: ' + error);
+    }
+  }
+
 
   handleFormBuilderAction(event: { action: string, data?: any }): void {
     switch (event.action) {

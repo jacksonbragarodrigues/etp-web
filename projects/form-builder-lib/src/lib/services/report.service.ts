@@ -32,6 +32,22 @@ export class ReportService {
     return this.generateFullHTML(formSchema.name || 'Formulário', summary, content);
   }
 
+  generateHTMLReportFull(): string {
+    const state = this.formBuilderService.getCurrentState();
+    const formSchema = state.formSchema;
+
+    // Include ALL steps without any filtering
+    const allSteps = formSchema.steps;
+    const summary = this.generateSummary(allSteps);
+
+    const content = allSteps.map((step, stepIndex) => {
+      const context: NumberingContext = { stepIndex: stepIndex + 1, componentNumbers: [] };
+      return this.generateStepContentFullStructure(step, context);
+    }).join('\n');
+
+    return this.generateFullHTML(formSchema.name || 'Formulário', summary, content);
+  }
+
   generateHTMLReportWithAnnotations(mode: 'full' | 'summary'): string {
     const state = this.formBuilderService.getCurrentState();
     const formSchema = state.formSchema;
@@ -101,6 +117,24 @@ ${summaryItems}
     return stepHeader + '\n' + componentsContent;
   }
 
+  private generateStepContentFullStructure(step: FormStep, context: NumberingContext): string {
+    const stepNumber = context.stepIndex;
+
+    context.componentNumbers = [0];
+
+    const stepHeader = `  <section class="capitulo outer-section" id="${stepNumber}">
+   <div class="outer-header" id="section-${stepNumber}">
+     ${stepNumber} - ${step.title}
+   </div>
+  </section>`;
+
+    const componentsContent = step.components.map(component => {
+      return this.generateComponentStructure(component, context, 0);
+    }).filter(c => c && c.trim() !== '').join('\n');
+
+    return stepHeader + '\n' + componentsContent;
+  }
+
   private generateComponentContent(component: FormComponent, context: NumberingContext, depth: number, mode: 'full' | 'summary' = 'full'): string {
     if (!this.shouldIncludeComponent(component)) {
       return '';
@@ -111,12 +145,15 @@ ${summaryItems}
     }
 
     if (component.properties?.hideLabel) {
+      // If hideLabel=true and is a container, recursively render its children
+      // (they will be accumulated into the first visible parent)
       if (this.isContainerComponent(component) && component.children && component.children.length > 0) {
         return component.children
           .map(child => this.generateComponentContent(child, context, depth, mode))
           .filter(content => content.trim() !== '')
           .join('\n');
       }
+      // If hideLabel=true and not a container, skip it completely
       return '';
     }
 
@@ -129,15 +166,28 @@ ${summaryItems}
 
     const currentNumber = this.getComponentNumber(context, depth);
     const numberedLabel = `${currentNumber} - ${component.label || this.getComponentTypeLabel(component.type)}`;
-    const componentValue = this.getComponentDisplayValue(component);
+    let componentValue = this.getComponentDisplayValue(component);
+
+    // Accumulate values from direct children with hideLabel=true
+    // This applies to both containers (panels) and leaf components
+    const hiddenChildrenValues = this.collectHiddenLabelChildrenValues(component);
+    if (hiddenChildrenValues.length > 0) {
+      const allValues = [componentValue, ...hiddenChildrenValues].filter(v => v && v.trim() !== '');
+      componentValue = allValues.join(' - ');
+    }
 
     let html = '';
 
     if (this.isContainerComponent(component)) {
+      // For containers, show the panel label with any accumulated hidden children values
+      const separator = componentValue && componentValue.trim() ? ': ' : '';
+      const valueHtml = componentValue ? `<span class="conteudo">${componentValue}</span>` : '';
+
       html += `  <article class="inner-section small-number" id="${currentNumber.replace(/\s/g, '')}">
-    ${numberedLabel}
+    ${numberedLabel}${separator}${valueHtml}
   </article>\n`;
 
+      // Then render visible children as sub-items
       if (component.children && component.children.length > 0) {
         const childrenContent = component.children.map(child => {
           return this.generateComponentContent(child, context, depth + 1, mode);
@@ -149,12 +199,51 @@ ${summaryItems}
       html += this.generateDataGridContent(component, currentNumber, numberedLabel);
       html += this.generateAnnotationsBlock(component.id);
     } else {
+      // For leaf components, add value with colon separator (if no colon already in label)
+      const separator = numberedLabel.trim().endsWith(':') ? ' ' : ': ';
       const valueHtml = componentValue ? `<span class="conteudo">${componentValue}</span>` : '<span class="conteudo"></span>';
 
       html += `  <article class="inner-section small-number" id="${currentNumber.replace(/\s/g, '')}">
-    ${numberedLabel}: ${valueHtml}
+    ${numberedLabel}${separator}${valueHtml}
   </article>`;
       html += this.generateAnnotationsBlock(component.id);
+    }
+
+    return html;
+  }
+
+  private generateComponentStructure(component: FormComponent, context: NumberingContext, depth: number): string {
+    // Full structure report: show component labels/structure in JSON order
+    // - No data values
+    // - No accumulation of hideLabel components
+    // - No filtering or special processing
+    // - Just list in the exact order they appear in JSON
+
+    if (context.componentNumbers.length <= depth) {
+      context.componentNumbers.push(1);
+    } else {
+      context.componentNumbers[depth]++;
+      context.componentNumbers = context.componentNumbers.slice(0, depth + 1);
+    }
+
+    const currentNumber = this.getComponentNumber(context, depth);
+    const componentLabel = component.label || this.getComponentTypeLabel(component.type);
+    const numberedLabel = `${currentNumber} - ${componentLabel}`;
+
+    let html = '';
+
+    // Always render the component label (regardless of type or hideLabel)
+    html += `  <article class="inner-section small-number" id="${currentNumber.replace(/\s/g, '')}">
+    ${numberedLabel}
+  </article>\n`;
+
+    // If component has children, render them recursively in JSON order
+    if (component.children && component.children.length > 0) {
+      const childrenContent = component.children.map(child => {
+        return this.generateComponentStructure(child, context, depth + 1);
+      }).filter(content => content.trim() !== '').join('\n');
+
+      html += childrenContent;
     }
 
     return html;
@@ -303,6 +392,78 @@ ${summaryItems}
     const conditionMet = actualValues.some(v => expectedValues.includes(v));
     const show = typeof conditional.show === 'string' ? (conditional.show === 'true') : !!conditional.show;
     return show ? conditionMet : !conditionMet;
+  }
+
+  /**
+   * Collects display values from direct children with hideLabel = true
+   * These values will be accumulated into the parent component's value
+   * For container children with hideLabel=true, collects their nested values (both visible and hidden)
+   */
+  private collectHiddenLabelChildrenValues(component: FormComponent): string[] {
+    const values: string[] = [];
+
+    if (!component.children || component.children.length === 0) {
+      return values;
+    }
+
+    for (const child of component.children) {
+      if (child.properties?.hideLabel) {
+        // If the hidden child is a container, collect all its nested values
+        if (this.isContainerComponent(child)) {
+          const nestedValues = this.collectAllComponentValuesInContainer(child);
+          values.push(...nestedValues);
+        } else {
+          // For non-container components, get their display value
+          const childValue = this.getComponentDisplayValue(child);
+          if (childValue && childValue.trim() !== '') {
+            values.push(childValue);
+          }
+        }
+      }
+    }
+
+    return values;
+  }
+
+  /**
+   * Recursively collects display values from all components within a container
+   * Includes both visible (hideLabel=false) and hidden (hideLabel=true) leaf components
+   * Skips nested containers with hideLabel=true as their children will be processed separately
+   */
+  private collectAllComponentValuesInContainer(component: FormComponent): string[] {
+    const values: string[] = [];
+
+    if (!component.children || component.children.length === 0) {
+      // If container has no children, get container's own value if it's not a pure container
+      if (!this.isContainerComponent(component)) {
+        const value = this.getComponentDisplayValue(component);
+        if (value && value.trim() !== '') {
+          values.push(value);
+        }
+      }
+      return values;
+    }
+
+    for (const child of component.children) {
+      // Skip children with hideLabel=true that are containers (they handle their own children)
+      if (child.properties?.hideLabel && this.isContainerComponent(child)) {
+        continue;
+      }
+
+      if (this.isContainerComponent(child)) {
+        // For visible containers, recursively collect from their children
+        const nestedValues = this.collectAllComponentValuesInContainer(child);
+        values.push(...nestedValues);
+      } else {
+        // For leaf components (visible or hidden), get their value
+        const childValue = this.getComponentDisplayValue(child);
+        if (childValue && childValue.trim() !== '') {
+          values.push(childValue);
+        }
+      }
+    }
+
+    return values;
   }
 
   /**
