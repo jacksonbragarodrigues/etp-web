@@ -311,7 +311,7 @@ export class StepsWizardComponent implements OnInit, OnDestroy {
   // Método para obter o ícone de validação
   getValidationIcon(step: FormStep): string {
     const isValid = this.isStepValid(step);
-    return isValid ? 'bi bi-check-circle text-success' : 'bi bi-x-circle text-danger';
+    return isValid ? 'fa fa-check text-success' : 'fa fa-times text-danger';
   }
 
   // Método para verificar se deve mostrar ícone de validação

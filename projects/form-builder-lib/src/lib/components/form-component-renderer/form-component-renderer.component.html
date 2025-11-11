@@ -472,10 +472,10 @@
     </div>
 
     <!-- Selection info -->
-    <div class="form-text" *ngIf="hasOptions() && component.properties.multiple && previewMode">
+    <!-- <div class="form-text" *ngIf="hasOptions() && component.properties.multiple && previewMode">
       Múltipla seleção {{ component.properties.multiple ? 'habilitada' : 'desabilitada' }}
       <span *ngIf="isValueArray() && value.length > 0"> - {{ value.length }} item(s) selecionado(s)</span>
-    </div>
+    </div> -->
 
     <!-- Help text -->
     <div class="form-text" *ngIf="component.properties.attributes?.['help-text']">
@@ -657,9 +657,9 @@
           </span>
           <h6 class="mb-0">
             {{ component.label }}
-            <i *ngIf="previewMode && component.valid !== false" class="bi bi-check-circle text-success ms-2"
+            <i *ngIf="previewMode && component.valid !== false" class="fa fa-check text-success"
               title="Todos os campos obrigatórios estão preenchidos"></i>
-            <i *ngIf="previewMode && component.valid === false" class="bi bi-x-circle text-danger ms-2"
+            <i *ngIf="previewMode && component.valid === false" class="fa fa-times text-danger"
               title="Existem campos obrigatórios não preenchidos"></i>
           </h6>
         </div>

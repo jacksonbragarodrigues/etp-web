@@ -133,33 +133,41 @@ export class FormComponentRendererComponent implements OnInit, OnChanges, AfterV
     this.stateSub = this.formBuilderService.state$.subscribe(state => {
       // Find the current component in the updated state and sync local value
       const updatedComponent = this.findComponentInState(state, this.component.id);
-      if (updatedComponent && updatedComponent.value !== this.component.value) {
-        this.component.value = updatedComponent.value;
+      if (updatedComponent) {
+        // Update component reference to latest state
+        this.component = updatedComponent;
 
-        // For SELECT_API, extract the primitive value for display
-        if (this.isSelectApiType()) {
-          this.value = this.extractPrimitiveValue(updatedComponent.value);
-        } else {
-          this.value = updatedComponent.value !== undefined && updatedComponent.value !== null
-            ? updatedComponent.value
-            : this.getDefaultValue();
-        }
+        if (updatedComponent.value !== this.component.value) {
+          this.component.value = updatedComponent.value;
 
-        // Re-sync options after value update
-        this.syncValueWithOptions();
-
-        // For SELECT_API, ensure options are loaded if needed
-        if (this.isSelectApiType()) {
-          if (!this.apiOptions || this.apiOptions.length === 0) {
-            const hasApiConfig = !!updatedComponent.properties?.apiConfig;
-            if (hasApiConfig) {
-              this.loadApiOptions();
-            }
+          // For SELECT_API, extract the primitive value for display
+          if (this.isSelectApiType()) {
+            this.value = this.extractPrimitiveValue(updatedComponent.value);
           } else {
-            // Options already loaded, match the new value to them
-            this.matchStoredValueToOptions();
+            this.value = updatedComponent.value !== undefined && updatedComponent.value !== null
+              ? updatedComponent.value
+              : this.getDefaultValue();
+          }
+
+          // Re-sync options after value update
+          this.syncValueWithOptions();
+
+          // For SELECT_API, ensure options are loaded if needed
+          if (this.isSelectApiType()) {
+            if (!this.apiOptions || this.apiOptions.length === 0) {
+              const hasApiConfig = !!updatedComponent.properties?.apiConfig;
+              if (hasApiConfig) {
+                this.loadApiOptions();
+              }
+            } else {
+              // Options already loaded, match the new value to them
+              this.matchStoredValueToOptions();
+            }
           }
         }
+
+        // Re-initialize panel state when form state changes
+        this.initializePanelState();
       }
 
       this.evaluateConditionalLogic();

@@ -273,9 +273,8 @@ ${summaryItems}
     if (step.properties?.invisible) {
       return false;
     }
-    if (step.properties?.conditional && step.properties.conditional.when) {
-      return this.evaluateStepConditional(step.properties.conditional);
-    }
+    // Include all steps regardless of conditional logic
+    // Conditional logic is for the live form UI, not for reports
     return true;
   }
 
@@ -304,6 +303,27 @@ ${summaryItems}
     const conditionMet = actualValues.some(v => expectedValues.includes(v));
     const show = typeof conditional.show === 'string' ? (conditional.show === 'true') : !!conditional.show;
     return show ? conditionMet : !conditionMet;
+  }
+
+  /**
+   * Renders a template string by replacing {fieldName} placeholders with values from data object
+   * Example: renderTemplate('{chave} - {descricao}', {chave: 'ABC', descricao: 'Test'}) -> 'ABC - Test'
+   */
+  private renderTemplate(template: string, data: any): string {
+    return template.replace(/\{([^}]+)\}/g, (match, fieldName) => {
+      const value = this.getNestedProperty(data, fieldName.trim());
+      return value !== undefined ? String(value) : match;
+    });
+  }
+
+  /**
+   * Gets a nested property from an object using dot notation
+   * Example: getNestedProperty({a: {b: 'value'}}, 'a.b') -> 'value'
+   */
+  private getNestedProperty(obj: any, path: string): any {
+    return path.split('.').reduce((current, key) => {
+      return current && current[key] !== undefined ? current[key] : undefined;
+    }, obj);
   }
 
   private getComponentTypeLabel(type: ComponentType): string {
@@ -371,17 +391,23 @@ ${summaryItems}
       }
 
   case ComponentType.SELECT_API:
-  case ComponentType.TIPO_CONTRATACAO: 
+  case ComponentType.TIPO_CONTRATACAO:
   case ComponentType.UNIDADE:
     case ComponentType.SERVIDOR:
-  
+
   {
         const labelFrom = (val: any): string => {
           const cfg = component.properties?.apiConfig || {};
           const labelKey = cfg.labelField || 'label';
           const valueKey = cfg.valueField || 'value';
+          const labelTemplate = cfg.labelTemplate;
 
           if (val && typeof val === 'object') {
+            // If labelTemplate is provided, apply it
+            if (labelTemplate) {
+              return this.renderTemplate(labelTemplate, val);
+            }
+            // Otherwise extract from labelKey or fallback fields
             return (
               val[labelKey] ?? val.label ?? val.name ?? val.descricao ?? val.text ?? val.title ?? val[valueKey] ?? ''
             ).toString();
@@ -421,7 +447,7 @@ ${summaryItems}
 
       case ComponentType.RICH_TEXT: {
         const str = typeof value === 'string' ? value : String(value);
-        return str.replace(/<[^>]*>/g, '');
+        return str;
       }
 
       default:

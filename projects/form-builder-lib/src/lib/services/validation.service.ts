@@ -426,7 +426,7 @@ export class ValidationService {
    * Focus on a specific component by ID
    * This method will expand panels if needed and scroll to the element
    */
-  focusComponent(componentId: string): void {
+  focusComponent(componentId: string, formBuilderService?: any): void {
     // Use a timeout to ensure the DOM is ready
     setTimeout(() => {
       // Try different selectors to find the component
@@ -446,7 +446,9 @@ export class ValidationService {
 
       if (element) {
         // First, expand any collapsed panels containing this component
-        this.expandParentPanels(element);
+        if (formBuilderService) {
+          formBuilderService.expandAllSubpanels(componentId);
+        }
 
         // Wait a bit for panel expansion animation to complete
         setTimeout(() => {
@@ -500,13 +502,15 @@ export class ValidationService {
       // Look for collapsed panels (Bootstrap collapse or custom panels)
       const collapseElement = currentElement.querySelector('.collapse:not(.show)');
       if (collapseElement) {
-        // Try to find the toggle button and click it
+        // Directly add the 'show' class without clicking the button
+        // This prevents event propagation to parent elements (which can open context menus)
+        collapseElement.classList.add('show');
+
+        // Update the toggle button attributes to reflect the expanded state
         const toggleButton = document.querySelector(`[data-bs-target="#${collapseElement.id}"], [href="#${collapseElement.id}"]`) as HTMLElement;
         if (toggleButton) {
-          toggleButton.click();
-        } else {
-          // If no toggle button found, manually add the 'show' class
-          collapseElement.classList.add('show');
+          toggleButton.classList.remove('collapsed');
+          toggleButton.setAttribute('aria-expanded', 'true');
         }
       }
 

@@ -25,7 +25,7 @@
                 <a
                   href="javascript:void(0)"
                   class="text-danger text-decoration-none fw-semibold"
-                  (click)="onValidationErrorClick(error)"
+                  (click)="onValidationErrorClick(error); $event.preventDefault(); $event.stopPropagation()"
                   [title]="'Clique para ir para ' + error.componentLabel + ' ' + error.componentId">
                   <i class="bi bi-arrow-right-circle me-1"></i>
                   {{ error.message }}

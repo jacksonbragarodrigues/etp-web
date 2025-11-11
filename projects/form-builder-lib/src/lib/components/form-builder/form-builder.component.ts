@@ -617,7 +617,7 @@ export class FormBuilderComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   getValidationIcon(step: FormStep): string {
-    return this.isStepValid(step) ? 'bi bi-check-circle text-success' : 'bi bi-x-circle text-danger';
+    return this.isStepValid(step) ? 'fa fa-check text-success' : 'fa fa-times text-danger';
   }
 
   shouldShowValidationIcon(step: FormStep): boolean {

@@ -287,7 +287,7 @@ this.isDragOver[targetIndex] = false;
   }
 
   onValidationErrorClick(error: ValidationError): void {
-    this.validationService.focusComponent(error.componentId);
+    this.validationService.focusComponent(error.componentId, this.formBuilderService);
   }
 
   hasValidationErrors(): boolean {

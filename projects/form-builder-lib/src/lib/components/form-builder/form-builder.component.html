@@ -192,15 +192,14 @@
     <div class="preview-main-content d-flex flex-grow-1">
 
       <!-- 2. Left Panel: Menu Principal -->
-      <div class="preview-left-panel bg-light border-end p-3" style="width: 350px; min-width: 350px;">
-        <h6 class="mb-3 fw-semibold">
-          <i class="bi bi-list-ol me-2"></i>
+      <div class="preview-left-panel bg-white border-end p-2" style="width: 350px; min-width: 350px;">
+        <h5 class="card-title-custom p-2">
           Menu Principal
-        </h6>
+        </h5>
         <div class="steps-menu">
-          <div *ngFor="let step of state.formSchema.steps; let i = index" class="step-item mb-2">
+          <div *ngFor="let step of state.formSchema.steps; let i = index" class="step-item">
             <button class="btn w-100 text-start" [class.btn-primary]="step.id === state.currentStep"
-              [class.btn-outline-secondary]="step.id !== state.currentStep"
+              
               (mousedown)="onPreviewStepPress(step.id, $event)">
               <!-- <i class="bi bi-check-circle me-2" *ngIf="step.id !== state.currentStep"></i>
               <i class="bi bi-arrow-right me-2" *ngIf="step.id === state.currentStep"></i> -->
@@ -214,9 +213,9 @@
       </div>
 
       <!-- 3. Center Panel: Form Content -->
-      <div class="preview-center-panel flex-grow-1 bg-white p-4">
+      <div class="preview-center-panel flex-grow-1 bg-white p-2">
         <div class="form-preview-container">
-          <h5 class="mb-4" *ngIf="getCurrentStepLabel()">{{ getCurrentStepLabel() }}</h5>
+          <h5 class="card-title-custom p-2 mb-1" *ngIf="getCurrentStepLabel()">{{ getCurrentStepLabel() }}</h5>
           <app-form-canvas></app-form-canvas>
           <div class="preview-bottom-panel bg-white border-top p-3">
             <div class="d-flex justify-content-between align-items-center">

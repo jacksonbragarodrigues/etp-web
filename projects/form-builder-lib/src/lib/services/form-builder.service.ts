@@ -1131,6 +1131,7 @@ export class FormBuilderService {
     if (src.tooltip) base.properties.tooltip = src.tooltip;
     if (src.disabled) base.properties.disabled = !!src.disabled;
     if (src.hidden) base.properties.hidden = !!src.hidden;
+    if (src.hideLabel) base.properties.hideLabel = !!src.hideLabel;
 
     // Validações básicas
     const validations: any[] = [];
@@ -3020,5 +3021,103 @@ export class FormBuilderService {
         cacheTimeout: 30,
       };
   }
-  
+
+  /**
+   * Expands all subpanels of a given panel component
+   * Recursively sets panelCollapsed to false for the panel and all child panels
+   * @param panelId - The ID of the panel to expand
+   */
+  expandAllSubpanels(panelId: string): void {
+    const state = this.getCurrentState();
+    const panel = this.findParentPanelOfComponent(state.formSchema, panelId);
+
+    console.log("panel:", panel?.id, panelId);
+
+    if (panel && panel.type === ComponentType.PANEL) {
+      this.expandPanelRecursive(panel);
+      // Update state to persist the changes
+      this.updateState({ formSchema: { ...state.formSchema } });
+    }
+  }
+
+  /**
+   * Recursively expands a panel and all its child panels
+   * @param component - The component to expand (should be a panel)
+   */
+  private expandPanelRecursive(component: FormComponent): void {
+    // Expand the current panel if it's collapsible
+    if (component.type === ComponentType.PANEL && component.properties.collapsible) {
+      console.log("expandPanelRecursive:", component.id);
+      (component.properties as any).panelCollapsed = false;
+    }
+
+    // Recursively expand all child panels
+    if (component.children && component.children.length > 0) {
+      for (const child of component.children) {
+        if (child.type === ComponentType.PANEL) {
+          this.expandPanelRecursive(child);
+        }
+      }
+    }
+  }
+
+  /**
+   * Finds a component by ID across all steps
+   * @param formSchema - The form schema to search in
+   * @param componentId - The ID of the component to find
+   * @returns The found component or null
+   */
+  private findComponentInAllSteps(formSchema: FormSchema, componentId: string): FormComponent | null {
+    for (const step of formSchema.steps) {
+      const found = this.findComponentInArray(componentId, step.components);
+      if (found) return found;
+    }
+    return null;
+  }
+
+  /**
+   * Finds the parent panel of a component by its ID across all steps
+   * If the component itself is a panel, returns the component
+   * If the component is nested within a panel, returns the containing panel
+   * @param formSchema - The form schema to search in
+   * @param componentId - The ID of the component to find its parent panel
+   * @returns The parent panel or the component if it's a panel, or null if not found
+   */
+  private findParentPanelOfComponent(formSchema: FormSchema, componentId: string): FormComponent | null {
+    for (const step of formSchema.steps) {
+      const found = this.findParentPanelInArray(componentId, step.components);
+      if (found) return found;
+    }
+    return null;
+  }
+
+  /**
+   * Helper method to recursively find the parent panel of a component within an array
+   * @param componentId - The ID of the component to find its parent panel
+   * @param components - The array of components to search in
+   * @param parentPanel - The current parent panel context (starts as null, tracked during recursion)
+   * @returns The parent panel or the component if it's a panel, or null if not found
+   */
+  private findParentPanelInArray(componentId: string, components: FormComponent[], parentPanel: FormComponent | null = null): FormComponent | null {
+    for (const component of components) {
+      if (component.id === componentId) {
+        // If the found component is a panel, return it
+        if (component.type === ComponentType.PANEL) {
+          return component;
+        }
+        // Otherwise, return the parent panel
+        return parentPanel;
+      }
+
+      // If current component is a panel, it becomes the parent for its children
+      const currentParent = component.type === ComponentType.PANEL ? component : parentPanel;
+
+      if (component.children && component.children.length > 0) {
+        const found = this.findParentPanelInArray(componentId, component.children, currentParent);
+        if (found) return found;
+      }
+    }
+    return null;
+  }
+
 }

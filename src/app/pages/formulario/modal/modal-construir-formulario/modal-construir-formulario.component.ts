@@ -200,8 +200,8 @@ export class ModalConstruirFormularioComponent implements OnInit, OnDestroy {
         icon: 'fa fa-fw fa-file-pdf',
         command: () => {
           this.menuIndex = 2;
-          //  this.onGenerateReport();
-          this.renderRelatorio();
+          this.onGenerateReport();
+          //this.renderRelatorio();
         },
         disabled: this.itemMenu[2],
       },
@@ -353,7 +353,7 @@ export class ModalConstruirFormularioComponent implements OnInit, OnDestroy {
         label: 'Sair',
         icon: 'fa fa-fw fa-sign-out',
         command: () => {
-          this.closeFormulario();
+          this.close();
         },
         disabled: this.itemMenu[14],
       },
@@ -482,6 +482,8 @@ export class ModalConstruirFormularioComponent implements OnInit, OnDestroy {
   private configurarFuncionalidadesMenuLateralDefault() {
     this.isBuilderDisabled = false;
 
+
+
     if (this.formulario.visualizar) {
       this.options.readOnly = true;
       this.toggleCssFlag(true);
@@ -542,6 +544,7 @@ export class ModalConstruirFormularioComponent implements OnInit, OnDestroy {
     index.forEach((i) => {
       this.itemMenu[i] = true;
     });
+
     this.montarMenu();
   }
 
@@ -581,6 +584,17 @@ export class ModalConstruirFormularioComponent implements OnInit, OnDestroy {
 
   }
 
+  close() {
+    if (this.formBuilderService.hasUnsavedStructuralChanges()) {
+      this.closeFormulario();
+    } else  if (this.formBuilderService.hasUnsavedDataChanges()) {
+      this.closeSimulador();
+    } else {
+      this.modalRef.close();
+    }
+
+  }
+
   closeSimulador() {
     if (this.formBuilderService.hasUnsavedDataChanges()) {
       this.alertUtils.confirmDialog(this.parametros.MSG_GRAVAR_SIMULADOR).then((dataConfirme) => {
@@ -610,10 +624,12 @@ export class ModalConstruirFormularioComponent implements OnInit, OnDestroy {
           this.menuIndex = 0;
           this.formBuilderService.updateState({ previewMode: false });
           this.modalRef.close();
-        } 
+        }
       });
     }
   }
+
+
 
   closeFormulario() {
     console.log("closeFormulario");
@@ -624,7 +640,7 @@ export class ModalConstruirFormularioComponent implements OnInit, OnDestroy {
         } else {
           this.gravarJsonFormulario.emit({
             id: this.idFormulario,
-            jsonForm: this.formulario.jsonDados,
+            jsonForm: this.formulario.jsonForm
           });
           this.formBuilderService.resetUnsavedChangesFlag();
           this.modalRef.close();
@@ -801,7 +817,7 @@ export class ModalConstruirFormularioComponent implements OnInit, OnDestroy {
   private setDadosFormulario(formulario: any) {
 
 
-     this.gestaoFormularioService
+    this.gestaoFormularioService
       .getFormularioById(formulario.id)
       .subscribe({
         next: (data: any) => {
