@@ -323,7 +323,7 @@ export class FormBuilderService {
           token: '',
           labelField: 'descricao',
           valueField: 'chave',
-          labelTemplate: '{chave} - {descricao}',
+          labelTemplate: '{descricao}',
           requestBody: '',
           cache: true,
           cacheTimeout: 30,
@@ -560,7 +560,7 @@ export class FormBuilderService {
         token: '',
         labelField: 'descricao',
         valueField: 'chave',
-        labelTemplate: '{chave} - {descricao}',
+        labelTemplate: '{descricao}',
         requestBody: '',
         cache: true,
         cacheTimeout: 30,
@@ -1229,7 +1229,7 @@ export class FormBuilderService {
           token: '',
           labelField: 'descricao',
           valueField: 'chave',
-          labelTemplate: '{chave} - {descricao}',
+          labelTemplate: '{descricao}',
           requestBody: '',
           cache: true,
           cacheTimeout: 30,
@@ -1260,7 +1260,7 @@ export class FormBuilderService {
             valueField = 'sigla';
             labelTemplate = '{sigla} - {descricao}';
           } else if (base.type === ComponentType.TIPO_CONTRATACAO) {
-            labelTemplate = '{chave} - {descricao}';
+            labelTemplate = '{descricao}';
           }
 
           base.properties.apiConfig = {
@@ -1466,7 +1466,7 @@ export class FormBuilderService {
             } else if (component.type === ComponentType.TIPO_CONTRATACAO) {
               component.properties.apiConfig = {
                 ...component.properties.apiConfig,
-                labelTemplate: '{chave} - {descricao}'
+                labelTemplate: '{descricao}'
               };
             }
           }
@@ -2278,7 +2278,16 @@ export class FormBuilderService {
       }
       // Para outros componentes, usar a condição normal
       else if (component.key && component.value !== undefined && component.value !== null && component.type !== ComponentType.DATAGRID) {
-        formData[component.key] = component.value;
+        // Clean select data before exporting to ensure only original API data is saved
+        // This prevents storing SelectOption objects with label/value/originalData/selected
+        let valueToExport = component.value;
+
+        // For SELECT_API components, ensure we export clean data
+        if (this.isSelectApiType(component)) {
+          valueToExport = this.cleanSelectDataForExport(component.value);
+        }
+
+        formData[component.key] = valueToExport;
       }
 
       // Extrair dados de delegação para PANEL components
@@ -2434,6 +2443,74 @@ export class FormBuilderService {
     }
 
     return compareValue == optionValue;
+  }
+
+  /**
+   * Check if a component is a SELECT_API type (includes custom types like UNIDADE, TIPO_CONTRATACAO, SERVIDOR)
+   */
+  private isSelectApiType(component: FormComponent): boolean {
+    return component.type === ComponentType.SELECT_API ||
+           component.type === ComponentType.TIPO_CONTRATACAO ||
+           component.type === ComponentType.UNIDADE ||
+           component.type === ComponentType.SERVIDOR;
+  }
+
+  /**
+   * Clean select data before export to remove SelectOption transformation
+   * Converts { label, value, originalData, selected } back to original data format
+   * Or extracts originalData if present
+   */
+  private cleanSelectDataForExport(value: any): any {
+    if (!value) {
+      return value;
+    }
+
+    // Handle arrays (multiple selection)
+    if (Array.isArray(value)) {
+      return value.map(item => this.cleanSelectItemForExport(item));
+    }
+
+    // Handle single value
+    return this.cleanSelectItemForExport(value);
+  }
+
+  /**
+   * Clean a single select item for export
+   */
+  private cleanSelectItemForExport(item: any): any {
+    if (!item || typeof item !== 'object') {
+      return item;
+    }
+
+    // If item has originalData field, extract it (it contains the original API response)
+    if ('originalData' in item && item.originalData && typeof item.originalData === 'object') {
+      return JSON.parse(JSON.stringify(item.originalData)); // Deep clone to avoid references
+    }
+
+    // If item looks like a SelectOption (has label, value, selected) but no originalData
+    // Extract only the meaningful fields
+    const isTransformedSelectOption = 'label' in item && 'value' in item && ('selected' in item || 'originalData' in item);
+
+    if (isTransformedSelectOption && !('originalData' in item)) {
+      // This is a transformed option without originalData - likely partially saved data
+      // Extract the fields that look like original API data
+      const cleaned: any = {};
+      const fieldsToKeep = ['sigla', 'id', 'descricao', 'chave', 'nome', 'matricula', 'label', 'email'];
+
+      for (const field of fieldsToKeep) {
+        if (field in item && !['label', 'value', 'selected', 'originalData'].includes(field)) {
+          cleaned[field] = item[field];
+        }
+      }
+
+      // If we extracted any fields, return the cleaned object
+      if (Object.keys(cleaned).length > 0) {
+        return cleaned;
+      }
+    }
+
+    // For regular objects, return as-is (they are already in the correct format)
+    return item;
   }
 
   // Método para atualizar validação de um componente e seus pais

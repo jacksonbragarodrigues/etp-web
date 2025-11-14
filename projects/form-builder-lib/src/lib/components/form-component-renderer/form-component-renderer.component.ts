@@ -1170,12 +1170,16 @@ export class FormComponentRendererComponent implements OnInit, OnChanges, AfterV
         this.apiError = null;
 
         // Update component's options for consistency
+        // NOTE: These are SelectOption objects with { label, value, selected, originalData }
+        // This is used only for UI rendering and selection logic, NOT for data storage
         this.component.properties.options = [...options];
 
         // If we have a stored value, find and match it to the loaded options
+        // This will set this.value to the SelectOption for UI display
         this.matchStoredValueToOptions();
 
         // Sync selected values with loaded options
+        // This marks option.selected flags for UI rendering
         this.syncValueWithOptions();
       },
       error: (error) => {
@@ -1222,10 +1226,12 @@ export class FormComponentRendererComponent implements OnInit, OnChanges, AfterV
       // Find matching option objects for each stored value
       const matchedOptions = storedValues.map(val => {
         const matchedOption = this.apiOptions.find(opt => opt.value == val);
+        // Return the SelectOption object for the dropdown UI to display label
         return matchedOption || val;
       });
 
       // Update this.value to the matched options (or primitive values if no match)
+      // Note: this.value is used for the UI dropdown display, not for data storage
       this.value = matchedOptions;
     } else {
       // For single selection, find the matching option object
@@ -1233,6 +1239,7 @@ export class FormComponentRendererComponent implements OnInit, OnChanges, AfterV
 
       // Update this.value to the full option object so dropdown can display label
       if (matchedOption) {
+        // Use the SelectOption for dropdown display
         this.value = matchedOption;
       } else {
         // Fallback to primitive value if no match found

@@ -242,7 +242,13 @@ export class PropertiesPanelComponent implements OnInit, OnDestroy, AfterViewIni
     } else {
       this.conditionalWhen = [];
     }
-    this.conditionalEq = component.properties.conditional?.eq || '';
+    // Normalize conditionalEq - handle both string and object formats
+    let eqValue = component.properties.conditional?.eq || '';
+    if (typeof eqValue === 'object' && eqValue !== null) {
+      // Handle cases where eq was saved as an object (from previous versions)
+      eqValue = (eqValue as any).id || (eqValue as any).value || '';
+    }
+    this.conditionalEq = (eqValue || '').toString().trim();
 
     // Load available component keys for conditional logic
     this.loadAvailableComponentKeys();
@@ -274,7 +280,11 @@ export class PropertiesPanelComponent implements OnInit, OnDestroy, AfterViewIni
 
     // API Select properties
     this.apiUrl = component.properties.apiConfig?.url || '';
-    this.apiMethod = component.properties.apiConfig?.method || 'GET';
+    // Ensure method is always a string, handling cases where it might be an object
+    let methodValue = component.properties.apiConfig?.method || 'GET';
+    this.apiMethod = typeof methodValue === 'object' && methodValue !== null && 'id' in methodValue
+      ? (methodValue as any).id
+      : methodValue;
     this.apiToken = component.properties.apiConfig?.token || '';
     this.apiLabelField = component.properties.apiConfig?.labelField || 'name';
     this.apiValueField = component.properties.apiConfig?.valueField || 'id';
@@ -576,6 +586,10 @@ export class PropertiesPanelComponent implements OnInit, OnDestroy, AfterViewIni
   }
 
   onConditionalEqChange(): void {
+    // Normalize conditionalEq immediately if it's an object from dropdown selection
+    if (typeof this.conditionalEq === 'object' && this.conditionalEq !== null) {
+      this.conditionalEq = ((this.conditionalEq as any).id || (this.conditionalEq as any).value || '').toString().trim();
+    }
     this.updateConditionalLogic();
   }
 
@@ -601,12 +615,20 @@ export class PropertiesPanelComponent implements OnInit, OnDestroy, AfterViewIni
       whenArray = this.conditionalWhen.split(',').map(s => s.trim()).filter(Boolean);
     }
 
+    // Normalize conditionalEq - extract ID if it's an object from dropdown selection
+    let eqValue = this.conditionalEq;
+    if (typeof eqValue === 'object' && eqValue !== null) {
+      // Extract the ID from the object (ngx-select-dropdown returns full object)
+      eqValue = (eqValue as any).id || (eqValue as any).value || '';
+    }
+    eqValue = (eqValue || '').toString().trim();
+
     // Only save conditional logic if whenArray has items
     if (whenArray.length > 0) {
       const conditional = {
         show: this.conditionalShow,
-        when: whenArray,
-        eq: this.conditionalEq
+        when: whenArray.length === 1 ? whenArray[0] : whenArray,
+        eq: eqValue
       };
       this.updateProperty('properties.conditional', conditional);
     } else {
@@ -654,7 +676,13 @@ export class PropertiesPanelComponent implements OnInit, OnDestroy, AfterViewIni
     } else {
       this.stepConditionalWhen = [];
     }
-    this.stepConditionalEq = step.properties?.conditional?.eq || '';
+    // Normalize stepConditionalEq - handle both string and object formats
+    let stepEqValue = step.properties?.conditional?.eq || '';
+    if (typeof stepEqValue === 'object' && stepEqValue !== null) {
+      // Handle cases where eq was saved as an object (from previous versions)
+      stepEqValue = (stepEqValue as any).id || (stepEqValue as any).value || '';
+    }
+    this.stepConditionalEq = (stepEqValue || '').toString().trim();
 
     // Load available component keys for conditional logic
     this.loadAvailableComponentKeys();
@@ -751,6 +779,11 @@ export class PropertiesPanelComponent implements OnInit, OnDestroy, AfterViewIni
   }
 
   onApiMethodChange(): void {
+    // Handle ngx-select-dropdown returning object instead of string
+    // Extract the method string value if it's an object
+    if (typeof this.apiMethod === 'object' && this.apiMethod !== null && 'id' in this.apiMethod) {
+      this.apiMethod = (this.apiMethod as any).id;
+    }
     this.updateApiConfig();
   }
 
@@ -810,9 +843,15 @@ export class PropertiesPanelComponent implements OnInit, OnDestroy, AfterViewIni
       }
     }
 
+    // Ensure method is a string, not an object from ngx-select-dropdown
+    let method = this.apiMethod;
+    if (typeof method === 'object' && method !== null && 'id' in method) {
+      method = (method as any).id;
+    }
+
     const apiConfig = {
       url: this.apiUrl.trim(),
-      method: this.apiMethod,
+      method: method, // Always ensure this is a string
       headers: headers,
       token: this.apiToken.trim(),
       labelField: this.apiLabelField.trim() || 'name',
@@ -975,6 +1014,10 @@ export class PropertiesPanelComponent implements OnInit, OnDestroy, AfterViewIni
   }
 
   onStepConditionalEqChange(): void {
+    // Normalize stepConditionalEq immediately if it's an object from dropdown selection
+    if (typeof this.stepConditionalEq === 'object' && this.stepConditionalEq !== null) {
+      this.stepConditionalEq = ((this.stepConditionalEq as any).id || (this.stepConditionalEq as any).value || '').toString().trim();
+    }
     this.updateStepConditionalLogic();
   }
 
@@ -1000,12 +1043,20 @@ export class PropertiesPanelComponent implements OnInit, OnDestroy, AfterViewIni
       stepWhenArray = this.stepConditionalWhen.split(',').map(s => s.trim()).filter(Boolean);
     }
 
+    // Normalize stepConditionalEq - extract ID if it's an object from dropdown selection
+    let stepEqValue = this.stepConditionalEq;
+    if (typeof stepEqValue === 'object' && stepEqValue !== null) {
+      // Extract the ID from the object (ngx-select-dropdown returns full object)
+      stepEqValue = (stepEqValue as any).id || (stepEqValue as any).value || '';
+    }
+    stepEqValue = (stepEqValue || '').toString().trim();
+
     // Only save conditional logic if stepWhenArray has items
     if (stepWhenArray.length > 0) {
       const conditional = {
         show: this.stepConditionalShow,
-        when: stepWhenArray,
-        eq: this.stepConditionalEq
+        when: stepWhenArray.length === 1 ? stepWhenArray[0] : stepWhenArray,
+        eq: stepEqValue
       };
       this.updateStepProperty('conditional', conditional);
     } else {

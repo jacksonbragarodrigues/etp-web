@@ -387,13 +387,14 @@
 
             <!-- isSelectApiType() || -->
 
-            <div class="accordion-item" *ngIf="isPermiteMultiple()">
+            <div class="accordion-item" >
               <h2 class="accordion-header" id="headingApiSelect">
                 <button class="accordion-button" [class.collapsed]="!isAccordionOpen('apiSelect')" type="button"
                   (click)="toggleAccordion('apiSelect')" [attr.aria-expanded]="isAccordionOpen('apiSelect')">
                   <i class="bi bi-cloud-download me-2"></i>
                   CONFIGURAÇÃO DA API
                 </button>
+
               </h2>
               <div id="collapseApiSelect" class="accordion-collapse collapse"
                 [class.show]="isAccordionOpen('apiSelect')" aria-labelledby="headingApiSelect">
@@ -528,7 +529,7 @@
 
 
                   <!-- API Select Options (Multiple Selection & Layout) -->
-                  <div class="property-section mb-4" *ngIf="isPermiteMultiple()">
+                  <div class="property-section mb-4" >
                     <h6 class="section-title" style="font-weight: bold;">
                       <i class="bi bi-ui-checks me-2"></i>
                       OPÇÕES DE SELEÇÃO

@@ -15,6 +15,7 @@ export interface FormComponent {
   valid?: boolean; // Universal validation status for all components
 }
 
+
 export interface ComponentProperties {
   classes?: string[];
   styles?: { [key: string]: string };

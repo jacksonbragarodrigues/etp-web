@@ -28,6 +28,7 @@ import { EtpEnvioSeiService } from 'src/app/services/etp-envio-sei.service';
 import { GestaoEtpService } from 'src/app/services/gestao-etp.service';
 import { AcoesEnum } from 'src/app/shared/models/acoes.enum';
 import { AlertUtils } from '../../../../../../utils/alerts.util';
+import { SelectDataCleanerUtil } from '../../../../../../utils/select-data-cleaner.util';
 import { GestaoFormularioService } from '../../../../../services/gestao-formulario.service';
 import { DelegarAcessoComponent } from '../../../../delegacao-acesso/gestao-delegacao-acesso/delegar-acesso.component';
 import ServidorSelect from '../../../../formulario/componentes-customizados-formio/servidores-select';
@@ -828,6 +829,11 @@ export class FormularioEtpComponent implements OnInit, OnDestroy {
       try {
         setTimeout(() => {
           if (event.changed?.component) {
+            // Clean select data in real-time when user makes changes
+            if (event.data) {
+              event.data = SelectDataCleanerUtil.cleanSelectData(event.data);
+              instance.data = event.data;
+            }
             this.dadosAlterados = _.cloneDeep(event.data);
           }
         }, 0);
@@ -838,7 +844,13 @@ export class FormularioEtpComponent implements OnInit, OnDestroy {
 
     instance.once('render', () => this.onFirstRender(instance));
     instance.on('render', () => this.onRender(instance));
-    instance.on('submit', () => this.onSubmit(instance));
+    instance.on('submit', (event: any) => {
+      // Clean select data before submission
+      if (instance.submission && instance.submission.data) {
+        instance.submission.data = SelectDataCleanerUtil.cleanSelectData(instance.submission.data);
+      }
+      this.onSubmit(instance);
+    });
     instance.on('prevPage', (event: any) =>
       this.safeCallback(() => this.onNext(event?.submission))
     );
@@ -913,8 +925,13 @@ export class FormularioEtpComponent implements OnInit, OnDestroy {
 
   private setarDadosIniciais(instance: any) {
     if (this.etp.jsonDados) {
+      let parsedData = JSON.parse(this.etp.jsonDados);
+
+      // Clean and normalize select data to remove transformed fields on load
+      parsedData = SelectDataCleanerUtil.cleanSelectData(parsedData);
+
       const submissionData = {
-        data: JSON.parse(this.etp.jsonDados),
+        data: parsedData,
       };
 
       setTimeout(() => {
@@ -950,8 +967,13 @@ export class FormularioEtpComponent implements OnInit, OnDestroy {
 
   private setarSubmission(instance: any) {
     try {
+      let parsedData = JSON.parse(this.etp.jsonDados);
+
+      // Clean and normalize select data to remove transformed fields on load
+      parsedData = SelectDataCleanerUtil.cleanSelectData(parsedData);
+
       const submissionData = {
-        data: JSON.parse(this.etp.jsonDados),
+        data: parsedData,
       };
 
       setTimeout(() => {
@@ -971,11 +993,20 @@ export class FormularioEtpComponent implements OnInit, OnDestroy {
   }
 
   public submit(dados: any) {
+    // Parse the JSON string to clean select data
+    let parsedData = JSON.parse(dados);
+
+    // Clean and normalize select data to remove transformed fields (label, originalData, value, selected)
+    parsedData = SelectDataCleanerUtil.cleanSelectData(parsedData);
+
+    // Convert back to JSON string
+    const cleanedDados = JSON.stringify(parsedData);
+
     const dadosInformados = {
       id: this.etp?.id,
-      jsonDados: dados,
+      jsonDados: cleanedDados,
     };
-    this.etp.jsonDados = dados;
+    this.etp.jsonDados = cleanedDados;
 
     setTimeout(() => {
       this.gravarDadosFormularioEtpNext(dadosInformados);
