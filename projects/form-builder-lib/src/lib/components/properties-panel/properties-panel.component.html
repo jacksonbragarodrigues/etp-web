@@ -214,6 +214,10 @@
               </textarea>
                     </div>
 
+
+
+                    
+
                     <!-- Help Text -->
                     <div class="form-group mb-3">
                       <label class="form-label">Texto de Ajuda</label>
@@ -292,6 +296,19 @@
                       <label class="form-check-label" for="allowsConfidentiality">
                         Permitir Sigilo
                       </label>
+                    </div>
+
+                    <!-- Multiple Value -->
+                    <div class="form-check mb-3" *ngIf="canHaveMultipleValue()">
+                      <input [disabled]="isComponentChave()" class="form-check-input" type="checkbox"
+                        id="multipleValue" [(ngModel)]="multipleValue"
+                        (change)="onMultipleValueChange()">
+                      <label class="form-check-label" for="multipleValue">
+                        Permitir Múltiplos Valores
+                      </label>
+                      <div class="form-text">
+                        Quando ativado, permite adicionar/remover múltiplos valores no campo
+                      </div>
                     </div>
 
                   </div>

@@ -63,6 +63,12 @@ export class FormComponentRendererComponent implements OnInit, OnChanges, AfterV
   // Drop zone state for children
   dragOverChildId: string | null = null;
 
+  // Multiple value properties
+  multiValueList: any[] = [];
+  selectedRowIndex: number = -1;
+  newValue: any = '';
+  private multiValueDebounceTimer: any;
+
   // Custom CKEditor
   private ckEditorInstance: any;
   private ckEditorId: string = '';
@@ -99,6 +105,11 @@ export class FormComponentRendererComponent implements OnInit, OnChanges, AfterV
   ) { }
 
   ngOnInit(): void {
+    // Initialize multiple value mode if enabled
+    if (this.component.properties.multipleValue) {
+      this.initializeMultipleValue();
+    }
+
     // For SELECT_API components, extract the primitive value for display
     // while keeping the full object in component.value for storage
     if (this.isSelectApiType()) {
@@ -472,6 +483,134 @@ export class FormComponentRendererComponent implements OnInit, OnChanges, AfterV
     this.onValueChange(value);
   }
 
+  // Multiple value methods
+  initializeMultipleValue(): void {
+    if (!this.component.properties.multipleValue) return;
+
+    // Convert existing single value to array if needed
+    if (this.component.value && !Array.isArray(this.component.value)) {
+      this.multiValueList = [this.component.value];
+      this.component.value = this.multiValueList;
+    } else if (Array.isArray(this.component.value)) {
+      this.multiValueList = [...this.component.value];
+    } else {
+      this.multiValueList = [];
+      this.component.value = [];
+    }
+    this.selectedRowIndex = -1;
+    this.newValue = '';
+  }
+
+  addMultipleValue(): void {
+    if (!this.component.properties.multipleValue) {
+      return;
+    }
+
+    // Add empty value for new line
+    this.multiValueList.push('');
+    this.component.value = this.multiValueList;
+    this.selectedRowIndex = -1;
+
+    // Persist in preview mode
+    if (this.previewMode) {
+      this.valueChange.emit(this.component.value);
+      setTimeout(() => {
+        this.formBuilderService.triggerConditionalLogicUpdate();
+        this.formBuilderService.updateComponentAndParentsValidation(this.component.id);
+      }, 0);
+    }
+  }
+
+  onMultipleValueInputChange(event: Event, index: number): void {
+    if (!this.component.properties.multipleValue || index < 0 || index >= this.multiValueList.length) {
+      return;
+    }
+
+    const target = event.target as HTMLInputElement | HTMLTextAreaElement;
+    const newValue = target?.value || '';
+
+    // Update the array directly WITHOUT creating a new reference
+    // This prevents triggering change detection that would re-render the ngFor
+    this.multiValueList[index] = newValue;
+
+    // Debounce both value emission and validation updates
+    // This prevents rapid DOM updates that cause focus loss
+    clearTimeout(this.multiValueDebounceTimer);
+    this.multiValueDebounceTimer = setTimeout(() => {
+      // Only update component.value after debounce to avoid excessive re-renders
+      this.component.value = [...this.multiValueList];
+
+      if (this.previewMode) {
+        this.valueChange.emit(this.component.value);
+        this.formBuilderService.triggerConditionalLogicUpdate();
+        this.formBuilderService.updateComponentAndParentsValidation(this.component.id);
+      }
+    }, 300);
+  }
+
+  onMultipleValueRichTextChange(value: string, index: number): void {
+    if (!this.component.properties.multipleValue || index < 0 || index >= this.multiValueList.length) {
+      return;
+    }
+
+    // Update the array directly WITHOUT creating a new reference
+    this.multiValueList[index] = value;
+
+    // Debounce to prevent rapid re-renders
+    clearTimeout(this.multiValueDebounceTimer);
+    this.multiValueDebounceTimer = setTimeout(() => {
+      // Only update component.value after debounce to avoid excessive re-renders
+      this.component.value = [...this.multiValueList];
+
+      if (this.previewMode) {
+        this.valueChange.emit(this.component.value);
+        this.formBuilderService.triggerConditionalLogicUpdate();
+        this.formBuilderService.updateComponentAndParentsValidation(this.component.id);
+      }
+    }, 300);
+  }
+
+  removeMultipleValue(): void {
+    if (!this.component.properties.multipleValue || this.selectedRowIndex < 0) {
+      return;
+    }
+
+    this.removeMultipleValueByIndex(this.selectedRowIndex);
+  }
+
+  removeMultipleValueByIndex(index: number): void {
+    if (!this.component.properties.multipleValue || index < 0 || index >= this.multiValueList.length) {
+      return;
+    }
+
+    this.multiValueList.splice(index, 1);
+    this.component.value = this.multiValueList;
+    this.selectedRowIndex = -1;
+
+    // Persist in preview mode
+    if (this.previewMode) {
+      this.valueChange.emit(this.component.value);
+      setTimeout(() => {
+        this.formBuilderService.triggerConditionalLogicUpdate();
+        this.formBuilderService.updateComponentAndParentsValidation(this.component.id);
+      }, 0);
+    }
+  }
+
+  selectMultipleValueRow(index: number): void {
+    this.selectedRowIndex = this.selectedRowIndex === index ? -1 : index;
+  }
+
+  isMultipleValueRowSelected(index: number): boolean {
+    return this.selectedRowIndex === index;
+  }
+
+  trackByMultipleValueIndex(index: number, item: any): number {
+    // Use index as stable trackBy key to prevent DOM recreation
+    // This is safe here because we're not reordering items, just adding/removing from the end
+    return index;
+  }
+
   private applyMask(value: string, mask: string): string {
     if (!mask || !value) return value;
 
@@ -765,6 +904,17 @@ export class FormComponentRendererComponent implements OnInit, OnChanges, AfterV
       ComponentType.URL,
       ComponentType.TEL,
       ComponentType.FILE
+    ].includes(this.component.type);
+  }
+
+  canHaveMultipleValue(): boolean {
+    return [
+      ComponentType.INPUT,
+      ComponentType.PROCESSO_SEI,
+      ComponentType.NUMERO_ETP,
+      ComponentType.TEXTAREA,
+      ComponentType.RICH_TEXT,
+      ComponentType.NUMBER
     ].includes(this.component.type);
   }
 

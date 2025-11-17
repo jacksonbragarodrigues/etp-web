@@ -48,6 +48,73 @@
         [readonly]="component.properties.readonly && previewMode">
     </ng-template>
 
+    <!-- Multiple Value Interface -->
+    <div *ngIf="component.properties.multipleValue && previewMode" class="multiple-value-container mt-3">
+      <!-- Values List with editable components -->
+      <div class="multiple-values-list">
+        <!-- Each value rendered as editable component -->
+        <div *ngFor="let item of multiValueList; let i = index; trackBy: trackByMultipleValueIndex"
+          [class]="component.properties.prefix ? 'multi-value-row d-flex gap-2 mb-2 align-items-start input-group' : 'multi-value-row d-flex gap-2 mb-2 align-items-start'">
+
+          <!-- Prefix with number for all multi-value components -->
+          <span *ngIf="component.properties.prefix" class="input-group-text">
+            {{ component.properties.prefix }} {{ i + 1 }}
+          </span>
+
+          <!-- Input component -->
+          <input *ngIf="isInputType()" type="text" class="form-control form-control-sm flex-grow-1"
+            [ngModel]="multiValueList[i]"
+            (input)="onMultipleValueInputChange($event, i)"
+            [disabled]="(component.properties.disabled ?? false)">
+
+          <!-- Textarea component -->
+          <textarea *ngIf="isTextareaType()" class="form-control form-control-sm flex-grow-1"
+            [ngModel]="multiValueList[i]"
+            (input)="onMultipleValueInputChange($event, i)"
+            [disabled]="(component.properties.disabled ?? false)"
+            rows="3"></textarea>
+
+          <!-- Number component -->
+          <input *ngIf="component.type === ComponentType.NUMBER" type="number" class="form-control form-control-sm flex-grow-1"
+            [ngModel]="multiValueList[i]"
+            (input)="onMultipleValueInputChange($event, i)"
+            [disabled]="(component.properties.disabled ?? false)">
+
+          <!-- Rich Text component -->
+          <div *ngIf="isRichTextType()" class="rich-text-editor-wrapper flex-grow-1"
+            [style.--ck-editor-height]="'120px'">
+            <app-custom-ckeditor [config]="getCKEditorConfig()" [ngModel]="multiValueList[i]"
+              (change)="onMultipleValueRichTextChange($event, i)"
+              [disabled]="(component.properties.disabled ?? false)"
+              [editorId]="getCKEditorUniqueId() + '_multi_' + i">
+            </app-custom-ckeditor>
+          </div>
+
+          <!-- Remove button -->
+          <button class="btn btn-sm btn-outline-danger remove-btn flex-shrink-0" type="button"
+            (click)="removeMultipleValueByIndex(i)"
+            [disabled]="(component.properties.disabled ?? false)"
+            title="Remover">
+            <i class="bi bi-trash-fill"></i>
+          </button>
+        </div>
+
+        <!-- Empty state message -->
+        <div *ngIf="multiValueList.length === 0" class="text-muted text-center py-3">
+          <small>Clique em "Adicionar" para criar um novo campo</small>
+        </div>
+      </div>
+
+      <!-- Add Button -->
+      <div class="multiple-value-controls mt-3">
+        <button class="btn btn-outline-primary btn-sm w-100" type="button"
+          (click)="addMultipleValue()"
+          [disabled]="(component.properties.disabled ?? false)">
+          <i class="bi bi-plus-lg"></i> Adicionar
+        </button>
+      </div>
+    </div>
+
     <!-- Validation feedback -->
     <div class="invalid-feedback" *ngIf="previewMode">
       Please provide a valid {{ component.label ? component.label.toLowerCase() : 'value' }}.
@@ -113,6 +180,49 @@
       </textarea>
     </ng-template>
 
+    <!-- Multiple Value Interface for Textarea -->
+    <div *ngIf="component.properties.multipleValue && previewMode" class="multiple-value-container mt-3">
+      <!-- Values List with editable components -->
+      <div class="multiple-values-list">
+        <!-- Each value rendered as editable component -->
+        <div *ngFor="let item of multiValueList; let i = index; trackBy: trackByMultipleValueIndex"
+          [class]="component.properties.prefix ? 'multi-value-row d-flex gap-2 mb-2 align-items-start input-group' : 'multi-value-row d-flex gap-2 mb-2 align-items-start'">
+          <!-- Prefix for multi-value Textarea -->
+          <span *ngIf="component.properties.prefix" class="input-group-text">
+            {{ component.properties.prefix }} {{ i + 1 }}
+          </span>
+          <!-- Textarea component -->
+          <textarea [class]="component.properties.prefix ? 'form-control form-control-sm flex-grow-1' : 'form-control form-control-sm flex-grow-1'"
+            [ngModel]="multiValueList[i]"
+            (input)="onMultipleValueInputChange($event, i)"
+            [disabled]="(component.properties.disabled ?? false)"
+            rows="3"></textarea>
+
+          <!-- Remove button -->
+          <button class="btn btn-sm btn-outline-danger remove-btn flex-shrink-0" type="button"
+            (click)="removeMultipleValueByIndex(i)"
+            [disabled]="(component.properties.disabled ?? false)"
+            title="Remover">
+            <i class="bi bi-trash-fill"></i>
+          </button>
+        </div>
+
+        <!-- Empty state message -->
+        <div *ngIf="multiValueList.length === 0" class="text-muted text-center py-3">
+          <small>Clique em "Adicionar" para criar um novo campo</small>
+        </div>
+      </div>
+
+      <!-- Add Button -->
+      <div class="multiple-value-controls mt-3">
+        <button class="btn btn-outline-primary btn-sm w-100" type="button"
+          (click)="addMultipleValue()"
+          [disabled]="(component.properties.disabled ?? false)">
+          <i class="bi bi-plus-lg"></i> Adicionar
+        </button>
+      </div>
+    </div>
+
     <!-- Character count -->
     <div class="form-text" *ngIf="component.properties.maxLength && previewMode">
       {{ value?.length || 0 }} / {{ component.properties.maxLength }} characters
@@ -153,14 +263,69 @@
       </div>
     </div>
 
-    <!-- Custom CKEditor Rich Text Editor -->
-    <div class="rich-text-editor-wrapper"
+    <!-- Custom CKEditor Rich Text Editor or Multiple Value Interface -->
+    <div *ngIf="!component.properties.multipleValue || !previewMode; else emptyTemplate"
+      [class]="component.properties.prefix ? 'input-group' : 'rich-text-editor-wrapper'"
       [style.--ck-editor-height]="(component.properties.ckEditorConfig?.height || 200) + 'px'">
-      <app-custom-ckeditor [config]="getCKEditorConfig()" [(ngModel)]="value" (change)="onCKEditorValueChange($event)"
-        [disabled]="!!component.properties.disabled" [readonly]="!!component.properties.readonly"
-        [placeholder]="component.placeholder || 'Digite seu conteúdo aqui...'" [editorId]="getCKEditorUniqueId()"
-        (ready)="onCKEditorReady($event)">
-      </app-custom-ckeditor>
+      <!-- Prefix for RichText Editor -->
+      <span *ngIf="component.properties.prefix" class="input-group-text">
+        {{ component.properties.prefix }}
+      </span>
+      <!-- CKEditor wrapper for prefix layout -->
+      <div [class]="component.properties.prefix ? 'flex-grow-1 rich-text-editor-wrapper' : ''">
+        <app-custom-ckeditor [config]="getCKEditorConfig()" [(ngModel)]="value" (change)="onCKEditorValueChange($event)"
+          [disabled]="!!component.properties.disabled" [readonly]="!!component.properties.readonly"
+          [placeholder]="component.placeholder || 'Digite seu conteúdo aqui...'" [editorId]="getCKEditorUniqueId()"
+          (ready)="onCKEditorReady($event)">
+        </app-custom-ckeditor>
+      </div>
+    </div>
+    <ng-template #emptyTemplate></ng-template>
+
+    <!-- Multiple Value Interface for RichText -->
+    <div *ngIf="component.properties.multipleValue && previewMode" class="multiple-value-container mt-3">
+      <!-- Values List with editable components -->
+      <div class="multiple-values-list">
+        <!-- Each value rendered as editable component -->
+        <div *ngFor="let item of multiValueList; let i = index; trackBy: trackByMultipleValueIndex"
+          [class]="component.properties.prefix ? 'multi-value-row d-flex gap-2 mb-2 align-items-start input-group' : 'multi-value-row d-flex gap-2 mb-2 align-items-start'">
+          <!-- Prefix for multi-value RichText Editor -->
+          <span *ngIf="component.properties.prefix" class="input-group-text">
+            {{ component.properties.prefix }} {{ i + 1 }}
+          </span>
+          <!-- Rich Text component -->
+          <div [class]="component.properties.prefix ? 'flex-grow-1 rich-text-editor-wrapper' : 'rich-text-editor-wrapper flex-grow-1'"
+            [style.--ck-editor-height]="'120px'">
+            <app-custom-ckeditor [config]="getCKEditorConfig()" [ngModel]="multiValueList[i]"
+              (change)="onMultipleValueRichTextChange($event, i)"
+              [disabled]="(component.properties.disabled ?? false)"
+              [editorId]="getCKEditorUniqueId() + '_multi_' + i">
+            </app-custom-ckeditor>
+          </div>
+
+          <!-- Remove button -->
+          <button class="btn btn-sm btn-outline-danger remove-btn flex-shrink-0 mt-1" type="button"
+            (click)="removeMultipleValueByIndex(i)"
+            [disabled]="(component.properties.disabled ?? false)"
+            title="Remover">
+            <i class="bi bi-trash-fill"></i>
+          </button>
+        </div>
+
+        <!-- Empty state message -->
+        <div *ngIf="multiValueList.length === 0" class="text-muted text-center py-3">
+          <small>Clique em "Adicionar" para criar um novo campo</small>
+        </div>
+      </div>
+
+      <!-- Add Button -->
+      <div class="multiple-value-controls mt-3">
+        <button class="btn btn-outline-primary btn-sm w-100" type="button"
+          (click)="addMultipleValue()"
+          [disabled]="(component.properties.disabled ?? false)">
+          <i class="bi bi-plus-lg"></i> Adicionar
+        </button>
+      </div>
     </div>
 
     <!-- Help text -->

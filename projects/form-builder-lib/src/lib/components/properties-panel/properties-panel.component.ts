@@ -121,6 +121,9 @@ export class PropertiesPanelComponent implements OnInit, OnDestroy, AfterViewIni
   // Confidentiality property
   allowsConfidentiality: boolean = false;
 
+  // Multiple Value property
+  multipleValue: boolean = false;
+
   // API Select specific properties
   apiUrl: string = '';
   apiMethod: 'GET' | 'POST' | 'PUT' | 'DELETE' = 'GET';
@@ -297,6 +300,9 @@ export class PropertiesPanelComponent implements OnInit, OnDestroy, AfterViewIni
     // Confidentiality property
     this.allowsConfidentiality = component.properties.allowsConfidentiality || false;
 
+    // Multiple Value property
+    this.multipleValue = component.properties.multipleValue || false;
+
     // Text Help properties
     this.helpText = component.properties.help || '';
     this.onlyInternal = component.properties.onlyInternal || false;
@@ -354,6 +360,7 @@ export class PropertiesPanelComponent implements OnInit, OnDestroy, AfterViewIni
     this.apiCache = true;
     this.apiCacheTimeout = 30;
     this.allowsConfidentiality = false;
+    this.multipleValue = false;
 
     // Reset step properties
     this.resetStepForm();
@@ -459,6 +466,9 @@ export class PropertiesPanelComponent implements OnInit, OnDestroy, AfterViewIni
       case 'properties.allowsConfidentiality':
         updates.properties = { ...this.state.selectedComponent.properties, allowsConfidentiality: value };
         break;
+      case 'properties.multipleValue':
+        updates.properties = { ...this.state.selectedComponent.properties, multipleValue: value };
+        break;
       case 'properties.help':
         updates.properties = { ...this.state.selectedComponent.properties, help: value };
         break;
@@ -537,6 +547,10 @@ export class PropertiesPanelComponent implements OnInit, OnDestroy, AfterViewIni
 
   onMultipleChange(): void {
     this.updateProperty('properties.multiple', this.multipleSelection);
+  }
+
+  onMultipleValueChange(): void {
+    this.updateProperty('properties.multipleValue', this.multipleValue);
   }
 
   onStepChange(): void {
@@ -931,11 +945,15 @@ export class PropertiesPanelComponent implements OnInit, OnDestroy, AfterViewIni
   }
 
   canHavePrefix(): boolean {
-    return this.isInputType() || this.isTextareaType() || this.isNumberType();
+    return this.isInputType() || this.isTextareaType() || this.isNumberType() || this.isRichTextType();
   }
 
   canHaveMask(): boolean {
     return this.isInputType() || this.isNumberType();
+  }
+
+  canHaveMultipleValue(): boolean {
+    return this.isInputType() || this.isTextareaType() || this.isRichTextType() || this.isNumberType();
   }
 
   canHaveLayoutHorizontal(): boolean {

@@ -39,6 +39,7 @@ export interface ComponentProperties {
   prefix?: string;
   mask?: string;
   layoutHorizontal?: boolean;
+  multipleValue?: boolean;
   conditional?: ConditionalLogic;
   collapsible?: boolean;
   initCollapsed?: boolean;
