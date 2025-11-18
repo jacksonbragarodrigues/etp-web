@@ -1,6 +1,6 @@
-import { Component, OnInit, OnDestroy, AfterViewInit, ViewChild, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ChangeDetectorRef, Component, OnInit, OnDestroy, ViewChild, AfterViewInit } from '@angular/core';
 import { Subject, takeUntil } from 'rxjs';
 import { FormBuilderService } from '../../services/form-builder.service';
 import { FormComponent, FormBuilderState, ComponentType, SelectOption, ValidationRule, ValidationType } from '../../models/form-builder.models';
@@ -52,7 +52,13 @@ export class PropertiesPanelComponent implements OnInit, OnDestroy, AfterViewIni
     search: true,
     height: '300px',
     placeholder: 'Selecione uma opção',
-    customComparator: () => 0,
+    customComparator: (item1: any, item2: any) => {
+      // Extract comparable values from both items
+      const val1 = typeof item1 === 'object' && item1 !== null ? (item1.id || item1.value || '') : (item1 || '');
+      const val2 = typeof item2 === 'object' && item2 !== null ? (item2.id || item2.value || '') : (item2 || '');
+      // Return 0 if equal, otherwise -1 (not equal)
+      return String(val1).trim() === String(val2).trim() ? 0 : -1;
+    },
     limitTo: 0,
     moreText: 'mais',
     noResultsFound: 'Nenhum resultado!',
@@ -88,7 +94,7 @@ export class PropertiesPanelComponent implements OnInit, OnDestroy, AfterViewIni
   // Conditional logic properties
   conditionalShow: string = 'true';
   conditionalWhen: ConditionalWhenValue = [];
-  conditionalEq: string = '';
+  conditionalEq: string | any = ''; // Can be string (value) or object (option from dropdown) for display
   availableComponentKeys: string[] = [];
   availableComponentKeysValues: { id: string, key: string, name: string }[] = [];
   conditionalWhenComponentOptions: SelectOption[] = []; // Options from the selected when component
@@ -148,7 +154,7 @@ export class PropertiesPanelComponent implements OnInit, OnDestroy, AfterViewIni
   stepInvisible: boolean = false;
   stepConditionalShow: string = 'true';
   stepConditionalWhen: ConditionalWhenValue = [];
-  stepConditionalEq: string = '';
+  stepConditionalEq: string | any = ''; // Can be string (value) or object (option from dropdown) for display
   stepConditionalWhenComponentOptions: SelectOption[] = []; // Options from the selected when component for steps
 
   private destroy$ = new Subject<void>();
@@ -232,6 +238,7 @@ export class PropertiesPanelComponent implements OnInit, OnDestroy, AfterViewIni
     this.conditionalShow = component.properties.conditional?.show || 'true';
     // Convert stored ID arrays back to dropdown object format
     const whenVal = component.properties.conditional?.when;
+
     if (Array.isArray(whenVal)) {
       // Convert ID strings to objects that ngx-select-dropdown expects
       this.conditionalWhen = whenVal.map(id => {
@@ -245,8 +252,10 @@ export class PropertiesPanelComponent implements OnInit, OnDestroy, AfterViewIni
     } else {
       this.conditionalWhen = [];
     }
+
     // Normalize conditionalEq - handle both string and object formats
     let eqValue = component.properties.conditional?.eq || '';
+
     if (typeof eqValue === 'object' && eqValue !== null) {
       // Handle cases where eq was saved as an object (from previous versions)
       eqValue = (eqValue as any).id || (eqValue as any).value || '';
@@ -600,10 +609,8 @@ export class PropertiesPanelComponent implements OnInit, OnDestroy, AfterViewIni
   }
 
   onConditionalEqChange(): void {
-    // Normalize conditionalEq immediately if it's an object from dropdown selection
-    if (typeof this.conditionalEq === 'object' && this.conditionalEq !== null) {
-      this.conditionalEq = ((this.conditionalEq as any).id || (this.conditionalEq as any).value || '').toString().trim();
-    }
+    // When user selects from dropdown, conditionalEq will be an object with id/name
+    // We keep it as object for display, but updateConditionalLogic will extract the id when saving
     this.updateConditionalLogic();
   }
 
@@ -1032,10 +1039,8 @@ export class PropertiesPanelComponent implements OnInit, OnDestroy, AfterViewIni
   }
 
   onStepConditionalEqChange(): void {
-    // Normalize stepConditionalEq immediately if it's an object from dropdown selection
-    if (typeof this.stepConditionalEq === 'object' && this.stepConditionalEq !== null) {
-      this.stepConditionalEq = ((this.stepConditionalEq as any).id || (this.stepConditionalEq as any).value || '').toString().trim();
-    }
+    // When user selects from dropdown, stepConditionalEq will be an object with id/name
+    // We keep it as object for display, but updateStepConditionalLogic will extract the id when saving
     this.updateStepConditionalLogic();
   }
 
@@ -1178,7 +1183,35 @@ export class PropertiesPanelComponent implements OnInit, OnDestroy, AfterViewIni
       } else if (component.properties.options && component.properties.options.length > 0) {
         // For regular select components, use the stored options and normalize them
         this.conditionalWhenComponentOptions = this.normalizeOptionsForDisplay(component.properties.options);
+        // After loading options, sync the conditionalEq value to match the options
+        // Use Promise.resolve to ensure options are rendered before syncing
+        Promise.resolve().then(() => {
+          this.syncConditionalEqWithOptions();
+          this.cdr.markForCheck();
+        });
       }
+    }
+  }
+
+  // Helper method to sync conditionalEq with the loaded options
+  private syncConditionalEqWithOptions(): void {
+    if (!this.conditionalEq || !this.conditionalWhenComponentOptions || this.conditionalWhenComponentOptions.length === 0) {
+      return;
+    }
+
+    // Try to find the option that matches the current conditionalEq value
+    const eqValueString = String(this.conditionalEq || '').trim();
+
+    const matchingOption = this.conditionalWhenComponentOptions.find((option: any) => {
+      const optionId = String(option.id || option.value || '').trim();
+      return optionId === eqValueString;
+    });
+
+    // If we found a matching option, convert conditionalEq to the option object so the dropdown displays the label
+    if (matchingOption) {
+      // Update conditionalEq to be the option object so ngx-select-dropdown shows the label
+      this.conditionalEq = matchingOption;
+      this.cdr.markForCheck();
     }
   }
 
@@ -1232,6 +1265,8 @@ export class PropertiesPanelComponent implements OnInit, OnDestroy, AfterViewIni
       next: (options) => {
         // Transform SelectOption to format expected by ngx-select-dropdown
         this.conditionalWhenComponentOptions = this.normalizeOptionsForDisplay(options);
+        // After loading API options, sync the conditionalEq value to match the options
+        this.syncConditionalEqWithOptions();
         this.cdr.markForCheck();
       },
       error: (error) => {
@@ -1330,7 +1365,35 @@ export class PropertiesPanelComponent implements OnInit, OnDestroy, AfterViewIni
       } else if (component.properties.options && component.properties.options.length > 0) {
         // For regular select components, use the stored options and normalize them
         this.stepConditionalWhenComponentOptions = this.normalizeOptionsForDisplay(component.properties.options);
+        // After loading options, sync the stepConditionalEq value to match the options
+        // Use Promise.resolve to ensure options are rendered before syncing
+        Promise.resolve().then(() => {
+          this.syncStepConditionalEqWithOptions();
+          this.cdr.markForCheck();
+        });
       }
+    }
+  }
+
+  // Helper method to sync stepConditionalEq with the loaded options
+  private syncStepConditionalEqWithOptions(): void {
+    if (!this.stepConditionalEq || !this.stepConditionalWhenComponentOptions || this.stepConditionalWhenComponentOptions.length === 0) {
+      return;
+    }
+
+    // Try to find the option that matches the current stepConditionalEq value
+    const eqValueString = String(this.stepConditionalEq || '').trim();
+
+    const matchingOption = this.stepConditionalWhenComponentOptions.find((option: any) => {
+      const optionId = String(option.id || option.value || '').trim();
+      return optionId === eqValueString;
+    });
+
+    // If we found a matching option, convert stepConditionalEq to the option object so the dropdown displays the label
+    if (matchingOption) {
+      // Update stepConditionalEq to be the option object so ngx-select-dropdown shows the label
+      this.stepConditionalEq = matchingOption;
+      this.cdr.markForCheck();
     }
   }
 
@@ -1355,6 +1418,8 @@ export class PropertiesPanelComponent implements OnInit, OnDestroy, AfterViewIni
       next: (options) => {
         // Transform SelectOption to format expected by ngx-select-dropdown
         this.stepConditionalWhenComponentOptions = this.normalizeOptionsForDisplay(options);
+        // After loading API options, sync the stepConditionalEq value to match the options
+        this.syncStepConditionalEqWithOptions();
         this.cdr.markForCheck();
       },
       error: (error) => {
@@ -1393,5 +1458,6 @@ export class PropertiesPanelComponent implements OnInit, OnDestroy, AfterViewIni
   getTitle(label: string, type: string) {
     return label + " (" + type + ")";
   }
+
 
 }

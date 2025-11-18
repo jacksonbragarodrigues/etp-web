@@ -1163,13 +1163,45 @@ export class FormBuilderService {
     }
     if (validations.length) base.validation = validations;
 
-    // Lógica condicional
+    // Lógica condicional - Suporta dois formatos Form.io:
+    // 1. Formato simples: component.conditional { when, eq, show }
+    // 2. Formato logic: component.logic[].trigger.simple { when, eq, show }
+    // IMPORTANTE: O "when" do Form.io é a KEY, precisa converter para ID para ser compatível com o properties-panel
+
+    let conditionalData: any = null;
+    let whenKey: string | null = null;
+    let eqValue: string | null = null;
+    let showValue: string = 'true';
+
+    // Tentar primeiro o formato simples (conditional)
     if (src.conditional && (src.conditional.when || src.conditional.show !== undefined)) {
-      base.properties.conditional = {
-        show: String(!!src.conditional.show) as 'true' | 'false',
-        when: src.conditional.when || '',
-        eq: src.conditional.eq != null ? String(src.conditional.eq) : ''
-      } as any;
+      whenKey = src.conditional.when || null;
+      eqValue = src.conditional.eq != null ? String(src.conditional.eq) : null;
+      showValue = String(!!src.conditional.show) as 'true' | 'false';
+      console.log(`[Import] Conditional simples encontrado para ${src.key}: when=${whenKey}, eq=${eqValue}`);
+    }
+    // Se não encontrar conditional, tentar logic array
+    else if (Array.isArray(src.logic) && src.logic.length > 0) {
+      const firstLogic = src.logic[0];
+      if (firstLogic.trigger && firstLogic.trigger.type === 'simple' && firstLogic.trigger.simple) {
+        const simple = firstLogic.trigger.simple;
+        whenKey = simple.when || null;
+        eqValue = simple.eq != null ? String(simple.eq) : null;
+        showValue = String(!!simple.show) as 'true' | 'false';
+        console.log(`[Import] Logic simples encontrado para ${src.key}: when=${whenKey}, eq=${eqValue}`);
+      }
+    }
+
+    // Se encontrou um conditional, precisa converter o whenKey (que é a KEY do componente) para ID
+    if (whenKey) {
+      // NOTA: Neste ponto do import, nem todos os componentes podem ter sido criados ainda
+      // Portanto, salvamos temporariamente a KEY, e será convertida para ID durante normalizeImportedSchema
+      conditionalData = {
+        show: showValue as 'true' | 'false',
+        when: whenKey,  // Salva a KEY temporariamente
+        eq: eqValue || ''
+      };
+      base.properties.conditional = conditionalData as any;
     }
        // Máscara
     if (src.inputMask || src.displayMask) {
@@ -1403,11 +1435,39 @@ export class FormBuilderService {
       // Sincronizar valores com opções selecionadas para select e radio
       this.syncComponentValueWithOptions(component);
 
+      // Converter KEYs para IDs nos condicionais (importante para import do Form.io)
+      this.normalizeConditionalLogic(component);
+
       // Processar componentes filhos recursivamente
       if (component.children) {
         this.normalizeComponents(component.children);
       }
     });
+  }
+
+  // Converte as KEYs para IDs nos condicionais após o import
+  // Isso é necessário porque o Form.io armazena "when" como KEY, mas o properties-panel espera ID
+  private normalizeConditionalLogic(component: FormComponent): void {
+    if (!component.properties?.conditional) {
+      return;
+    }
+
+    const conditional = component.properties.conditional;
+
+    // Se "when" estiver preenchido e parecer ser uma KEY (não um ID como comp_123)
+    if (conditional.when && typeof conditional.when === 'string') {
+      // Tentar encontrar o componente pela KEY
+      const whenComponent = this.getComponentByKey(conditional.when);
+
+      if (whenComponent) {
+        // Encontrou o componente pela KEY, converter para ID
+        conditional.when = whenComponent.id;
+        console.log(`[Normalize] Convertendo when: ${whenComponent.key} -> ${whenComponent.id}`);
+      } else {
+        // Se não encontrar pela KEY, assume que já é um ID
+        console.log(`[Normalize] Não encontrou componente com key '${conditional.when}', mantendo como está`);
+      }
+    }
   }
 
   // Método para sincronizar valor do componente com opções selecionadas
